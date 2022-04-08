@@ -183,7 +183,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, matplotlib, seaborn, and, squarify
     
-    ver = '0.1.7'
+    ver = '0.1.8'
 
     release date
     09/04/2022
@@ -286,7 +286,7 @@ def grplot(plot, # default general value
                 y=None,
                 fig=fig, 
                 ax=ax, 
-                axes='[0]',
+                axes='[{}]'.format(i+1),
                 xaxislabel=ax.get_xlabel(), 
                 yaxislabel=ax.get_ylabel(), 
                 hue=hue,
@@ -336,7 +336,7 @@ def grplot(plot, # default general value
                 y=y,
                 fig=fig, 
                 ax=ax, 
-                axes='[0]', 
+                axes='[{}]'.format(i+1), 
                 xaxislabel=ax.get_xlabel(), 
                 yaxislabel=ax.get_ylabel(), 
                 hue=hue,
@@ -386,7 +386,7 @@ def grplot(plot, # default general value
                 y=y,
                 fig=fig, 
                 ax=ax,
-                axes='[0]', 
+                axes='[{}]'.format(i+1), 
                 xaxislabel=ax.get_xlabel(), 
                 yaxislabel=ax.get_ylabel(), 
                 hue=hue,
