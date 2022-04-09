@@ -1,7 +1,7 @@
 import numpy
 import seaborn as sns
-import squarify as sfy
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
+from grplot.features.plot.treemaps import plot as tms
 
 
 def plot_single_def(plot,
@@ -596,16 +596,17 @@ def plot_single_def(plot,
         else:
             pass
         # plot
-        sfy.plot(sizes=count, 
-                 norm_x=norm_x, 
-                 norm_y=norm_y, 
-                 color=color, 
-                 label=label, 
-                 value=value, 
-                 ax=ax, 
-                 pad=treemaps_pad, 
-                 bar_kwargs=bar_kwargs, 
-                 text_kwargs=text_kwargs)
+        tms(sizes=count, 
+            norm_x=norm_x, 
+            norm_y=norm_y, 
+            color=color, 
+            label=label, 
+            value=value, 
+            ax=ax, 
+            pad=treemaps_pad, 
+            bar_kwargs=bar_kwargs, 
+            text_kwargs=text_kwargs)
+        ax.axis('off')
     # categorical plot family
     elif plot == 'stripplot':
         if x is not None or y is not None:

@@ -183,7 +183,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.1.10'
+    ver = '0.1.11'
 
     release date
     09/04/2022
@@ -211,7 +211,7 @@ def grplot(plot, # default general value
     label_fontsize: font size for label <- axes arguments with numeric return data type
     title_fontsize: font size for axes title <- axes arguments with numeric return data type
     
-    sep: separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
+    sep: separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] and axes arguments for plot in ['pieplot', 'treemapsplot']
     xsep: x-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
     ysep: y-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
     log: scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
@@ -229,9 +229,9 @@ def grplot(plot, # default general value
     statdesc: statistical description <- axislabel-axes arguments with string return data type with base stat in ['general', 'boxplot', ...] can be passed by ['stat', 'stat1+stat2']
     xstatdesc: x-axis statistical description <- axislabel-axes arguments with string return data type
     ystatdesc: y-axis statistical description <- axislabel-axes arguments with string return data type
-    text: text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2']
-    xtext: x-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2']
-    ytext: y-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2']
+    text: text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] for plot in ['histplot', 'barplot', 'countplot', 'paretoplot'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot'] and axes arguments with boolean return data type for plot in ['pieplot', 'treemapsplot']
+    xtext: x-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
+    ytext: y-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
     label_add: add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}'] 
     xlabel_add: x-axis add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}']
     ylabel_add: y-axis add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}']
@@ -252,7 +252,7 @@ def grplot(plot, # default general value
     arg = {return:'[i,j]'}
     arg = {return:['[i,j]']}  
 
-    note: axes argument starts from 1  
+    note: axes argument starts from 1 (*different from matplotlib which starts from 0)
     '''
     
     # initialization

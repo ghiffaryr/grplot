@@ -1,4 +1,4 @@
-<img src="grplot/doc/logo/grlogo_white.svg"><br>
+<img src="doc/logo/grlogo_white.svg"><br>
 
 --------------------------------------
 
@@ -23,7 +23,7 @@ Dependencies
 
 grplot supports Python 3.6+.
 
-Installation requires [numpy](https://numpy.org), [scipy](https://www.scipy.org), [matplotlib](https://matplotlib.org), [seaborn](https://seaborn.pydata.org), [squarify](https://github.com/laserson/squarify), and [pandas](https://pandas.pydata.org). Some functions will optionally use [statsmodels](https://www.statsmodels.org) if it is installed.
+Installation requires [numpy](https://numpy.org), [scipy](https://www.scipy.org), [matplotlib](https://matplotlib.org), [seaborn](https://seaborn.pydata.org), and [pandas](https://pandas.pydata.org). Some functions will optionally use [statsmodels](https://www.statsmodels.org) if it is installed.
 
 
 Installation
