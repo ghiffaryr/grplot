@@ -1,6 +1,7 @@
 import numpy
 import seaborn as sns
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
+from grplot.features.plot.packedbubbles import plot as pb
 from grplot.features.plot.treemaps import plot as tms
 
 
@@ -136,7 +137,8 @@ def plot_single_def(plot,
                     norm_y, 
                     treemaps_pad, 
                     bar_kwargs, 
-                    text_kwargs): #disini default kalau nilai khusus plotnya none diganti default seaborn per plot
+                    text_kwargs,
+                    bubble_spacing): #disini default kalau nilai khusus plotnya none diganti default seaborn per plot
     # relational plot family
     if plot == 'scatterplot':
         if x is not None or y is not None:
@@ -606,7 +608,31 @@ def plot_single_def(plot,
             pad=treemaps_pad, 
             bar_kwargs=bar_kwargs, 
             text_kwargs=text_kwargs)
-        ax.axis('off')
+    elif plot == 'packedbubblesplot':
+        if x is not None and y is None:
+            label, count = numpy.unique(data[x], return_counts=True)
+        elif x is None and y is not None:
+            label, count = numpy.unique(data[y], return_counts=True)
+        elif x is not None and y is not None:
+            raise Exception('Ambiguous axis label!')
+        else:
+            raise Exception('Define axis label!')
+        # default value
+        if bubble_spacing is None:
+            bubble_spacing = 0.1
+        else:
+            pass
+        if text == True:
+            value = count
+        else:
+            value = None
+        # plot
+        pb(area=count,
+           bubble_spacing=bubble_spacing,
+           color=color,
+           label=label,
+           value=value,
+           ax=ax)
     # categorical plot family
     elif plot == 'stripplot':
         if x is not None or y is not None:
@@ -1046,6 +1072,7 @@ def plot_single_def(plot,
                 data_cum_percentage = numpy.cumsum(data_pareto_y)/numpy.sum(data_pareto_y)*100
                 ax2 = ax.twinx()
                 ax2.plot(data_pareto_x, data_cum_percentage, color=color2, marker=marker, markersize=markersize)
+                ax2.grid(False)
                 ax2.set_ylabel('Cumulative Percentage')
                 ax.get_shared_x_axes().get_siblings(ax)[0].set_yticks(ax.get_shared_x_axes().get_siblings(ax)[0].get_yticks())
                 ax.get_shared_x_axes().get_siblings(ax)[0].set_yticklabels(['{:1.0f}%'.format(y) for y in ax.get_shared_x_axes().get_siblings(ax)[0].get_yticks()])
@@ -1119,6 +1146,7 @@ def plot_single_def(plot,
                 data_cum_percentage = numpy.cumsum(data_pareto_x)/numpy.sum(data_pareto_x)*100
                 ax2 = ax.twiny()
                 ax2.plot(data_cum_percentage, data_pareto_y, color=color2, marker=marker, markersize=markersize)
+                ax2.grid(False)
                 ax2.set_xlabel('Cumulative Percentage')
                 ax.get_shared_y_axes().get_siblings(ax)[0].set_xticks(ax.get_shared_y_axes().get_siblings(ax)[0].get_xticks())
                 ax.get_shared_y_axes().get_siblings(ax)[0].set_xticklabels(['{:1.0f}%'.format(x) for x in ax.get_shared_y_axes().get_siblings(ax)[0].get_xticks()])

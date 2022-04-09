@@ -134,7 +134,8 @@ def plot_multi_def(plot,
                    norm_y, 
                    treemaps_pad, 
                    bar_kwargs, 
-                   text_kwargs):
+                   text_kwargs,
+                   bubble_spacing):
     alpha_ = alpha
     # plotting
     if type(plot) == str:
@@ -322,7 +323,8 @@ def plot_multi_def(plot,
                             norm_y=norm_y, 
                             treemaps_pad=treemaps_pad, 
                             bar_kwargs=bar_kwargs, 
-                            text_kwargs=text_kwargs)
+                            text_kwargs=text_kwargs,
+                            bubble_spacing=bubble_spacing)
     else:
         raise Exception('Wrong plot argument!')
     return ax

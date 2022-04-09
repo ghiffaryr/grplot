@@ -260,5 +260,6 @@ def plot(
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)
+    ax.axis('off')
 
     return ax

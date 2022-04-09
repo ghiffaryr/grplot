@@ -339,7 +339,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     pass
         else:
             pass
-        if ('treemapsplot' in plot) and (text == True):
+        if (('treemapsplot' in plot) or ('packedbubblesplot' in plot)) and (text == True):
             for child in ax.get_children():
                 if isinstance(child, matplotlib.text.Text) and (child.get_text().isdigit() == True):
                     num = int(child.get_text())

@@ -5,7 +5,7 @@ from grplot.utils.arg_axis_ax_type import arg_axis_ax_type
 
 def text_type(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
     plot = arg_ax_type(arg=plot, axes=axes)
-    if ('treemapsplot' in plot) or ('pieplot' in plot):
+    if ('pieplot' in plot) or ('treemapsplot' in plot) or ('packedbubblesplot' in plot):
         text = arg_ax_type(arg=text, axes=axes)
     else:
         text = arg_axis_ax_type(arg=text, axislabel=axislabel, axes=axes)
