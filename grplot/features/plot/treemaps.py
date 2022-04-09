@@ -211,6 +211,7 @@ def plot(
     """
 
     import matplotlib.pyplot as plt
+    from math import ceil
 
     if ax is None:
         ax = plt.gca()
@@ -218,7 +219,7 @@ def plot(
     if color is None:
         color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         if len(sizes) > len(color_cycle):
-            color_cycle = color_cycle * round(len(color_cycle)/len(sizes))
+            color_cycle = color_cycle * ceil(len(color_cycle)/len(sizes))
         color = color_cycle[:len(sizes)]
 
     if bar_kwargs is None:
