@@ -45,6 +45,14 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=std, color=None, stat_label='std', stat_fmt=std_add)
+            elif 'var' in stat:
+                try:
+                    var = numpy.var(data)
+                    var_sep = statdesc_var_type(num=var, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    var_add = statdesc_add_type(num=var_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=var, color=None, stat_label='var', stat_fmt=var_add)
             elif 'min' in stat:
                 try:
                     mini = numpy.min(data)
@@ -53,6 +61,14 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=mini, color='red', stat_label='min', stat_fmt=mini_add)
+            elif 'pct1' in stat:
+                try:
+                    pct1 = numpy.percentile(data, 1)
+                    pct1_sep = statdesc_sep_type(num=pct1, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    pct1_add = statdesc_add_type(num=pct1_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=pct1, color='orange', stat_label='1st pct', stat_fmt=pct1_add)
             elif 'whislo' in stat:
                 try:
                     whislo = cbook.boxplot_stats(data)[0]['whislo']
@@ -133,6 +149,14 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=whishi, color='orange', stat_label='upper whisker', stat_fmt=whishi_add)
+            elif 'pct99' in stat:
+                try:
+                    pct99 = numpy.percentile(data, 99)
+                    pct99_sep = statdesc_sep_type(num=pct99, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    pct99_add = statdesc_add_type(num=pct99_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=pct99, color='orange', stat_label='99th pct', stat_fmt=pct99_add)
             elif 'max' in stat:
                 try:
                     maxi = numpy.max(data)
