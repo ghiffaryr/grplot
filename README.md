@@ -17,12 +17,13 @@ Documentation can be accesed through python:
 
 Online documentation is available at [grplot repository](https://github.com/ghiffaryr/grplot).
 
+
 Dependencies
 ------------
 
-grplot supports Python 3.7+.
+grplot supports Python 3.6+.
 
-Installation requires [numpy](https://numpy.org), [matplotlib](https://matplotlib.org), [seaborn](https://seaborn.pydata.org), [squarify](https://github.com/laserson/squarify), and [pandas](https://pandas.pydata.org). Some functions will optionally use [scipy](https://www.scipy.org/) and/or [statsmodels](https://www.statsmodels.org/) if they are available.
+Installation requires [numpy](https://numpy.org), [scipy](https://www.scipy.org), [matplotlib](https://matplotlib.org), [seaborn](https://seaborn.pydata.org), [squarify](https://github.com/laserson/squarify), and [pandas](https://pandas.pydata.org). Some functions will optionally use [statsmodels](https://www.statsmodels.org) if it is installed.
 
 
 Installation
@@ -32,9 +33,6 @@ The latest stable release (and required dependencies) can be installed from PyPI
 
     pip install grplot
 
-It is also possible to include optional dependencies:
-
-    pip install grplot[all]
 
 Development
 -----------

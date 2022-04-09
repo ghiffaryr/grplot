@@ -1,41 +1,37 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "0.1.8"
+VERSION = "0.1.9"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
-LICENSE = 'BSD (3-clause)'
+LICENSE = "BSD (3-clause)"
 URL = "https://github.com/ghiffaryr/grplot"
 PROJECT_URLS = {
                 "Bug Tracker": "https://github.com/ghiffaryr/grplot/issues"
                }
 CLASSIFIERS = [
-               'Intended Audience :: Science/Research',
-               'Programming Language :: Python :: 3.7',
-               'Programming Language :: Python :: 3.8',
-               'Programming Language :: Python :: 3.9',
-               'License :: OSI Approved :: BSD License',
-               'Topic :: Scientific/Engineering :: Visualization',
-               'Topic :: Multimedia :: Graphics',
-               'Operating System :: OS Independent',
-               'Framework :: Matplotlib',
+               "Intended Audience :: Science/Research",
+               "Programming Language :: Python :: 3.6",
+               "Programming Language :: Python :: 3.7",
+               "Programming Language :: Python :: 3.8",
+               "Programming Language :: Python :: 3.9",
+               "License :: OSI Approved :: BSD License",
+               "Topic :: Scientific/Engineering :: Visualization",
+               "Topic :: Multimedia :: Graphics",
+               "Operating System :: OS Independent",
+               "Framework :: Matplotlib",
               ]
 DOWNLOAD_URL = "https://github.com/ghiffaryr/grplot"
-PYTHON_REQUIRES = ">=3.7"
+PYTHON_REQUIRES = ">=3.6"
 INSTALL_REQUIRES = [
-    'numpy>=1.22.3',
-    'matplotlib>=3.5.1',
-    'seaborn>=0.11.2',
-    'squarify>=0.4.3',
-    'pandas>=1.4.1',
+    "numpy>=1.15",
+    "scipy>=1.0",
+    "matplotlib>=2.2",
+    "seaborn>=0.11.2",
+    "squarify>=0.4.3",
+    "pandas>=0.23",
 ]
-EXTRAS_REQUIRE = {
-                  'all': [
-                          'scipy>=1.2',
-                          'statsmodels>=0.9',
-                         ]
-                 }
 PACKAGES = ["grplot",
             "grplot.features",
             "grplot.features.add.label_add",
@@ -65,8 +61,8 @@ if __name__ == "__main__":
     from setuptools import setup
 
     import sys
-    if sys.version_info[:2] < (3, 7):
-        raise RuntimeError("grplot requires python >= 3.7.")
+    if sys.version_info[:2] < (3, 6):
+        raise RuntimeError("grplot requires python >= 3.6.")
 
     with open("README.md", "r", encoding="utf-8") as fh:
         long_description = fh.read()
@@ -87,7 +83,6 @@ if __name__ == "__main__":
         download_url=DOWNLOAD_URL,
         python_requires=PYTHON_REQUIRES,
         install_requires=INSTALL_REQUIRES,
-        extras_require=EXTRAS_REQUIRE,
         packages=PACKAGES,
         classifiers=CLASSIFIERS
     )
