@@ -1,3 +1,4 @@
+import numpy
 from grplot.features.alpha.check_alpha import check_alpha
 from grplot.features.plot.plot_single_def import plot_single_def
 
@@ -137,6 +138,7 @@ def plot_multi_def(plot,
                    text_kwargs,
                    bubble_spacing):
     alpha_ = alpha
+    dodge_ = dodge
     # plotting
     if type(plot) == str:
         for count, plt in enumerate(plot.split('+')):
@@ -176,16 +178,53 @@ def plot_multi_def(plot,
                 pass
             if plot == 'stripplot+pointplot':
                 if plt == 'stripplot':
-                    alpha = .25 
-                    zorder = 1
+                    if hue is not None:
+                        if dodge_ is None:
+                            dodge = True
+                        else:
+                            pass
+                    else:
+                        pass
+                    if alpha is None:
+                        alpha = .25
+                    else:
+                        pass
                 else:
                     pass
                 if plt == 'pointplot':
-                    join = False 
-                    markers = "d" 
-                    scale = 1.5
-                    ci = None
-                    color = '.3'
+                    if hue is not None:
+                        if dodge_ is None:
+                            # check data type
+                            if type(data[hue]) == list:
+                                data_hue = numpy.array(data[hue])
+                            elif numpy.issubdtype(type(data[hue]), numpy.ndarray) == True:
+                                data_hue = data[hue]
+                            else:
+                                raise Exception('Unsupported dtype')
+                            # drop numpy.nan
+                            unique_data_hue = numpy.unique(data_hue)
+                            unique_data_hue_not_nan = unique_data_hue[unique_data_hue != 'nan']
+                            dodge = .8 - .8 / len(numpy.unique(unique_data_hue_not_nan))
+                        else:
+                            pass
+                    else:
+                        pass
+                    if join is None:
+                        join = False 
+                    else:
+                        pass
+                    if palette is None:
+                        palette = 'dark'
+                    else:
+                        pass
+                    if markers is None:
+                        markers = 'd' 
+                    else:
+                        pass
+                    if scale is None:
+                        scale = 1.5
+                    else:
+                        pass
                 else:
                     pass
             else:

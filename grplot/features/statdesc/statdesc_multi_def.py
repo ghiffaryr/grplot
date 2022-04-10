@@ -48,7 +48,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
             elif 'var' in stat:
                 try:
                     var = numpy.var(data)
-                    var_sep = statdesc_var_type(num=var, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    var_sep = statdesc_sep_type(num=var, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     var_add = statdesc_add_type(num=var_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')

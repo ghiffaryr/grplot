@@ -148,7 +148,7 @@ def plot(
     color=None,
     label=None,
     value=None,
-    ax=None,
+    ax=None
 ):
     if ax is None:
         ax = plt.gca()

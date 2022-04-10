@@ -174,7 +174,7 @@ def plot_single_def(plot,
                             x_bins=x_bins, 
                             y_bins=y_bins, 
                             units=units, 
-                            estimator=None, 
+                            estimator=estimator, 
                             ci=ci, 
                             n_boot=n_boot, 
                             alpha=alpha, 
@@ -570,8 +570,7 @@ def plot_single_def(plot,
                center=center, 
                frame=frame, 
                rotatelabels=rotatelabels,
-               normalize=normalize,
-               )
+               normalize=normalize)
     elif plot == 'treemapsplot':
         if x is not None and y is None:
             label, count = numpy.unique(data[x], return_counts=True)
