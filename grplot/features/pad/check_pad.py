@@ -1,4 +1,4 @@
-def check_padding(x, y, fig, hpad, wpad, pad):
+def check_pad(fig, hpad, wpad, pad):
     if hpad is not None or wpad is not None:
         if hpad is None:
             raise Exception('hpad argument must not be None!')

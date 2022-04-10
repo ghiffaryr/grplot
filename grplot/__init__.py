@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy
-from grplot.features.padding.check_padding import check_padding
+from grplot.features.pad.check_pad import check_pad
 from grplot.features.plot.plot_type import plot_type
 from grplot.setting import setting
 from grplot.utils.check_axes import check_axes
@@ -188,7 +188,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.3'
+    ver = '0.3.1'
 
     release date
     10/04/2022
@@ -271,12 +271,10 @@ def grplot(plot, # default general value
                            figsize=(figsize[0], 
                                     figsize[1]))
     # padding
-    fig = check_padding(x=x, 
-                        y=y, 
-                        fig=fig, 
-                        hpad=hpad, 
-                        wpad=wpad, 
-                        pad=pad)    
+    fig = check_pad(fig=fig, 
+                    hpad=hpad, 
+                    wpad=wpad, 
+                    pad=pad)    
     # pandas index to array
     x, y = check_pandas_index(x=x, 
                               y=y)    
