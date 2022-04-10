@@ -1,17 +1,18 @@
-from grplot.features.add.label_add.check_label_add import check_label_add
-from grplot.features.add.log_label_add.check_log_label_add import check_log_label_add
-from grplot.features.add.tick_add.check_tick_add import check_tick_add
-from grplot.features.dt.check_dt import check_dt
 from grplot.features.font.check_fontsize import check_fontsize
-from grplot.features.font.font_def import font_def
+from grplot.hotfix.histplot_legend_fix import histplot_legend_fix
+from grplot.features.lim.check_lim import check_lim
 from grplot.features.log.check_log import check_log
-from grplot.features.rot.check_rot import check_rot
 from grplot.features.sep.tick_sep.check_tick_sep import check_tick_sep
+from grplot.features.dt.check_dt import check_dt
+from grplot.hotfix.histplot_percent_add import histplot_percent_add
+from grplot.features.add.tick_add.check_tick_add import check_tick_add
+from grplot.features.rot.check_rot import check_rot
 from grplot.features.statdesc.check_statdesc import check_statdesc
 from grplot.features.text.check_text import check_text
+from grplot.features.add.label_add.check_label_add import check_label_add
+from grplot.features.add.log_label_add.check_log_label_add import check_log_label_add
 from grplot.features.title.check_title import check_title
-from grplot.hotfix.histplot_legend_fix import histplot_legend_fix
-from grplot.hotfix.histplot_percent_add import histplot_percent_add
+from grplot.features.font.font_def import font_def
 
 
 def setting(plot,
@@ -31,6 +32,9 @@ def setting(plot,
             sep, 
             xsep, 
             ysep, 
+            lim,
+            xlim,
+            ylim,
             log, 
             xlog, 
             ylog, 
@@ -76,6 +80,13 @@ def setting(plot,
                                size=size,
                                legend_fontsize=legend_fontsize,
                                axes=axes)
+    check_lim(ax=ax, 
+              lim=lim, 
+              xlim=xlim, 
+              ylim=ylim, 
+              xaxislabel=xaxislabel, 
+              yaxislabel=yaxislabel, 
+              axes=axes)
     check_log(ax=ax, 
               log=log,
               xlog=xlog, 

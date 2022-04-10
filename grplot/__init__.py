@@ -29,6 +29,9 @@ def grplot(plot, # default general value
            sep=',',
            xsep=None,
            ysep=None,
+           lim=None,
+           xlim=None,
+           ylim=None,
            log=None,
            xlog=None, 
            ylog=None, 
@@ -185,7 +188,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.2.1'
+    ver = '0.3'
 
     release date
     10/04/2022
@@ -194,11 +197,11 @@ def grplot(plot, # default general value
     
     plot: plot type <- axes arguments with string return data type with base in ['scatterplot', 'lineplot', 'histplot', 'kdeplot', 'ecdfplot', 'rugplot', 'pieplot', 'treemapsplot', 'packedbubblesplot', 'stripplot', 'swarmplot', 'boxplot', 'violinplot', 'boxenplot', 'pointplot', 'barplot', 'countplot', 'rugplot', 'residplot'] can be passed by ['plot', 'plot1+plot2+...']
     df: dataframe <- pandas dataframe, dictionary-list, dictionary-numpy.array
-    x: x-axis <- string, list
-    y: y-axis <- string, list
+    x: x-axis <- string, list-string
+    y: y-axis <- string, list-string
     Nx: axes height <- int
     Ny: axes width <- int
-    figsize: figure size <- list
+    figsize: figure size <- list-numeric
     pad: figure padding size <- numeric data type
     hpad: figure padding height size <- numeric data type
     wpad: figure padding width size <- numeric data type
@@ -216,6 +219,9 @@ def grplot(plot, # default general value
     sep: separator <- axislabel-axes arguments or axes arguments for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot'] with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
     xsep: x-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
     ysep: y-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
+    lim: limit <- axislabel-axes arguments with list-numeric return data type
+    xlim: x-axis limit <- axislabel-axes arguments with list-numeric return data type
+    ylim: y-axis limit <- axislabel-axes arguments with list-numeric return data type
     log: scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
     xlog: x-axis scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
     ylog: y-axis scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
@@ -299,6 +305,9 @@ def grplot(plot, # default general value
                 sep=sep, 
                 xsep=xsep, 
                 ysep=ysep, 
+                lim=lim,
+                xlim=xlim,
+                ylim=ylim, 
                 log=log, 
                 xlog=xlog, 
                 ylog=ylog, 
@@ -349,6 +358,9 @@ def grplot(plot, # default general value
                 sep=sep, 
                 xsep=xsep, 
                 ysep=ysep, 
+                lim=lim,
+                xlim=xlim,
+                ylim=ylim, 
                 log=log, 
                 xlog=xlog, 
                 ylog=ylog, 
@@ -399,6 +411,9 @@ def grplot(plot, # default general value
                 sep=sep, 
                 xsep=xsep, 
                 ysep=ysep, 
+                lim=lim,
+                xlim=xlim,
+                ylim=ylim, 
                 log=log, 
                 xlog=xlog, 
                 ylog=ylog, 
@@ -456,6 +471,9 @@ def grplot(plot, # default general value
                         sep=sep, 
                         xsep=xsep, 
                         ysep=ysep, 
+                        lim=lim,
+                        xlim=xlim,
+                        ylim=ylim, 
                         log=log, 
                         xlog=xlog, 
                         ylog=ylog, 
@@ -512,6 +530,9 @@ def grplot(plot, # default general value
                             sep=sep, 
                             xsep=xsep, 
                             ysep=ysep, 
+                            lim=lim,
+                            xlim=xlim,
+                            ylim=ylim, 
                             log=log, 
                             xlog=xlog, 
                             ylog=ylog, 
@@ -570,6 +591,9 @@ def grplot(plot, # default general value
                         sep=sep, 
                         xsep=xsep, 
                         ysep=ysep, 
+                        lim=lim,
+                        xlim=xlim,
+                        ylim=ylim, 
                         log=log, 
                         xlog=xlog, 
                         ylog=ylog, 
@@ -626,6 +650,9 @@ def grplot(plot, # default general value
                             sep=sep, 
                             xsep=xsep, 
                             ysep=ysep, 
+                            lim=lim,
+                            xlim=xlim,
+                            ylim=ylim, 
                             log=log, 
                             xlog=xlog, 
                             ylog=ylog, 
@@ -685,6 +712,9 @@ def grplot(plot, # default general value
                         sep=sep, 
                         xsep=xsep, 
                         ysep=ysep, 
+                        lim=lim,
+                        xlim=xlim,
+                        ylim=ylim, 
                         log=log, 
                         xlog=xlog, 
                         ylog=ylog, 
@@ -741,6 +771,9 @@ def grplot(plot, # default general value
                             sep=sep, 
                             xsep=xsep, 
                             ysep=ysep, 
+                            lim=lim,
+                            xlim=xlim,
+                            ylim=ylim, 
                             log=log, 
                             xlog=xlog, 
                             ylog=ylog, 
