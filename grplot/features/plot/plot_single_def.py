@@ -1,5 +1,6 @@
 import numpy
 import seaborn as sns
+from matplotlib.ticker import PercentFormatter
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
 from grplot.features.plot.packedbubbles import plot as pb
 from grplot.features.plot.treemaps import plot as tms
@@ -1072,10 +1073,10 @@ def plot_single_def(plot,
                 data_cum_percentage = numpy.cumsum(data_pareto_y)/numpy.sum(data_pareto_y)*100
                 ax2 = ax.twinx()
                 ax2.plot(data_pareto_x, data_cum_percentage, color=color2, marker=marker, markersize=markersize)
+                ax2.yaxis.set_major_formatter(PercentFormatter())
                 ax2.grid(False)
                 ax2.set_ylabel('Cumulative Percentage')
-                ax.get_shared_x_axes().get_siblings(ax)[0].set_yticks(ax.get_shared_x_axes().get_siblings(ax)[0].get_yticks())
-                ax.get_shared_x_axes().get_siblings(ax)[0].set_yticklabels(['{:1.0f}%'.format(y) for y in ax.get_shared_x_axes().get_siblings(ax)[0].get_yticks()])
+                ax.get_shared_x_axes().get_siblings(ax)[0].set_ylim([0,110])
             elif ((is_numeric_dtype(data[x]) == True) or (is_numeric_dtype(type(data[x][0])) == True)) and ((is_object_dtype(data[y]) == True) or (is_object_dtype(type(data[y][0])) == True) or (is_categorical_dtype(data[y]) == True) or (is_categorical_dtype(type(data[y][0])) == True)):
                 data_pareto_y, idx, counts = numpy.unique(data[y], return_inverse=True, return_counts=True)
                 data_bin_x = numpy.bincount(idx, weights=data[x])
@@ -1146,10 +1147,10 @@ def plot_single_def(plot,
                 data_cum_percentage = numpy.cumsum(data_pareto_x)/numpy.sum(data_pareto_x)*100
                 ax2 = ax.twiny()
                 ax2.plot(data_cum_percentage, data_pareto_y, color=color2, marker=marker, markersize=markersize)
+                ax2.xaxis.set_major_formatter(PercentFormatter())
                 ax2.grid(False)
                 ax2.set_xlabel('Cumulative Percentage')
-                ax.get_shared_y_axes().get_siblings(ax)[0].set_xticks(ax.get_shared_y_axes().get_siblings(ax)[0].get_xticks())
-                ax.get_shared_y_axes().get_siblings(ax)[0].set_xticklabels(['{:1.0f}%'.format(x) for x in ax.get_shared_y_axes().get_siblings(ax)[0].get_xticks()])
+                ax.get_shared_y_axes().get_siblings(ax)[0].set_xlim([0,110])
             else:
                 raise Exception('x and y must be a pair of numeric and object data types!')
         else:
