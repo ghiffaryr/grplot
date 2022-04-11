@@ -180,7 +180,7 @@ def grplot(plot, # default general value
            bar_kwargs=None, 
            text_kwargs=None,
            bubble_spacing=None # {0.1:'packedbubblesplot'}
-           ):
+          ):
     '''
     -----------------------------------------------
     grplot
@@ -188,7 +188,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.4.1'
+    ver = '0.4.2'
 
     release date
     11/04/2022

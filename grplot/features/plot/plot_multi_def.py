@@ -204,7 +204,8 @@ def plot_multi_def(plot,
                             # drop numpy.nan
                             unique_data_hue = numpy.unique(data_hue)
                             unique_data_hue_not_nan = unique_data_hue[unique_data_hue != 'nan']
-                            dodge = .8 - .8 / len(numpy.unique(unique_data_hue_not_nan))
+                            # set dodge
+                            dodge = .8 - .8 / len(unique_data_hue_not_nan)
                         else:
                             pass
                     else:
