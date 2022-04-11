@@ -71,8 +71,8 @@ def grplot(plot, # default general value
            y_bins=None,
            estimator=None, # {'mean':'lineplot'} 
            x_estimator=None,
-           ci=None, # {95:'barplot'}
-           n_boot=None, # {1000:'scatterplot+lineplot+pointplot+barplot+regplot'}
+           ci=None, # {95:'barplot+paretoplot+regplot'}
+           n_boot=None, # {1000:'scatterplot+lineplot+pointplot+barplot+paretoplot+regplot'}
            alpha=None,
            expand_margins=None,
            jitter=None, # {True:'stripplot'}
@@ -125,9 +125,9 @@ def grplot(plot, # default general value
            orient=None,
            edgecolor=None, # {'gray':'stripplot+swarmplot'}
            linewidth=None, # {0:'stripplot+swarmplot'}
-           saturation=None, # {0.75:'boxplot+violinplot+boxenplot+barplot+countplot'}
+           saturation=None, # {0.75:'boxplot+violinplot+boxenplot+barplot+paretoplot+countplot'}
            width=None, # {0.8:'boxplot+violinplot+boxenplot'}
-           dodge=None, # {True:'boxplot+violinplot+boxenplot', False:'pointplot'} 
+           dodge=None, # {True:'boxplot+violinplot+boxenplot+barplot+paretoplot', False:'pointplot'} 
            fliersize=None, # {5:'boxplot'}
            whis=None, # {1.5:'boxplot'}
            scale=None, # {'area':'violinplot', 'exponential':'boxenplot', 1:'pointplot'}
@@ -142,7 +142,7 @@ def grplot(plot, # default general value
            join=None, # {True:'pointplot'}
            errwidth=None,
            capsize=None,
-           errcolor=None, # {'.26':'barplot'}
+           errcolor=None, # {'.26':'barplot+paretoplot'}
            x_ci=None, # {'ci':'regplot'}
            scatter=None, # {True:'regplot'}
            fit_reg=None, # {True:'regplot'}
@@ -153,11 +153,11 @@ def grplot(plot, # default general value
            y_partial=None,
            truncate=None, # {True:'regplot'}
            scatter_kws=None,
-           marker=None, # {'o':'regplot'}
+           marker=None, # {'o':'regplot', 'D':'paretoplot'}
            dropna=None, # {True:'regplot+residplot'}
            label=None,
            zorder=None,
-           color2=None, # {'C1':'paretoplot'}
+           color2=None, # {'.26':'paretoplot'}
            markersize=None, # {7:'paretoplot'}
            explode=None, 
            colors=None, 
@@ -188,7 +188,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.5'
+    ver = '0.5.1'
 
     release date
     11/04/2022
