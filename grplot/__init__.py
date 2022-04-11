@@ -188,7 +188,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.4.2'
+    ver = '0.5'
 
     release date
     11/04/2022
@@ -206,8 +206,9 @@ def grplot(plot, # default general value
     hpad: figure padding height size <- numeric data type
     wpad: figure padding width size <- numeric data type
 
-    hue: grouping variable that will produce points with different colors <- axes arguments with seaborn argument return data type
-    size: grouping variable that will produce points with different colors <- axes arguments with seaborn argument return data type
+    hue: grouping variable that will produce points with different colors <- axes-plot arguments with seaborn argument return data type
+    size: grouping variable that will produce points with different colors <- axes-plot arguments with seaborn argument return data type
+
     title: axes title <- axes arguments with string return data type
     fontsize: font size for text, legend, label, and tick <- axes arguments with numeric return data type
     tick_fontsize: font size for tick <- axes arguments with numeric return data type
@@ -216,36 +217,50 @@ def grplot(plot, # default general value
     label_fontsize: font size for label <- axes arguments with numeric return data type
     title_fontsize: font size for axes title <- axes arguments with numeric return data type
     
-    sep: separator <- axislabel-axes arguments or axes arguments for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot'] with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
-    xsep: x-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
-    ysep: y-axis separator <- axislabel-axes arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
-    lim: limit <- axislabel-axes arguments with list-numeric return data type
-    xlim: x-axis limit <- axislabel-axes arguments with list-numeric return data type
-    ylim: y-axis limit <- axislabel-axes arguments with list-numeric return data type
-    log: scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
-    xlog: x-axis scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
-    ylog: y-axis scale <- axislabel-axes arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
-    dt: datetime format <- axislabel-axes arguments with string return data type refers to python string format time
-    xdt: x-axis datetime format <- axislabel-axes arguments with string return data type refers to python string format time
-    ydt: y-axis datetime format <- axislabel-axes arguments with string return data type refers to python string format time
-    tick_add: add tick label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}'] 
-    xtick_add: x-axis add tick label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}']
-    ytick_add: y-axis add tick label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}']
-    rot: tick rotation <- axislabel-axes arguments with numeric return data type
-    xrot: x-axis tick rotation <- axislabel-axes arguments with numeric return data type
-    yrot: y-axis tick rotation <- axislabel-axes arguments with numeric return data type
-    statdesc: statistical description <- axislabel-axes arguments with string return data type with base stat in ['general', 'boxplot', 'count', 'unique', 'std', 'var', 'min', 'pct1', 'whislo', 'cilo', 'pct5', 'q1', 'median', 'mean', 'q3', 'pct95', 'cihi', 'whishi', 'pct99', 'max'] can be passed by ['stat', 'stat1+stat2+...']
-    xstatdesc: x-axis statistical description <- axislabel-axes arguments with string return data type
-    ystatdesc: y-axis statistical description <- axislabel-axes arguments with string return data type
-    text: text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] for plot in ['histplot', 'barplot', 'countplot', 'paretoplot'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot'] whereas axes arguments with boolean return data type for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot']
-    xtext: x-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
-    ytext: y-axis text annotation <- axislabel-axes arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
-    label_add: add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}'] 
-    xlabel_add: x-axis add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}']
-    ylabel_add: y-axis add axis label unit <- axislabel-axes arguments with string return data type in ['{}_', '_{}', '{}_{}']
+    sep: separator <- axes-axislabel arguments or axes arguments for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot'] with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
+    xsep: x-axis separator <- axes-axislabel arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
+    ysep: y-axis separator <- axes-axislabel arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
+    lim: limit <- axes-axislabel arguments with list-numeric return data type
+    xlim: x-axis limit <- axes-axislabel arguments with list-numeric return data type
+    ylim: y-axis limit <- axes-axislabel arguments with list-numeric return data type
+    log: scale <- axes-axislabel arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
+    xlog: x-axis scale <- axes-axislabel arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
+    ylog: y-axis scale <- axes-axislabel arguments with string return data type refers to matplotlib, e.g. ["linear", "log", "symlog", "logit"]
+    dt: datetime format <- axes-axislabel arguments with string return data type refers to python string format time
+    xdt: x-axis datetime format <- axes-axislabel arguments with string return data type refers to python string format time
+    ydt: y-axis datetime format <- axes-axislabel arguments with string return data type refers to python string format time
+    tick_add: add tick label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}'] 
+    xtick_add: x-axis add tick label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}']
+    ytick_add: y-axis add tick label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}']
+    rot: tick rotation <- axes-axislabel arguments with numeric return data type
+    xrot: x-axis tick rotation <- axes-axislabel arguments with numeric return data type
+    yrot: y-axis tick rotation <- axes-axislabel arguments with numeric return data type
+    statdesc: statistical description <- axes-axislabel arguments with string return data type with base stat in ['general', 'boxplot', 'count', 'unique', 'std', 'var', 'min', 'pct1', 'whislo', 'cilo', 'pct5', 'q1', 'median', 'mean', 'q3', 'pct95', 'cihi', 'whishi', 'pct99', 'max'] can be passed by ['stat', 'stat1+stat2+...']
+    xstatdesc: x-axis statistical description <- axes-axislabel arguments with string return data type
+    ystatdesc: y-axis statistical description <- axes-axislabel arguments with string return data type
+    text: text annotation <- axes-axislabel arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] for plot in ['histplot', 'barplot', 'countplot', 'paretoplot'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot'] whereas axes arguments with boolean return data type for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot']
+    xtext: x-axis text annotation <- axes-axislabel arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
+    ytext: y-axis text annotation <- axes-axislabel arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot']
+    label_add: add axis label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}', '{}(_)', '(_){}', '{}(_){}'] 
+    xlabel_add: x-axis add axis label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}']
+    ylabel_add: y-axis add axis label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}']
     
-    **kwargs from matplotlib, seaborn, and squarify <- axes arguments with return data type refers to matplotlib, seaborn, and squarify (dictionary based arguments excluded)
+    **kwargs from matplotlib, seaborn, and squarify <- axes-plot arguments with return data type refers to matplotlib, seaborn, and squarify (dictionary based arguments excluded)
 
+    axes arguments:
+    arg = {'[i,j]':return}
+    arg = {return:'[i,j]'}
+    arg = {return:['[i,j]']}  
+    
+    axes-plot arguments: 
+    arg = {'plot':return}
+    arg = {'[i,j]':{'plot':return}}
+    arg = {'[i,j]':{return:'plot'}}
+    arg = {'[i,j]':{return:['plot']}}
+    arg = {'[i,j]':return}}
+    arg = {return:'plot'}
+    arg = {return:['plot']}
+    
     axes-axislabel arguments: 
     arg = {'axislabel':return}
     arg = {'[i,j]':{'axislabel':return}}
@@ -254,11 +269,6 @@ def grplot(plot, # default general value
     arg = {'[i,j]':return}}
     arg = {return:'axislabel'}
     arg = {return:['axislabel']}
-
-    axes arguments:
-    arg = {'[i,j]':return}
-    arg = {return:'[i,j]'}
-    arg = {return:['[i,j]']}  
 
     note: axes argument starts from 1 (*different from matplotlib which starts from 0)
     '''

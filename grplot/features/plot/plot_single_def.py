@@ -901,34 +901,64 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.pointplot(x=x, 
-                          y=y, 
-                          hue=hue, 
-                          data=data, 
-                          order=order, 
-                          hue_order=hue_order, 
-                          ci=ci, 
-                          n_boot=n_boot, 
-                          units=units, 
-                          seed=seed, 
-                          markers=markers, 
-                          linestyles=linestyles, 
-                          dodge=dodge, 
-                          join=join, 
-                          scale=scale, 
-                          orient=orient, 
-                          color=color, 
-                          palette=palette, 
-                          errwidth=errwidth, 
-                          capsize=capsize, 
-                          ax=ax,
-                          alpha=alpha,
-                          zorder=zorder)
+            if estimator is None:
+                sns.pointplot(x=x, 
+                              y=y, 
+                              hue=hue, 
+                              data=data, 
+                              order=order, 
+                              hue_order=hue_order, 
+                              ci=ci, 
+                              n_boot=n_boot, 
+                              units=units, 
+                              seed=seed, 
+                              markers=markers, 
+                              linestyles=linestyles, 
+                              dodge=dodge, 
+                              join=join, 
+                              scale=scale, 
+                              orient=orient, 
+                              color=color, 
+                              palette=palette, 
+                              errwidth=errwidth, 
+                              capsize=capsize, 
+                              ax=ax,
+                              alpha=alpha,
+                              zorder=zorder)
+            else:
+                sns.pointplot(x=x, 
+                              y=y, 
+                              hue=hue, 
+                              data=data, 
+                              order=order, 
+                              hue_order=hue_order, 
+                              estimator=estimator, 
+                              ci=ci, 
+                              n_boot=n_boot, 
+                              units=units, 
+                              seed=seed, 
+                              markers=markers, 
+                              linestyles=linestyles, 
+                              dodge=dodge, 
+                              join=join, 
+                              scale=scale, 
+                              orient=orient, 
+                              color=color, 
+                              palette=palette, 
+                              errwidth=errwidth, 
+                              capsize=capsize, 
+                              ax=ax,
+                              alpha=alpha,
+                              zorder=zorder)
         else:
             raise Exception('Define axis label!')
     elif plot == 'barplot':
         if x is not None or y is not None:
             # default value
+            if ci is None:
+                ci = 95
+            else:
+                pass
             if n_boot is None:
                 n_boot = 1000
             else:
@@ -946,27 +976,51 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.barplot(x=x, 
-                        y=y, 
-                        hue=hue, 
-                        data=data, 
-                        order=order, 
-                        hue_order=hue_order, 
-                        ci=ci, 
-                        n_boot=n_boot, 
-                        units=units, 
-                        seed=seed, 
-                        orient=orient, 
-                        color=color, 
-                        palette=palette, 
-                        saturation=saturation, 
-                        errcolor=errcolor, 
-                        errwidth=errwidth, 
-                        capsize=capsize, 
-                        dodge=dodge, 
-                        ax=ax,
-                        alpha=alpha,
-                        zorder=zorder)
+            if estimator is None:
+                sns.barplot(x=x, 
+                            y=y, 
+                            hue=hue, 
+                            data=data, 
+                            order=order, 
+                            hue_order=hue_order, 
+                            ci=ci, 
+                            n_boot=n_boot, 
+                            units=units, 
+                            seed=seed, 
+                            orient=orient, 
+                            color=color, 
+                            palette=palette, 
+                            saturation=saturation, 
+                            errcolor=errcolor, 
+                            errwidth=errwidth, 
+                            capsize=capsize, 
+                            dodge=dodge, 
+                            ax=ax,
+                            alpha=alpha,
+                            zorder=zorder)
+            else:
+                sns.barplot(x=x, 
+                            y=y, 
+                            hue=hue, 
+                            data=data, 
+                            order=order, 
+                            hue_order=hue_order, 
+                            estimator=estimator, 
+                            ci=ci, 
+                            n_boot=n_boot, 
+                            units=units, 
+                            seed=seed, 
+                            orient=orient, 
+                            color=color, 
+                            palette=palette, 
+                            saturation=saturation, 
+                            errcolor=errcolor, 
+                            errwidth=errwidth, 
+                            capsize=capsize, 
+                            dodge=dodge, 
+                            ax=ax,
+                            alpha=alpha,
+                            zorder=zorder)
             if x is not None:
                 ax.set_xlabel(x)
             else:
@@ -1009,6 +1063,10 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_y.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
+                if ci is None:
+                    ci = 95
+                else:
+                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1038,27 +1096,51 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                sns.barplot(x=x, 
-                            y=y, 
-                            hue=hue, 
-                            data=data, 
-                            order=data_pareto_x, 
-                            hue_order=data_pareto_x, 
-                            ci=ci, 
-                            n_boot=n_boot, 
-                            units=units, 
-                            seed=seed, 
-                            orient=orient, 
-                            color=color, 
-                            palette=palette, 
-                            saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
-                            dodge=dodge, 
-                            ax=ax,
-                            alpha=alpha,
-                            zorder=zorder)
+                if estimator is None:
+                    sns.barplot(x=x, 
+                                y=y, 
+                                hue=hue, 
+                                data=data, 
+                                order=data_pareto_x, 
+                                hue_order=data_pareto_x, 
+                                ci=ci, 
+                                n_boot=n_boot, 
+                                units=units, 
+                                seed=seed, 
+                                orient=orient, 
+                                color=color, 
+                                palette=palette, 
+                                saturation=saturation, 
+                                errcolor=errcolor, 
+                                errwidth=errwidth, 
+                                capsize=capsize, 
+                                dodge=dodge, 
+                                ax=ax,
+                                alpha=alpha,
+                                zorder=zorder)
+                else:
+                    sns.barplot(x=x, 
+                                y=y, 
+                                hue=hue, 
+                                data=data, 
+                                order=data_pareto_x, 
+                                hue_order=data_pareto_x, 
+                                estimator=estimator, 
+                                ci=ci, 
+                                n_boot=n_boot, 
+                                units=units, 
+                                seed=seed, 
+                                orient=orient, 
+                                color=color, 
+                                palette=palette, 
+                                saturation=saturation, 
+                                errcolor=errcolor, 
+                                errwidth=errwidth, 
+                                capsize=capsize, 
+                                dodge=dodge, 
+                                ax=ax,
+                                alpha=alpha,
+                                zorder=zorder)
                 if x is not None:
                     ax.set_xticks(ax.get_xticks())
                     ax.set_xlabel(x)
@@ -1083,6 +1165,10 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_x.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
+                if ci is None:
+                    ci = 95
+                else:
+                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1112,27 +1198,51 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                sns.barplot(x=x, 
-                            y=y, 
-                            hue=hue, 
-                            data=data, 
-                            order=data_pareto_y, 
-                            hue_order=data_pareto_y, 
-                            ci=ci, 
-                            n_boot=n_boot, 
-                            units=units, 
-                            seed=seed, 
-                            orient=orient, 
-                            color=color, 
-                            palette=palette, 
-                            saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
-                            dodge=dodge, 
-                            ax=ax,
-                            alpha=alpha,
-                            zorder=zorder)
+                if estimator is None:
+                    sns.barplot(x=x, 
+                                y=y, 
+                                hue=hue, 
+                                data=data, 
+                                order=data_pareto_y, 
+                                hue_order=data_pareto_y, 
+                                ci=ci, 
+                                n_boot=n_boot, 
+                                units=units, 
+                                seed=seed, 
+                                orient=orient, 
+                                color=color, 
+                                palette=palette, 
+                                saturation=saturation, 
+                                errcolor=errcolor, 
+                                errwidth=errwidth, 
+                                capsize=capsize, 
+                                dodge=dodge, 
+                                ax=ax,
+                                alpha=alpha,
+                                zorder=zorder)
+                else:
+                    sns.barplot(x=x, 
+                                y=y, 
+                                hue=hue, 
+                                data=data, 
+                                order=data_pareto_y, 
+                                hue_order=data_pareto_y, 
+                                estimator=estimator, 
+                                ci=ci, 
+                                n_boot=n_boot, 
+                                units=units, 
+                                seed=seed, 
+                                orient=orient, 
+                                color=color, 
+                                palette=palette, 
+                                saturation=saturation, 
+                                errcolor=errcolor, 
+                                errwidth=errwidth, 
+                                capsize=capsize, 
+                                dodge=dodge, 
+                                ax=ax,
+                                alpha=alpha,
+                                zorder=zorder)
                 if x is not None:
                     ax.set_xticks(ax.get_xticks())
                     ax.set_xlabel(x)
@@ -1168,6 +1278,10 @@ def plot_single_def(plot,
                 pass
             if fit_reg is None:
                 fit_reg = True
+            else:
+                pass
+            if ci is None:
+                ci = 95
             else:
                 pass
             if n_boot is None:
