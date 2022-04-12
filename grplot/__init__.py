@@ -188,10 +188,10 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.5.1'
+    ver = '0.5.2'
 
     release date
-    11/04/2022
+    12/04/2022
     -----------------------------------------------
     parameters
     

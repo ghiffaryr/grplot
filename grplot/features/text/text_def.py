@@ -39,7 +39,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             else:
                 pass
         else:
-            raise Exception('Patches height must not be an empty list!')
+            pass
         if list_width.size != 0:
             max_width = max(list_width)
             # barplot calibration
@@ -48,7 +48,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             else:
                 pass
         else:
-            raise Exception('Patches width must not be an empty list!')
+            pass
         # numerical check for main axis of histplot, barplot, countplot, barplot in paretoplot
         numeric = False
         if axislabel in df:
@@ -62,7 +62,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             else:
                 pass
         # annotate for histplot, barplot, countplot, barplot in paretoplot
-        if numeric == True:
+        if (list_height.size != 0) and (list_width.size != 0) and (numeric == True):
             if axis == 'x':
                 if text in ['h', 'h+o', 'o+h']:
                     for p in text_patches:
@@ -202,18 +202,21 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     if x_arr.size != 0:
                         max_x = max(x_arr)
                     else:
-                        raise Exception('x-axis data points must not be an empty list!')
-                    for x, y in zip(x_arr, y_arr):
-                        # annotate
-                        x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
-                        x_add = text_add_type(num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
-                        if text_fontsize is not None:
-                            try:
-                                ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175*text_fontsize/10, y), fontsize=text_fontsize, ha='left', va='center')
-                            except:
-                                raise Exception('Unknown text fontsize argument!')
-                        else:
-                            ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175, y), ha='left', va='center')
+                        pass
+                    if (x_arr.size != 0) and (y_arr.size != 0):
+                        for x, y in zip(x_arr, y_arr):
+                            # annotate
+                            x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
+                            x_add = text_add_type(num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
+                            if text_fontsize is not None:
+                                try:
+                                    ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175*text_fontsize/10, y), fontsize=text_fontsize, ha='left', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175, y), ha='left', va='center')
+                    else:
+                        pass
             elif axis == 'y':
                 for data in ax.get_shared_x_axes().get_siblings(ax)[0].get_lines():
                     x_arr, y_arr = data.get_data()
@@ -221,18 +224,21 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     if y_arr.size != 0:
                         max_y = max(y_arr)
                     else:
-                        raise Exception('y-axis data points must not be an empty list!')
-                    for x, y in zip(x_arr, y_arr):
-                        # annotate
-                        y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
-                        y_add = text_add_type(num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
-                        if text_fontsize is not None:
-                            try:
-                                ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                            except:
-                                raise Exception('Unknown text fontsize argument!')
-                        else:
-                            ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                        pass
+                    if (x_arr.size != 0) and (y_arr.size != 0):
+                        for x, y in zip(x_arr, y_arr):
+                            # annotate
+                            y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
+                            y_add = text_add_type(num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
+                            if text_fontsize is not None:
+                                try:
+                                    ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                    else:
+                        pass
             else:
                 raise Exception('Unsupported axis!')
         else:
@@ -240,57 +246,14 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
     else:
         pass
     if (plot == 'scatterplot') and (text == True):
-        # get y data points
-        y_arr = numpy.array([y for _, y in ax.collections[0].get_offsets()])
+        x_arr, y_arr = numpy.array([x for x, _ in ax.collections[0].get_offsets()]), numpy.array([y for _, y in ax.collections[0].get_offsets()])
         # get max y data points
         if y_arr.size != 0:
             max_y = max(y_arr)
         else:
-            raise Exception('y-axis data points must not be an empty list!')
-        for x, y in ax.collections[0].get_offsets():
-            # annotate
-            if axis == 'x':
-                x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                x_add = text_add_type(num=x_sep, add=add, axislabel=axislabel, axes=axes)
-                if text_fontsize is not None:
-                    try:
-                        ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                    except:
-                        raise Exception('Unknown text fontsize argument!')
-                else:
-                    ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
-            elif axis == 'y':
-                y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                y_add = text_add_type(num=y_sep, add=add, axislabel=axislabel, axes=axes)
-                if text_fontsize is not None:
-                    try:
-                        ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                    except:
-                        raise Exception('Unknown text fontsize argument!')
-                else:
-                    ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
-            else:
-                raise Exception('Unsupported axis!')
-    else:
-        pass
-    if (plot in ['lineplot', 'ecdfplot']) and (text == True):
-        for data in ax.get_lines():
-            x_arr, y_arr = data.get_data()
-            # get max y data points
-            if y_arr.size != 0:
-                max_y = max(y_arr)
-            else:
-                raise Exception('y-axis data points must not be an empty list!')
-            for x, y in zip(x_arr, y_arr):
-                # temporary bug fix for ecdfplot
-                if x == numpy.NINF:
-                    x = 0
-                else:
-                    pass
-                if y == numpy.NINF:
-                    y = 0
-                else:
-                    pass
+            pass
+        if (x_arr.size != 0) and (y_arr.size != 0):
+            for x, y in ax.collections[0].get_offsets():
                 # annotate
                 if axis == 'x':
                     x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel=axislabel, axes=axes)
@@ -314,6 +277,54 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
                 else:
                     raise Exception('Unsupported axis!')
+        else:
+            pass
+    else:
+        pass
+    if (plot in ['lineplot', 'ecdfplot']) and (text == True):
+        for data in ax.get_lines():
+            x_arr, y_arr = data.get_data()
+            # get max y data points
+            if y_arr.size != 0:
+                max_y = max(y_arr)
+            else:
+                pass
+            if (x_arr.size != 0) and (y_arr.size != 0):
+                for x, y in zip(x_arr, y_arr):
+                    # temporary bug fix for ecdfplot
+                    if x == numpy.NINF:
+                        x = 0
+                    else:
+                        pass
+                    if y == numpy.NINF:
+                        y = 0
+                    else:
+                        pass
+                    # annotate
+                    if axis == 'x':
+                        x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel=axislabel, axes=axes)
+                        x_add = text_add_type(num=x_sep, add=add, axislabel=axislabel, axes=axes)
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
+                    elif axis == 'y':
+                        y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel=axislabel, axes=axes)
+                        y_add = text_add_type(num=y_sep, add=add, axislabel=axislabel, axes=axes)
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                    else:
+                        raise Exception('Unsupported axis!')
+            else:
+                pass
     else:
         pass
     if (plot == 'pieplot') and (text == True):
