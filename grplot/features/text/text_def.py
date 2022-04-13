@@ -68,8 +68,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
-                            width_sep = text_sep_type(num=width, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            width_add = text_add_type(num=width_sep, add=add, axislabel=axislabel, axes=axes)
+                            width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
+                            width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
@@ -83,8 +83,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
-                            width_sep = text_sep_type(num=width, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            width_add = text_add_type(num=width_sep, add=add, axislabel=axislabel, axes=axes)
+                            width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
+                            width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='left', va='center', fontsize=text_fontsize)
@@ -98,8 +98,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
-                            width_sep = text_sep_type(num=width, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            width_add = text_add_type(num=width_sep, add=add, axislabel=axislabel, axes=axes)
+                            width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
+                            width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize)
@@ -113,8 +113,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
-                            width_sep = text_sep_type(num=width, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            width_add = text_add_type(num=width_sep, add=add, axislabel=axislabel, axes=axes)
+                            width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
+                            width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
@@ -131,8 +131,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
-                            height_sep = text_sep_type(num=height, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            height_add = text_add_type(num=height_sep, add=add, axislabel=axislabel, axes=axes)
+                            height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
+                            height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='center', fontsize=text_fontsize)
@@ -146,8 +146,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
-                            height_sep = text_sep_type(num=height, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            height_add = text_add_type(num=height_sep, add=add, axislabel=axislabel, axes=axes)
+                            height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
+                            height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='bottom', fontsize=text_fontsize, rotation=90)
@@ -161,8 +161,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
-                            height_sep = text_sep_type(num=height, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            height_add = text_add_type(num=height_sep, add=add, axislabel=axislabel, axes=axes)
+                            height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
+                            height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{height_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=90)
@@ -176,8 +176,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     for p in text_patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
-                            height_sep = text_sep_type(num=height, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                            height_add = text_add_type(num=height_sep, add=add, axislabel=axislabel, axes=axes)
+                            height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
+                            height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.annotate((f'{height_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize)
@@ -206,8 +206,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     if (x_arr.size != 0) and (y_arr.size != 0):
                         for x, y in zip(x_arr, y_arr):
                             # annotate
-                            x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
-                            x_add = text_add_type(num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
+                            x_sep = text_sep_type(plot=plot, df=df, num=x, sep=sep, axislabel='Cumulative Percentage', axes=axes)
+                            x_add = text_add_type(plot=plot, num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175*text_fontsize/10, y), fontsize=text_fontsize, ha='left', va='center')
@@ -228,8 +228,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     if (x_arr.size != 0) and (y_arr.size != 0):
                         for x, y in zip(x_arr, y_arr):
                             # annotate
-                            y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel='Cumulative Percentage', axes=axes)
-                            y_add = text_add_type(num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
+                            y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel='Cumulative Percentage', axes=axes)
+                            y_add = text_add_type(plot=plot, num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
                             if text_fontsize is not None:
                                 try:
                                     ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
@@ -256,8 +256,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             for x, y in ax.collections[0].get_offsets():
                 # annotate
                 if axis == 'x':
-                    x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                    x_add = text_add_type(num=x_sep, add=add, axislabel=axislabel, axes=axes)
+                    x_sep = text_sep_type(plot=plot, df=df, num=x, sep=sep, axislabel=axislabel, axes=axes)
+                    x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
                     if text_fontsize is not None:
                         try:
                             ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
@@ -266,8 +266,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     else:
                         ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
                 elif axis == 'y':
-                    y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                    y_add = text_add_type(num=y_sep, add=add, axislabel=axislabel, axes=axes)
+                    y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
+                    y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
                     if text_fontsize is not None:
                         try:
                             ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
@@ -302,8 +302,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         pass
                     # annotate
                     if axis == 'x':
-                        x_sep = text_sep_type(num=x, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                        x_add = text_add_type(num=x_sep, add=add, axislabel=axislabel, axes=axes)
+                        x_sep = text_sep_type(plot=plot, df=df, num=x, sep=sep, axislabel=axislabel, axes=axes)
+                        x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
                         if text_fontsize is not None:
                             try:
                                 ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
@@ -312,8 +312,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
                     elif axis == 'y':
-                        y_sep = text_sep_type(num=y, df=df, sep=sep, axislabel=axislabel, axes=axes)
-                        y_add = text_add_type(num=y_sep, add=add, axislabel=axislabel, axes=axes)
+                        y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
+                        y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
                         if text_fontsize is not None:
                             try:
                                 ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
@@ -331,8 +331,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
         for child in ax.get_children():
             if isinstance(child, matplotlib.text.Text) and ('%' in child.get_text()):
                 num = float(child.get_text()[:-1])
-                text_sep = text_sep_type(num=num, df=df, sep=sep, axislabel=naxislabel, axes=axes)
-                text_add = text_add_type(num=text_sep, add='_%', axislabel=naxislabel, axes=axes)
+                text_sep = text_sep_type(plot=plot, df=df, num=num, sep=sep, axislabel=naxislabel, axes=axes)
+                text_add = text_add_type(plot=plot, num=text_sep, add='_%', axislabel=naxislabel, axes=axes)
                 child.set_text(f'{text_add}')
             else:
                 pass
@@ -349,8 +349,8 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
         for child in ax.get_children():
             if isinstance(child, matplotlib.text.Text) and (child.get_text().isdigit() == True):
                 num = int(child.get_text())
-                text_sep = text_sep_type(num=num, df=df, sep=sep, axislabel=naxislabel, axes=axes)
-                text_add = text_add_type(num=text_sep, add=add, axislabel=naxislabel, axes=axes)
+                text_sep = text_sep_type(plot=plot, df=df, num=num, sep=sep, axislabel=naxislabel, axes=axes)
+                text_add = text_add_type(plot=plot, num=text_sep, add=add, axislabel=naxislabel, axes=axes)
                 child.set_text(f'{text_add}')
             else:
                 pass

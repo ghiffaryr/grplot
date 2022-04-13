@@ -54,6 +54,7 @@ def grplot(plot, # default general value
            xlabel_add=None, 
            ylabel_add=None, 
            title=None,
+           legend_loc=None,
            style=None, 
            palette=None, 
            hue_order=None, 
@@ -188,7 +189,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.5.5'
+    ver = '0.6.1'
 
     release date
     13/04/2022
@@ -216,6 +217,7 @@ def grplot(plot, # default general value
     text_fontsize: font size for text <- axes arguments with numeric return data type
     label_fontsize: font size for label <- axes arguments with numeric return data type
     title_fontsize: font size for axes title <- axes arguments with numeric return data type
+    legend_loc: legend location <- axes arguments with string return data type in ['best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', 'center right', 'lower center', 'upper center', 'center']
     
     sep: separator <- axes-axislabel arguments or axes arguments for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot'] with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
     xsep: x-axis separator <- axes-axislabel arguments with string return data type in ['.', ',', '.c', ',c', '.L', ',L', '.cL', ',cL'] 
@@ -343,7 +345,8 @@ def grplot(plot, # default general value
                 legend_fontsize=legend_fontsize,
                 text_fontsize=text_fontsize,
                 label_fontsize=label_fontsize,
-                title_fontsize=title_fontsize)
+                title_fontsize=title_fontsize,
+                legend_loc=legend_loc)
         
     # single plot, y axis
     elif (x is None) and (type(y) == str):
@@ -396,7 +399,8 @@ def grplot(plot, # default general value
                 legend_fontsize=legend_fontsize,
                 text_fontsize=text_fontsize,
                 label_fontsize=label_fontsize,
-                title_fontsize=title_fontsize)
+                title_fontsize=title_fontsize,
+                legend_loc=legend_loc)
         
     # single plot, x and y axis
     elif (type(x) == str) and (type(y) == str):
@@ -449,7 +453,8 @@ def grplot(plot, # default general value
                 legend_fontsize=legend_fontsize,
                 text_fontsize=text_fontsize,
                 label_fontsize=label_fontsize,
-                title_fontsize=title_fontsize)
+                title_fontsize=title_fontsize,
+                legend_loc=legend_loc)
     
     # multi axes plot, x axis
     elif (type(x) in [list, numpy.ndarray]) and (y is None):
@@ -509,7 +514,8 @@ def grplot(plot, # default general value
                         legend_fontsize=legend_fontsize,
                         text_fontsize=text_fontsize,
                         label_fontsize=label_fontsize,
-                        title_fontsize=title_fontsize)
+                        title_fontsize=title_fontsize,
+                        legend_loc=legend_loc)
                 flag += 1
         # multi axes plot, 2D, x axis
         elif (Nx > 1) and (Ny > 1):
@@ -568,7 +574,8 @@ def grplot(plot, # default general value
                             legend_fontsize=legend_fontsize,
                             text_fontsize=text_fontsize,
                             label_fontsize=label_fontsize,
-                            title_fontsize=title_fontsize)
+                            title_fontsize=title_fontsize,
+                            legend_loc=legend_loc)
                     flag += 1 
     
     # multi axes plot, y axis
@@ -629,7 +636,8 @@ def grplot(plot, # default general value
                         legend_fontsize=legend_fontsize,
                         text_fontsize=text_fontsize,
                         label_fontsize=label_fontsize,
-                        title_fontsize=title_fontsize)
+                        title_fontsize=title_fontsize,
+                        legend_loc=legend_loc)
                 flag += 1
         # multi axes plot, 2D, y axis
         elif (Nx > 1) and (Ny > 1):
@@ -688,7 +696,8 @@ def grplot(plot, # default general value
                             legend_fontsize=legend_fontsize,
                             text_fontsize=text_fontsize,
                             label_fontsize=label_fontsize,
-                            title_fontsize=title_fontsize)
+                            title_fontsize=title_fontsize,
+                            legend_loc=legend_loc)
                     flag += 1 
     
     # multi axes plot, (x string and y list-array axis) or (x list-array and y string axis) or (x list-array and y list-array axis)
@@ -750,7 +759,8 @@ def grplot(plot, # default general value
                         legend_fontsize=legend_fontsize,
                         text_fontsize=text_fontsize,
                         label_fontsize=label_fontsize,
-                        title_fontsize=title_fontsize)
+                        title_fontsize=title_fontsize,
+                        legend_loc=legend_loc)
                 flag += 1 
         
         # multi axes plot, 2D, x list and y list axis
@@ -809,7 +819,8 @@ def grplot(plot, # default general value
                             legend_fontsize=legend_fontsize,
                             text_fontsize=text_fontsize,
                             label_fontsize=label_fontsize,
-                            title_fontsize=title_fontsize)
+                            title_fontsize=title_fontsize,
+                            legend_loc=legend_loc)
                     flag += 1
                     
     else:

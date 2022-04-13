@@ -1,6 +1,3 @@
-from grplot.utils.arg_ax_type import arg_ax_type
-
-
 def histplot_percent_add(plot, tick_add, xtick_add, ytick_add, xaxislabel, yaxislabel):
     if plot == 'histplot':
         if xaxislabel == 'Percent':

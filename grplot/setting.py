@@ -14,6 +14,7 @@ from grplot.features.add.label_add.check_label_add import check_label_add
 from grplot.features.add.log_label_add.check_log_label_add import check_log_label_add
 from grplot.features.title.check_title import check_title
 from grplot.features.font.font_def import font_def
+from grplot.features.legend.check_legend import check_legend
 from grplot.utils.arg_ax_type import arg_ax_type
 from grplot.utils.arg_plot_ax_type import arg_plot_ax_type
 
@@ -65,8 +66,9 @@ def setting(plot,
             legend_fontsize,
             text_fontsize,
             label_fontsize,
-            title_fontsize):
-    plot = arg_ax_type(arg=plot, axes=axes)
+            title_fontsize,
+            legend_loc):
+    plot, legend_loc = map(arg_ax_type, (plot, legend_loc), numpy.hstack([axes]*2))
     if plot is None:
         pass
     elif type(plot) == str:
@@ -199,20 +201,22 @@ def setting(plot,
                     title_fontsize=title_fontsize,
                     axes=axes)
         for plot in plot_.split('+'):
-                hue, size = map(arg_plot_ax_type, (hue_, size_), numpy.hstack([plot]*2), numpy.hstack([axes]*2))
                 font_def(plot=plot, 
                          df=df, 
                          x=x, 
                          y=y, 
                          ax=ax, 
                          tick_fontsize=tick_fontsize, 
-                         legend_fontsize=legend_fontsize, 
-                         label_fontsize=label_fontsize, 
-                         hue=hue, 
-                         size=size, 
-                         h=h, 
-                         l=l)
+                         label_fontsize=label_fontsize)
+                hue, size = map(arg_plot_ax_type, (hue_, size_), numpy.hstack([plot]*2), numpy.hstack([axes]*2))
+                check_legend(plot=plot, 
+                             ax=ax, 
+                             legend_fontsize=legend_fontsize, 
+                             legend_loc=legend_loc, 
+                             hue=hue, 
+                             size=size, 
+                             h=h, 
+                             l=l)
     else:
         raise Exception('Unknown plot argument!')
-
     return ax
