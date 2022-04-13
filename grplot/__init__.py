@@ -188,14 +188,14 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.5.4'
+    ver = '0.5.5'
 
     release date
-    12/04/2022
+    13/04/2022
     -----------------------------------------------
     parameters
     
-    plot: plot type <- axes arguments with string return data type with base in ['scatterplot', 'lineplot', 'histplot', 'kdeplot', 'ecdfplot', 'rugplot', 'pieplot', 'treemapsplot', 'packedbubblesplot', 'stripplot', 'swarmplot', 'boxplot', 'violinplot', 'boxenplot', 'pointplot', 'barplot', 'countplot', 'rugplot', 'residplot'] can be passed by ['plot', 'plot1+plot2+...']
+    plot: plot type <- axes arguments with string return data type with base in ['scatterplot', 'lineplot', 'histplot', 'kdeplot', 'ecdfplot', 'rugplot', 'pieplot', 'treemapsplot', 'packedbubblesplot', 'stripplot', 'swarmplot', 'boxplot', 'violinplot', 'boxenplot', 'pointplot', 'barplot', 'countplot', 'paretoplot', 'rugplot', 'residplot'] can be passed by ['plot', 'plot1+plot2+...']
     df: dataframe <- pandas dataframe, dictionary-list, dictionary-numpy.array
     x: x-axis <- string, list-string
     y: y-axis <- string, list-string
