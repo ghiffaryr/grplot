@@ -189,10 +189,10 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    ver = '0.6.1'
+    ver = '0.6.3'
 
     release date
-    13/04/2022
+    15/04/2022
     -----------------------------------------------
     parameters
     
@@ -237,7 +237,7 @@ def grplot(plot, # default general value
     rot: tick rotation <- axes-axislabel arguments with numeric return data type
     xrot: x-axis tick rotation <- axes-axislabel arguments with numeric return data type
     yrot: y-axis tick rotation <- axes-axislabel arguments with numeric return data type
-    statdesc: statistical description <- axes-axislabel arguments with string return data type with base stat in ['general', 'boxplot', 'count', 'unique', 'std', 'var', 'min', 'pct1', 'whislo', 'cilo', 'pct5', 'q1', 'median', 'mean', 'q3', 'pct95', 'cihi', 'whishi', 'pct99', 'max'] can be passed by ['stat', 'stat1+stat2+...']
+    statdesc: statistical description <- axes-axislabel arguments with string return data type with base stat in ['general', 'boxplot', 'count', 'unique', 'std', 'min', 'pct1', 'whislo', 'pct5', 'q1', 'cilo', 'median', 'mean', 'cihi', 'q3', 'pct95', 'whishi', 'pct99', 'max'] can be passed by ['stat', 'stat1+stat2+...']
     xstatdesc: x-axis statistical description <- axes-axislabel arguments with string return data type
     ystatdesc: y-axis statistical description <- axes-axislabel arguments with string return data type
     text: text annotation <- axes-axislabel arguments with string return data type with base position in ['h', 'v', 'i'] can be passed by ['position', 'position1+position2'] for plot in ['histplot', 'barplot', 'countplot', 'paretoplot'] and boolean return data type for plot in ['scatterplot', 'lineplot', 'ecdfplot'] whereas axes arguments with boolean return data type for plot in ['pieplot', 'treemapsplot', 'packedbubblesplot']
@@ -247,12 +247,12 @@ def grplot(plot, # default general value
     xlabel_add: x-axis add axis label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}']
     ylabel_add: y-axis add axis label unit <- axes-axislabel arguments with string return data type in ['{}_', '_{}', '{}_{}']
     
-    **kwargs from matplotlib, seaborn, and squarify <- axes-plot arguments with return data type refers to matplotlib, seaborn, and squarify (dictionary based arguments excluded)
+    arguments from matplotlib, seaborn, and squarify <- axes-plot arguments with return data type refers to matplotlib, seaborn, and squarify (dictionary based arguments excluded)
 
     axes arguments:
     arg = {'[i,j]':return}
     arg = {return:'[i,j]'}
-    arg = {return:['[i,j]']}  
+    arg = {return:['[i,j]']}
     
     axes-plot arguments: 
     arg = {'plot':return}

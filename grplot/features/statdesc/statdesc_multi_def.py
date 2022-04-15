@@ -19,7 +19,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
         if 'general' in statdesc:
             statdesc = statdesc.replace('general', 'count+unique+std+min+q1+median+mean+q3+max')
         elif 'boxplot' in statdesc:
-            statdesc = statdesc.replace('boxplot', 'min+whislo+q1+cilo+median+mean+q3+cihi+whishi+max')
+            statdesc = statdesc.replace('boxplot', 'min+whislo+q1+cilo+median+mean+cihi+q3+whishi+max')
         else:
             pass
         for stat in statdesc.split('+'):
@@ -45,14 +45,6 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=std, color=None, stat_label='std', stat_fmt=std_add)
-            elif 'var' in stat:
-                try:
-                    var = numpy.var(data)
-                    var_sep = statdesc_sep_type(num=var, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
-                    var_add = statdesc_add_type(num=var_sep, add=add, axislabel=axislabel, axes=axes)
-                except:
-                    raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=var, color=None, stat_label='var', stat_fmt=var_add)
             elif 'min' in stat:
                 try:
                     mini = numpy.min(data)
@@ -77,14 +69,6 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=whislo, color='orange', stat_label='lower whisker', stat_fmt=whislo_add)
-            elif 'cilo' in stat:
-                try:
-                    cilo = cbook.boxplot_stats(data)[0]['cilo']
-                    cilo_sep = statdesc_sep_type(num=cilo, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
-                    cilo_add = statdesc_add_type(num=cilo_sep, add=add, axislabel=axislabel, axes=axes)
-                except:
-                    raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=cilo, color='yellow', stat_label='95% CI low', stat_fmt=cilo_add)
             elif 'pct5' in stat:
                 try:
                     pct5 = numpy.percentile(data, 5)
@@ -92,7 +76,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                     pct5_add = statdesc_add_type(num=pct5_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=pct5, color='yellow', stat_label='5th pct', stat_fmt=pct5_add)
+                statdesc_plot_def(ax=ax, axis=axis, stat=pct5, color='green', stat_label='5th pct', stat_fmt=pct5_add)
             elif 'q1' in stat:
                 try:
                     q1 = numpy.percentile(data, 25)
@@ -100,7 +84,15 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                     q1_add = statdesc_add_type(num=q1_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=q1, color='green', stat_label='q1', stat_fmt=q1_add)
+                statdesc_plot_def(ax=ax, axis=axis, stat=q1, color='yellow', stat_label='q1', stat_fmt=q1_add)
+            elif 'cilo' in stat:
+                try:
+                    cilo = cbook.boxplot_stats(data)[0]['cilo']
+                    cilo_sep = statdesc_sep_type(num=cilo, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    cilo_add = statdesc_add_type(num=cilo_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=cilo, color='green', stat_label='95% CI low', stat_fmt=cilo_add)
             elif 'median' in stat:
                 try:
                     median = numpy.median(data)
@@ -117,22 +109,6 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=mean, color='blue', stat_label='mean', stat_fmt=mean_add)
-            elif 'q3' in stat:
-                try:
-                    q3 = numpy.percentile(data, 75)
-                    q3_sep = statdesc_sep_type(num=q3, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
-                    q3_add = statdesc_add_type(num=q3_sep, add=add, axislabel=axislabel, axes=axes)
-                except:
-                    raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=q3, color='green', stat_label='q3', stat_fmt=q3_add)
-            elif 'pct95' in stat:
-                try:
-                    pct95 = numpy.percentile(data, 95)
-                    pct95_sep = statdesc_sep_type(num=pct95, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
-                    pct95_add = statdesc_add_type(num=pct95_sep, add=add, axislabel=axislabel, axes=axes)
-                except:
-                    raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=pct95, color='yellow', stat_label='95th pct', stat_fmt=pct95_add)
             elif 'cihi' in stat:
                 try:
                     cihi = cbook.boxplot_stats(data)[0]['cihi']
@@ -140,7 +116,23 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                     cihi_add = statdesc_add_type(num=cihi_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=cihi, color='yellow', stat_label='95% CI hi', stat_fmt=cihi_add)
+                statdesc_plot_def(ax=ax, axis=axis, stat=cihi, color='green', stat_label='95% CI hi', stat_fmt=cihi_add)
+            elif 'q3' in stat:
+                try:
+                    q3 = numpy.percentile(data, 75)
+                    q3_sep = statdesc_sep_type(num=q3, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    q3_add = statdesc_add_type(num=q3_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=q3, color='yellow', stat_label='q3', stat_fmt=q3_add)
+            elif 'pct95' in stat:
+                try:
+                    pct95 = numpy.percentile(data, 95)
+                    pct95_sep = statdesc_sep_type(num=pct95, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    pct95_add = statdesc_add_type(num=pct95_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=pct95, color='green', stat_label='95th pct', stat_fmt=pct95_add)
             elif 'whishi' in stat:
                 try:
                     whishi = cbook.boxplot_stats(data)[0]['whishi']
