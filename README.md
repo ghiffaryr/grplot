@@ -19,6 +19,8 @@ Offline documentation can be accesed through Python:
 
 	help(grplot)
 
+Each plot arguments and documentations can be found [here](https://github.com/ghiffaryr/grplot/tree/main/grplot/features/plot).
+
 
 Dependencies
 ------------
