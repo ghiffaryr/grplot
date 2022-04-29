@@ -108,6 +108,7 @@ def plot_single_def(plot,
                     logistic,
                     lowess,
                     robust,
+                    regplot_logx
                     x_partial,
                     y_partial,
                     truncate,
@@ -534,7 +535,7 @@ def plot_single_def(plot,
         else:
             pass
         if center is None:
-            center = (0, 0)
+            center = [0, 0]
         else:
             pass
         if frame is None:
@@ -641,6 +642,10 @@ def plot_single_def(plot,
                 jitter = True
             else:
                 pass
+            if dodge is None:
+                dodge = False
+            else:
+                pass
             if size is None:
                 size = 5
             else:
@@ -676,6 +681,10 @@ def plot_single_def(plot,
     elif plot == 'swarmplot':
         if x is not None or y is not None:
             # default value
+            if dodge is None:
+                dodge = False
+            else:
+                pass
             if size is None:
                 size = 5
             else:
@@ -773,10 +782,6 @@ def plot_single_def(plot,
                 width = 0.8
             else:
                 pass
-            if inner is None:
-                inner = 'box'
-            else:
-                pass
             if split is None:
                 split = False
             else:
@@ -811,7 +816,6 @@ def plot_single_def(plot,
                            palette=palette, 
                            saturation=saturation, 
                            ax=ax,
-                           alpha=alpha,
                            zorder=zorder)
         else:
             raise Exception('Define axis label!')
@@ -923,7 +927,6 @@ def plot_single_def(plot,
                               errwidth=errwidth, 
                               capsize=capsize, 
                               ax=ax,
-                              alpha=alpha,
                               zorder=zorder)
             else:
                 sns.pointplot(x=x, 
@@ -948,17 +951,12 @@ def plot_single_def(plot,
                               errwidth=errwidth, 
                               capsize=capsize, 
                               ax=ax,
-                              alpha=alpha,
                               zorder=zorder)
         else:
             raise Exception('Define axis label!')
     elif plot == 'barplot':
         if x is not None or y is not None:
             # default value
-            if ci is None:
-                ci = 95
-            else:
-                pass
             if n_boot is None:
                 n_boot = 1000
             else:
@@ -1038,6 +1036,10 @@ def plot_single_def(plot,
                 saturation = 0.75
             else:
                 pass
+            if dodge is None:
+                dodge = True
+            else:
+                pass
             sns.countplot(x=x, 
                           y=y, 
                           hue=hue, 
@@ -1063,10 +1065,6 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_y.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
-                if ci is None:
-                    ci = 95
-                else:
-                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1165,10 +1163,6 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_x.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
-                if ci is None:
-                    ci = 95
-                else:
-                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1268,20 +1262,12 @@ def plot_single_def(plot,
     elif plot == 'regplot':
         if x is not None or y is not None:
             # default value
-            if x_ci is None:
-                x_ci = 'ci'
-            else:
-                pass
             if scatter is None:
                 scatter = True
             else:
                 pass
             if fit_reg is None:
                 fit_reg = True
-            else:
-                pass
-            if ci is None:
-                ci = 95
             else:
                 pass
             if n_boot is None:
@@ -1302,6 +1288,10 @@ def plot_single_def(plot,
                 pass
             if robust is None:
                 robust = False
+            else:
+                pass
+            if regplot_logx is None:
+                regplot_logx = False
             else:
                 pass
             if truncate is None:
@@ -1333,7 +1323,7 @@ def plot_single_def(plot,
                         logistic=logistic, 
                         lowess=lowess, 
                         robust=robust, 
-                        logx=False, 
+                        logx=regplot_logx, 
                         x_partial=x_partial, 
                         y_partial=y_partial, 
                         truncate=truncate, 
@@ -1345,9 +1335,7 @@ def plot_single_def(plot,
                         marker=marker, 
                         scatter_kws=scatter_kws, 
                         line_kws=line_kws, 
-                        ax=ax,
-                        alpha=alpha,
-                        zorder=zorder)
+                        ax=ax)
         else:
             raise Exception('Define axis label!')
     elif plot == 'residplot':
@@ -1383,9 +1371,7 @@ def plot_single_def(plot,
                           color=color, 
                           scatter_kws=scatter_kws, 
                           line_kws=line_kws, 
-                          ax=ax,
-                          alpha=alpha,
-                          zorder=zorder)
+                          ax=ax)
         else:
             raise Exception('Define axis label!')
     else:

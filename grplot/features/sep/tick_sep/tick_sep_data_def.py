@@ -9,7 +9,7 @@ def tick_sep_data_def(df, ax, axis, axislabel, sep):
         else:
             pass
     else: # axislabel not in df, special case as in histogram, barplot, etc.
-        if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent', 'Cumulative Percentage']:
+        if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent', 'count', 'Cumulative Percentage']:
             if sep in [',c', ',cL']:
                 tick_sep_def(ax=ax, axis=axis, sep=',')
             elif sep in ['.c', '.cL']:

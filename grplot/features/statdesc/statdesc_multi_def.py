@@ -14,7 +14,10 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
     else:
         raise Exception('Unsupported dtype')
     # drop numpy.nan
-    data = data[~numpy.isnan(data)]
+    try:
+        data = data[~numpy.isnan(data)]
+    except:
+        data = numpy.array([value for value in data if str(value) != 'nan'])
     if type(statdesc) == str:
         if 'general' in statdesc:
             statdesc = statdesc.replace('general', 'count+unique+std+min+q1+median+mean+q3+max')
@@ -84,7 +87,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                     q1_add = statdesc_add_type(num=q1_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=q1, color='yellow', stat_label='q1', stat_fmt=q1_add)
+                statdesc_plot_def(ax=ax, axis=axis, stat=q1, color='gold', stat_label='q1', stat_fmt=q1_add)
             elif 'cilo' in stat:
                 try:
                     cilo = cbook.boxplot_stats(data)[0]['cilo']
@@ -124,7 +127,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                     q3_add = statdesc_add_type(num=q3_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
-                statdesc_plot_def(ax=ax, axis=axis, stat=q3, color='yellow', stat_label='q3', stat_fmt=q3_add)
+                statdesc_plot_def(ax=ax, axis=axis, stat=q3, color='gold', stat_label='q3', stat_fmt=q3_add)
             elif 'pct95' in stat:
                 try:
                     pct95 = numpy.percentile(data, 95)

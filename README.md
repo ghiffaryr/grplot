@@ -13,11 +13,7 @@ Documentation
 
 Online documentation is available at [grplot repository](https://github.com/ghiffaryr/grplot).
 
-The docs include an [example](https://github.com/ghiffaryr/grplot/blob/main/doc/example/example.ipynb) and other useful information.
-
-Offline documentation can be accesed through Python:
-
-	help(grplot)
+The docs include a [Full Documentation](https://github.com/ghiffaryr/grplot/blob/main/doc/Full_Documentation.ipynb) and other useful information.
 
 Each plot arguments and documentations can be found [here](https://github.com/ghiffaryr/grplot/tree/main/grplot/features/plot).
 

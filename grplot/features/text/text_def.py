@@ -57,7 +57,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             else:
                 pass
         else: # axislabel not in df, special case as in histogram, barplot, etc.
-            if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent']:
+            if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent', 'count']:
                 numeric = True
             else:
                 pass
@@ -198,6 +198,20 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             if axis == 'x':
                 for data in ax.get_shared_y_axes().get_siblings(ax)[0].get_lines():
                     x_arr, y_arr = data.get_data()
+                    # check x_arr data type
+                    if type(x_arr) == list:
+                        x_arr = numpy.array(x_arr)
+                    elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+                        x_arr = numpy.array(x_arr)
+                    else:
+                        pass
+                    # check y_arr data type
+                    if type(y_arr) == list:
+                        y_arr = numpy.array(y_arr)
+                    elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+                        y_arr = numpy.array(y_arr)
+                    else:
+                        pass
                     # get max x data points
                     if x_arr.size != 0:
                         max_x = max(x_arr)
@@ -220,6 +234,20 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
             elif axis == 'y':
                 for data in ax.get_shared_x_axes().get_siblings(ax)[0].get_lines():
                     x_arr, y_arr = data.get_data()
+                    # check x_arr data type
+                    if type(x_arr) == list:
+                        x_arr = numpy.array(x_arr)
+                    elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+                        x_arr = numpy.array(x_arr)
+                    else:
+                        pass
+                    # check y_arr data type
+                    if type(y_arr) == list:
+                        y_arr = numpy.array(y_arr)
+                    elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+                        y_arr = numpy.array(y_arr)
+                    else:
+                        pass
                     # get max y data points
                     if y_arr.size != 0:
                         max_y = max(y_arr)
@@ -260,21 +288,21 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
                     if text_fontsize is not None:
                         try:
-                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                         except:
                             raise Exception('Unknown text fontsize argument!')
                     else:
-                        ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
+                        ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
                 elif axis == 'y':
                     y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
                     y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
                     if text_fontsize is not None:
                         try:
-                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                         except:
                             raise Exception('Unknown text fontsize argument!')
                     else:
-                        ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                        ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
                 else:
                     raise Exception('Unsupported axis!')
         else:
@@ -284,6 +312,20 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
     if (plot in ['lineplot', 'ecdfplot']) and (text == True):
         for data in ax.get_lines():
             x_arr, y_arr = data.get_data()
+            # check x_arr data type
+            if type(x_arr) == list:
+                x_arr = numpy.array(x_arr)
+            elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+                x_arr = numpy.array(x_arr)
+            else:
+                pass
+            # check y_arr data type
+            if type(y_arr) == list:
+                y_arr = numpy.array(y_arr)
+            elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+                y_arr = numpy.array(y_arr)
+            else:
+                pass
             # get max y data points
             if y_arr.size != 0:
                 max_y = max(y_arr)
@@ -306,21 +348,21 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
+                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
                     elif axis == 'y':
                         y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
                         y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
                     else:
                         raise Exception('Unsupported axis!')
             else:

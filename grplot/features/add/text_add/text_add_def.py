@@ -1,4 +1,9 @@
 def text_add_def(num, add):
+    # check num data type
+    if type(num) != str:
+        num = str(num)
+    else:
+        pass
     if '(_)' in add:
         if add[-3:] == '(_)':
             if '-' in num[0]:

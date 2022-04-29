@@ -9,7 +9,7 @@ def text_sep_data_def(df, num, axislabel, sep):
         else:
             pass
     else: # axislabel not in df, special case as in histogram, barplot, etc.
-        if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent', 'Cumulative Percentage']:
+        if axislabel in ['Probability', 'Proportion', 'Density', 'Count', 'Frequency', 'Percent', 'count', 'Cumulative Percentage']:
             if sep in [',c', ',cL']:
                 num = text_sep_def(num=num, sep=',')
             elif sep in ['.c', '.cL']:
