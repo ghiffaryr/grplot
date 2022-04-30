@@ -108,7 +108,7 @@ def plot_single_def(plot,
                     logistic,
                     lowess,
                     robust,
-                    regplot_logx
+                    regplot_logx,
                     x_partial,
                     y_partial,
                     truncate,
