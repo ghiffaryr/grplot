@@ -5,10 +5,10 @@ from grplot.features.add.text_add.text_add_type import text_add_type
 from grplot.features.sep.text_sep.text_sep_type import text_sep_type
 
 
-def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
+def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
     if plot in ['histplot', 'barplot', 'countplot', 'paretoplot']:
         # check ci
-        if (ci is not None) or (multiple in ['fill', 'stack']):
+        if (ci is not None) or (multiple == 'fill') or ((hue is not None) and (multiple == 'stack')):
             if 'o' in text:
                 text = text.replace('o','i')
             elif 'h' in text:
@@ -19,14 +19,6 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                 pass
         else:
             pass
-        # get patches
-        if cumulative is not None:
-            if cumulative == True:
-                text_patches = ax.patches[len(ax.patches)//2:]
-            else: # cumulative == False
-                text_patches = ax.patches
-        else: 
-            text_patches = ax.patches
         # get patches height and width data
         list_height = numpy.array([p.get_height() for p in ax.patches])
         list_width = numpy.array([p.get_width() for p in ax.patches])
@@ -65,7 +57,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
         if (list_height.size != 0) and (list_width.size != 0) and (numeric == True):
             if axis == 'x':
                 if text in ['h', 'h+o', 'o+h']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
@@ -80,7 +72,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['v', 'v+o', 'o+v']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
@@ -95,7 +87,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['i', 'i+v', 'v+i']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
@@ -110,7 +102,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['i+h', 'h+i']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
@@ -128,7 +120,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                     pass
             elif axis == 'y':
                 if text in ['h', 'h+o', 'o+h']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
@@ -143,7 +135,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['v', 'v+o', 'o+v']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
@@ -158,7 +150,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['i', 'i+v', 'v+i']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
@@ -173,7 +165,7 @@ def text_def(plot, df, ax, ci, cumulative, multiple, axis, text, sep, add, text_
                         else:
                             pass
                 elif text in ['i+h', 'h+i']:
-                    for p in text_patches:
+                    for p in ax.patches:
                         left, bottom, width, height = p.get_bbox().bounds
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)

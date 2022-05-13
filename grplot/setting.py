@@ -32,7 +32,6 @@ def setting(plot,
             size,
             ci,
             multiple,
-            cumulative, 
             sep, 
             xsep, 
             ysep, 
@@ -72,7 +71,7 @@ def setting(plot,
     if plot is None:
         pass
     elif type(plot) == str:
-        plot_, hue_, size_, ci_, multiple_, cumulative_ = plot, hue, size, ci, multiple, cumulative
+        plot_, hue_, size_, ci_, multiple_ = plot, hue, size, ci, multiple
         tick_fontsize, \
         legend_fontsize, \
         text_fontsize, \
@@ -160,15 +159,15 @@ def setting(plot,
                        yaxislabel=yaxislabel,
                        axes=axes)
         for plot in plot_.split('+'):
-                ci, cumulative, multiple  = map(arg_plot_ax_type, (ci_, cumulative_, multiple_), numpy.hstack([plot]*3), numpy.hstack([axes]*3))
+                ci, hue, multiple  = map(arg_plot_ax_type, (ci_, hue_, multiple_), numpy.hstack([plot]*3), numpy.hstack([axes]*3))
                 check_text(plot=plot, 
                            df=df, 
                            x=x,
                            y=y, 
                            ax=ax, 
                            ci=ci, 
-                           cumulative=cumulative, 
-                           multiple=multiple,
+                           hue=hue, 
+                           multiple=multiple, 
                            text=text, 
                            xtext=xtext, 
                            ytext=ytext, 

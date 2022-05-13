@@ -140,7 +140,9 @@ def plot_single_def(plot,
                     treemaps_pad, 
                     bar_kwargs, 
                     text_kwargs,
-                    bubble_spacing): #disini default kalau nilai khusus plotnya none diganti default seaborn per plot
+                    bubble_spacing,
+                    showmeans, 
+                    meanprops):
     # relational plot family
     if plot == 'scatterplot':
         if x is not None or y is not None:
@@ -739,6 +741,16 @@ def plot_single_def(plot,
                 whis = 1.5
             else:
                 pass
+            if showmeans is None:
+                showmeans = False
+            else:
+                pass
+            if meanprops is None:
+                meanprops = {'marker':'s',
+                             'markerfacecolor':'white', 
+                             'markeredgecolor':'.3'}
+            else:
+                pass
             # plot
             sns.boxplot(x=x, 
                         y=y, 
@@ -755,6 +767,8 @@ def plot_single_def(plot,
                         fliersize=fliersize, 
                         linewidth=linewidth, 
                         whis=whis, 
+                        showmeans=showmeans,
+                        meanprops=meanprops,
                         ax=ax,
                         zorder=zorder)
         else:

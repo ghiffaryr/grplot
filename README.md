@@ -5,7 +5,7 @@
 grplot: lazy statistical data visualization
 =======================================
 
-grplot is a Python visualization library based on numpy, scipy, matplotlib, seaborn, squarify, and pandas. It supports human laziness in drawing complete and attractive statistical graphs.
+grplot is a Python visualization library based on numpy, scipy, matplotlib, seaborn, squarify, and pandas. It supports human laziness in drawing complete and attractive statistical graphs in just one line of code.
 
 
 Documentation
