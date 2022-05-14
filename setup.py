@@ -31,6 +31,10 @@ INSTALL_REQUIRES = [
     "pandas>=0.23",
     "ipython>=6.0",
 ]
+EXTRA_REQUIRES = [
+    "pytest==7.1.2",
+    "pytest-cov==3.0.0"
+]
 PACKAGES = ["grplot",
             "grplot.analytic",
             "grplot.features",
@@ -90,6 +94,7 @@ if __name__ == "__main__":
         download_url=DOWNLOAD_URL,
         python_requires=PYTHON_REQUIRES,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRA_REQUIRES,
         packages=PACKAGES,
         classifiers=CLASSIFIERS
     )
