@@ -31,6 +31,10 @@ INSTALL_REQUIRES = [
     "seaborn>=0.11.2",
     "pandas>=0.23",
 ]
+EXTRA_REQUIRES = [
+    "pytest==7.1.2",
+    "pytest-cov==3.0.0"
+]
 PACKAGES = ["grplot",
             "grplot.features",
             "grplot.features.add.label_add",
@@ -83,6 +87,7 @@ if __name__ == "__main__":
         download_url=DOWNLOAD_URL,
         python_requires=PYTHON_REQUIRES,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRA_REQUIRES,
         packages=PACKAGES,
         classifiers=CLASSIFIERS
     )

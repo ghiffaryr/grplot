@@ -1,0 +1,9 @@
+[run]
+source=grplot
+
+[report]
+omit = 
+    grplot/setting.py 
+    grplot/__init__.py
+    grplot/*/__init__.py
+    grplot/*/**/__init__.py
