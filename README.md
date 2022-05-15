@@ -13,7 +13,7 @@ Documentation
 
 Documentation at [grplot repository](https://github.com/ghiffaryr/grplot) includes a [Full_Documentation.ipynb](https://github.com/ghiffaryr/grplot/blob/main/doc/Full_Documentation.ipynb) and other useful information.
 
-The Full_Documentation.ipynb can be read online using [Google Colaboratory](https://drive.google.com/file/d/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g/view?usp=sharing).
+The Full_Documentation.ipynb can be read online using [Google Colaboratory](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g).
 
 
 Dependencies
