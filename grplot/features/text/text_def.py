@@ -22,23 +22,15 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
         # get patches height and width data
         list_height = numpy.array([p.get_height() for p in ax.patches])
         list_width = numpy.array([p.get_width() for p in ax.patches])
-        # get patches max height and width data
+        # get patches max and min height and width data
         if list_height.size != 0:
             max_height = max(list_height)
-            # barplot calibration
-            if plot in ['barplot', 'paretoplot']:
-                max_height = max_height * 2
-            else:
-                pass
+            min_height = min(list_height)
         else:
             pass
         if list_width.size != 0:
             max_width = max(list_width)
-            # barplot calibration
-            if plot in ['barplot', 'paretoplot']:
-                max_width = max_width * 2
-            else:
-                pass
+            min_width = min(list_width)
         else:
             pass
         # numerical check for main axis of histplot, barplot, countplot, barplot in paretoplot
@@ -62,13 +54,24 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
                             width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
-                            if text_fontsize is not None:
-                                try:
-                                    ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
-                                except:
-                                    raise Exception('Unknown text fontsize argument!')
+                            if width > 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175, bottom+height/2), ha='center', va='center', rotation=270)
+                            elif width < 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(width+min_width*0.0175*text_fontsize/10, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=90)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(width+min_width*0.0175, bottom+height/2), ha='center', va='center', rotation=90)
                             else:
-                                ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175, bottom+height/2), ha='center', va='center', rotation=270)
+                                pass
                         else:
                             pass
                 elif text in ['v', 'v+o', 'o+v']:
@@ -77,13 +80,24 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
                             width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
-                            if text_fontsize is not None:
-                                try:
-                                    ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='left', va='center', fontsize=text_fontsize)
-                                except:
-                                    raise Exception('Unknown text fontsize argument!')
+                            if width > 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175*text_fontsize/10, bottom+height/2), ha='left', va='center', fontsize=text_fontsize)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175, bottom+height/2), ha='left', va='center')
+                            elif width < 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(width+min_width*0.0175*text_fontsize/10, bottom+height/2), ha='right', va='center', fontsize=text_fontsize)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(width+min_width*0.0175, bottom+height/2), ha='right', va='center')
                             else:
-                                ax.annotate((f'{width_add}'), xy=(width+max_width*0.0175, bottom+height/2), ha='left', va='center')
+                                pass
                         else:
                             pass
                 elif text in ['i', 'i+v', 'v+i']:
@@ -107,13 +121,24 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                         if width != 0:
                             width_sep = text_sep_type(plot=plot, df=df, num=width, sep=sep, axislabel=axislabel, axes=axes)
                             width_add = text_add_type(plot=plot, num=width_sep, add=add, axislabel=axislabel, axes=axes)
-                            if text_fontsize is not None:
-                                try:
-                                    ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
-                                except:
-                                    raise Exception('Unknown text fontsize argument!')
+                            if width > 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=270)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', rotation=270)
+                            elif width < 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', fontsize=text_fontsize, rotation=90)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', rotation=90)
                             else:
-                                ax.annotate((f'{width_add}'), xy=(left+width/2, bottom+height/2), ha='center', va='center', rotation=270)
+                                pass
                         else:
                             pass
                 else:
@@ -125,13 +150,24 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
                             height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
-                            if text_fontsize is not None:
-                                try:
-                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='center', fontsize=text_fontsize)
-                                except:
-                                    raise Exception('Unknown text fontsize argument!')
+                            if height > 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='center', fontsize=text_fontsize)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325), ha='center', va='center')
+                            elif height < 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{height_add}'), xy=(left+width/2, height+min_height*0.0325*text_fontsize/10), ha='center', va='center', fontsize=text_fontsize)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+min_height*0.0325), ha='center', va='center')
                             else:
-                                ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325), ha='center', va='center')
+                                pass
                         else:
                             pass
                 elif text in ['v', 'v+o', 'o+v']:
@@ -140,13 +176,24 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                         if height != 0:
                             height_sep = text_sep_type(plot=plot, df=df, num=height, sep=sep, axislabel=axislabel, axes=axes)
                             height_add = text_add_type(plot=plot, num=height_sep, add=add, axislabel=axislabel, axes=axes)
-                            if text_fontsize is not None:
-                                try:
-                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='bottom', fontsize=text_fontsize, rotation=90)
-                                except:
-                                    raise Exception('Unknown text fontsize argument!')
+                            if height > 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325*text_fontsize/10), ha='center', va='bottom', fontsize=text_fontsize, rotation=90)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325), ha='center', va='bottom', rotation=90)
+                            elif height < 0:
+                                if text_fontsize is not None:
+                                    try:
+                                        ax.annotate((f'{height_add}'), xy=(left+width/2, height+min_height*0.0325*text_fontsize/10), ha='center', va='top', fontsize=text_fontsize, rotation=90)
+                                    except:
+                                        raise Exception('Unknown text fontsize argument!')
+                                else:
+                                    ax.annotate((f'{height_add}'), xy=(left+width/2, height+min_height*0.0325), ha='center', va='top', rotation=90)
                             else:
-                                ax.annotate((f'{height_add}'), xy=(left+width/2, height+max_height*0.0325), ha='center', va='bottom', rotation=90)
+                                pass
                         else:
                             pass
                 elif text in ['i', 'i+v', 'v+i']:
@@ -216,11 +263,11 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                             x_add = text_add_type(plot=plot, num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
                             if text_fontsize is not None:
                                 try:
-                                    ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175*text_fontsize/10, y), fontsize=text_fontsize, ha='left', va='center')
+                                    ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x-max_x*0.0325*text_fontsize/10, y), fontsize=text_fontsize, ha='right', va='center')
                                 except:
                                     raise Exception('Unknown text fontsize argument!')
                             else:
-                                ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x+max_x*0.0175, y), ha='left', va='center')
+                                ax.get_shared_y_axes().get_siblings(ax)[0].annotate(f'{x_add}', xy=(x-max_x*0.0325, y), ha='right', va='center')
                     else:
                         pass
             elif axis == 'y':
@@ -252,11 +299,11 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                             y_add = text_add_type(plot=plot, num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=axes)
                             if text_fontsize is not None:
                                 try:
-                                    ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                    ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='bottom')
                                 except:
                                     raise Exception('Unknown text fontsize argument!')
                             else:
-                                ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='center')
+                                ax.get_shared_x_axes().get_siblings(ax)[0].annotate(f'{y_add}', xy=(x, y+max_y*0.0325), ha='center', va='bottom')
                     else:
                         pass
             else:
@@ -267,9 +314,10 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
         pass
     if (plot == 'scatterplot') and (text == True):
         x_arr, y_arr = numpy.array([x for x, _ in ax.collections[0].get_offsets()]), numpy.array([y for _, y in ax.collections[0].get_offsets()])
-        # get max y data points
+        # get max and min y data points
         if y_arr.size != 0:
             max_y = max(y_arr)
+            min_y = min(y_arr)
         else:
             pass
         if (x_arr.size != 0) and (y_arr.size != 0):
@@ -278,23 +326,45 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                 if axis == 'x':
                     x_sep = text_sep_type(plot=plot, df=df, num=x, sep=sep, axislabel=axislabel, axes=axes)
                     x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
-                    if text_fontsize is not None:
-                        try:
-                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                        except:
-                            raise Exception('Unknown text fontsize argument!')
+                    if y > 0:
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
+                    elif y < 0:
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325), ha='center', va='center')
                     else:
-                        ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
+                        pass
                 elif axis == 'y':
                     y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
                     y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
-                    if text_fontsize is not None:
-                        try:
-                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                        except:
-                            raise Exception('Unknown text fontsize argument!')
+                    if y > 0:
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
+                    elif y < 0:
+                        if text_fontsize is not None:
+                            try:
+                                ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                            except:
+                                raise Exception('Unknown text fontsize argument!')
+                        else:
+                            ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03), ha='center', va='center')
                     else:
-                        ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
+                        pass
                 else:
                     raise Exception('Unsupported axis!')
         else:
@@ -318,9 +388,10 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                 y_arr = numpy.array(y_arr)
             else:
                 pass
-            # get max y data points
+            # get max and min y data points
             if y_arr.size != 0:
                 max_y = max(y_arr)
+                min_y = min(y_arr)
             else:
                 pass
             if (x_arr.size != 0) and (y_arr.size != 0):
@@ -338,23 +409,45 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                     if axis == 'x':
                         x_sep = text_sep_type(plot=plot, df=df, num=x, sep=sep, axislabel=axislabel, axes=axes)
                         x_add = text_add_type(plot=plot, num=x_sep, add=add, axislabel=axislabel, axes=axes)
-                        if text_fontsize is not None:
-                            try:
-                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                            except:
-                                raise Exception('Unknown text fontsize argument!')
+                        if y > 0:
+                            if text_fontsize is not None:
+                                try:
+                                    ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
+                        elif y < 0:
+                            if text_fontsize is not None:
+                                try:
+                                    ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325), ha='center', va='center')
                         else:
-                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
+                            pass
                     elif axis == 'y':
                         y_sep = text_sep_type(plot=plot, df=df, num=y, sep=sep, axislabel=axislabel, axes=axes)
                         y_add = text_add_type(plot=plot, num=y_sep, add=add, axislabel=axislabel, axes=axes)
-                        if text_fontsize is not None:
-                            try:
-                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
-                            except:
-                                raise Exception('Unknown text fontsize argument!')
+                        if y > 0:
+                            if text_fontsize is not None:
+                                try:
+                                    ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
+                        elif y < 0:
+                            if text_fontsize is not None:
+                                try:
+                                    ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                except:
+                                    raise Exception('Unknown text fontsize argument!')
+                            else:
+                                ax.annotate(f'{y_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
                         else:
-                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
+                            pass
                     else:
                         raise Exception('Unsupported axis!')
             else:

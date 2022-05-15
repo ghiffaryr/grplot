@@ -14,4 +14,4 @@ def scientific_superscript(num, digits=1, exp=None):
         else:
             base = float((f'{num:.{digits+n}e}'.split('e'))[0])*(10**n)
         base = f'{base:.{digits}f}'
-    return f'{str(base)}$\cdot$10${"".join(d.get(x, x) for x in str(exp).lstrip("0+"))}$'
+    return f'{str(base)}×10${"".join(d.get(x, x) for x in str(exp).replace("+0", "").replace("+", "").replace("-0", "-"))}$'
