@@ -11,9 +11,9 @@ grplot is a Python visualization library based on numpy, scipy, matplotlib, seab
 Documentation
 -------------
 
-Online documentation is available at [grplot repository](https://github.com/ghiffaryr/grplot).
+Documentation at [grplot repository](https://github.com/ghiffaryr/grplot) includes a [Full_Documentation.ipynb](https://github.com/ghiffaryr/grplot/blob/main/doc/Full_Documentation.ipynb) and other useful information.
 
-The docs include a [Full Documentation](https://github.com/ghiffaryr/grplot/blob/main/doc/Full_Documentation.ipynb) and other useful information.
+The Full_Documentation.ipynb can be read online using [Google Colaboratory](https://drive.google.com/file/d/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g/view?usp=sharing).
 
 
 Dependencies

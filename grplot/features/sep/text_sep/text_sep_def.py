@@ -1,14 +1,18 @@
-import matplotlib as mpl
+import matplotlib
 from pandas.api.types import is_float_dtype, is_integer_dtype
 from grplot.utils.scientific_superscript import scientific_superscript
 
 
 def text_sep_def(num, sep):
-    lim = mpl.rcParams["axes.formatter.limits"] # default: lim = [-5,6]
+    lim = matplotlib.rcParams['axes.formatter.limits'] # default: lim = [-5,6]
+    mathtext = matplotlib.rcParams['axes.formatter.use_mathtext']
     # comma
     if sep in [',', ',L']:
         if (abs(num) <= 10**lim[0] and abs(num) != 0) or abs(num) >= 10**lim[1]:
-            num = scientific_superscript(num)
+            if mathtext == True:
+                num = scientific_superscript(num)
+            else:
+                num = '{:.1e}'.format(num).replace('+0', '').replace('+', '').replace('-0', '-')
         elif abs(num) > 10**lim[0] and abs(num) < 1:
             num = round(num, abs(lim[0]))
             num = '{:,}'.format(num)
@@ -24,7 +28,10 @@ def text_sep_def(num, sep):
                 pass         
     elif sep in [',c', ',cL']:
         if abs(num) <= 10**lim[0] and abs(num) != 0:
-            num = scientific_superscript(num)
+            if mathtext == True:
+                num = scientific_superscript(num)
+            else:
+                num = '{:.1e}'.format(num).replace('+0', '').replace('+', '').replace('-0', '-')
         elif abs(num) > 10**lim[0] and abs(num) < 1:
             if abs(num) >= 0.01:
                 num = '{:,.2f}'.format(num)
@@ -36,7 +43,10 @@ def text_sep_def(num, sep):
     # dot
     elif sep in ['.', '.L']:
         if (abs(num) <= 10**lim[0] and abs(num) != 0) or abs(num) >= 10**lim[1]:
-            num = scientific_superscript(num).replace(',', '~').replace('.', ',').replace('~', '.')
+            if mathtext == True:
+                num = scientific_superscript(num).replace(',', '~').replace('.', ',').replace('~', '.')
+            else:
+                num = '{:.1e}'.format(num).replace('+0', '').replace('+', '').replace('-0', '-').replace(',', '~').replace('.', ',').replace('~', '.')
         elif abs(num) > 10**lim[0] and abs(num) < 1:
             num = round(num, abs(lim[0]))
             num = '{:,}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
@@ -52,7 +62,10 @@ def text_sep_def(num, sep):
                 pass         
     elif sep in ['.c', '.cL']:
         if abs(num) <= 10**lim[0] and abs(num) != 0:
-            num = scientific_superscript(num).replace(',', '~').replace('.', ',').replace('~', '.')
+            if mathtext == True:
+                num = scientific_superscript(num).replace(',', '~').replace('.', ',').replace('~', '.')
+            else:
+                num = '{:.1e}'.format(num).replace('+0', '').replace('+', '').replace('-0', '-').replace(',', '~').replace('.', ',').replace('~', '.')
         elif abs(num) > 10**lim[0] and abs(num) < 1:
             if abs(num) >= 0.01:
                 num = '{:,.2f}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')

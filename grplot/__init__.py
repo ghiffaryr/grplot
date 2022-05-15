@@ -186,15 +186,15 @@ def grplot(plot, # default general value
            meanprops=None):
     '''
     -----------------------------------------------
-    grplot | lazy statistical data visualization
+    grplot: lazy statistical data visualization
     
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    version = '0.7.2'
+    version = '0.7.3'
 
     release date
-    13/05/2022
+    15/05/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot
