@@ -4,8 +4,8 @@ import pytest
 from typing import Union
 
 @pytest.mark.parametrize('input,expected', [
-    (('asu', 'jancuk'), (np.array(['asu' for i in range(6)]), 'jancuk')),
-    (([1, 2, 3], 'jancuk'), ([1, 2, 3], np.array(['jancuk' for i in range(3)]))),
+    (('abe', 'jeanne'), (np.array(['abe' for i in range(6)]), 'jeanne')),
+    (([1, 2, 3], 'jeanne'), ([1, 2, 3], np.array(['jeanne' for i in range(3)]))),
     (([1, 2, 3], [1, 2, 3]), ([1, 2, 3], [1, 2, 3])) 
 ])
 def test_strtoarray(input: tuple[Union[list, str], Union[list, str]], expected: tuple[any, any]): 
