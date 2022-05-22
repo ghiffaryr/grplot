@@ -10,7 +10,7 @@ df_columns = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]}).columns
     ((pd.Index([1, 2, 3]), pd.Index([1, 2, 3])), (pd.core.indexes.numeric.Int64Index, pd.core.indexes.numeric.Int64Index)),
     ((df_columns, df_columns), (numpy.ndarray, numpy.ndarray))
 ])
-def test_check_pandas_index(test_input: tuple[any, any], expected: any) -> None:
+def test_check_pandas_index(test_input: tuple, expected: any) -> None:
    result = check_pandas_index(test_input[0], test_input[1])
    for input, output in zip(result, expected):
        assert type(input) is output

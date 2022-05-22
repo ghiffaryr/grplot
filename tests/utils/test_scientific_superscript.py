@@ -7,5 +7,5 @@ import pytest
     ([1000, 1, -4], '10000000.00000000×10$⁻⁴$'),
     ([1000, 1, 5], '0.0×10$⁵$')
 ])
-def test_scientific_superscript(input: list[any], expected: str):
+def test_scientific_superscript(input: list, expected: str):
     assert scientific_superscript(*input) == expected

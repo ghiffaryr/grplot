@@ -7,6 +7,6 @@ import pytest
     (([1, 2, 3], 1, None, None), (2, 2)),
     (([1, 2, 3], 1, 1, 2), (1, 2))
 ])
-def test_check_axes(input: tuple[any, any, any, any], expected: tuple[int, int]):
+def test_check_axes(input: tuple, expected: tuple):
     axes = check_axes(*input)
     assert axes == expected
