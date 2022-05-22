@@ -7,7 +7,7 @@ import matplotlib as mpl
     (('halo', None, None), ('halo')),
     ((1, None, None), (None)),
 ])
-def test_check_title_is_None(_ax: mpl.axes._axes.Axes, input: tuple[any, any, any], expected: any):
+def test_check_title_is_None(_ax: mpl.axes._axes.Axes, input: tuple, expected: any):
     try:
         axes = check_title(_ax, *input)
     except:

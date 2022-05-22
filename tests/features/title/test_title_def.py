@@ -7,7 +7,7 @@ import matplotlib as mpl
     (('halo', 15), ('halo')),
     (('halo', 'amigos'), (None))
 ])
-def test_title_def(_ax: mpl.axes._axes.Axes, input: tuple[any, any], expected: any):
+def test_title_def(_ax: mpl.axes._axes.Axes, input: tuple, expected: any):
     try:
         title_def(_ax, *input)
     except:
