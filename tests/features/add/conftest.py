@@ -13,4 +13,5 @@ def _ax(request):
     xlabel, ylabel = request.param
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    return ax
+    yield ax
+    plt.close()
