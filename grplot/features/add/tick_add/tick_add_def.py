@@ -1,3 +1,5 @@
+import numpy as np
+import matplotlib.pyplot as plt
 def tick_add_def(ax, axis, add):
     if axis == 'x':
         if '(_)' in add:
@@ -49,3 +51,15 @@ def tick_add_def(ax, axis, add):
         raise Exception('Unsupported axis!')
 
     return ax
+
+x = np.arange(0, 10, 0.1)
+y = np.sin(x)
+
+ax = plt.subplot(221)
+ax.plot(x,y)
+
+ax.set_xlabel('time')
+ax.set_ylabel('freq')
+
+new_ax = tick_add_def(ax=ax, axis='x', add='_ km')
+print(new_ax.get_xticks())
