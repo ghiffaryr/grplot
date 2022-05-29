@@ -1,5 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
 def tick_add_def(ax, axis, add):
     if axis == 'x':
         if '(_)' in add:
