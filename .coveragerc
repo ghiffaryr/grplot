@@ -7,3 +7,4 @@ omit =
     grplot/__init__.py
     grplot/*/__init__.py
     grplot/*/**/__init__.py
+    grplot/features/plot/*.py
