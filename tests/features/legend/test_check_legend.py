@@ -248,8 +248,3 @@ def test_check_legend(_plot, input, expected):
         if input['plot'] in ['pieplot', 'line', 'histplot']:
             np.testing.assert_array_almost_equal(ax.get_legend().get_frame().get_bbox().bounds, expected[0])
             assert len(ax.get_legend().get_texts()) == expected[1]
-    
-
-
-    
-    
