@@ -3,6 +3,7 @@ from pandas.api.types import is_numeric_dtype
 import matplotlib
 from grplot.features.add.text_add.text_add_type import text_add_type
 from grplot.features.sep.text_sep.text_sep_type import text_sep_type
+from grplot.utils.first_valid_index import first_valid_index
 
 
 def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
@@ -36,7 +37,7 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
         # numerical check for main axis of histplot, barplot, countplot, barplot in paretoplot
         numeric = False
         if axislabel in df:
-            if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][df.first_valid_index()])) == True):
+            if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][first_valid_index(df)])) == True):
                 numeric = True
             else:
                 pass

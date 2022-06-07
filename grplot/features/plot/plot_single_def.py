@@ -4,6 +4,7 @@ from matplotlib.ticker import PercentFormatter
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
 from grplot.features.plot.packedbubbles import plot as pb
 from grplot.features.plot.treemaps import plot as tms
+from grplot.utils.first_valid_index import first_valid_index
 
 
 def plot_single_def(plot,
@@ -1072,7 +1073,7 @@ def plot_single_def(plot,
             raise Exception('Define axis label!')
     elif plot == 'paretoplot':
         if x is not None and y is not None:
-            if ((is_object_dtype(data[x]) == True) or (is_object_dtype(type(data[x][data.first_valid_index()])) == True) or (is_categorical_dtype(data[x]) == True) or (is_categorical_dtype(type(data[x][data.first_valid_index()])) == True)) and ((is_numeric_dtype(data[y]) == True) or (is_numeric_dtype(type(data[y][data.first_valid_index()])) == True)):
+            if ((is_object_dtype(data[x]) == True) or (is_object_dtype(type(data[x][first_valid_index(data)])) == True) or (is_categorical_dtype(data[x]) == True) or (is_categorical_dtype(type(data[x][first_valid_index(data)])) == True)) and ((is_numeric_dtype(data[y]) == True) or (is_numeric_dtype(type(data[y][first_valid_index(data)])) == True)):
                 data_pareto_x, idx, counts = numpy.unique(data[x], return_inverse=True, return_counts=True)
                 data_bin_y = numpy.bincount(idx, weights=data[y])
                 data_pareto_y = data_bin_y / counts
@@ -1170,7 +1171,7 @@ def plot_single_def(plot,
                 ax2.grid(False)
                 ax2.set_ylabel('Cumulative Percentage')
                 ax.get_shared_x_axes().get_siblings(ax)[0].set_ylim([0,110])
-            elif ((is_numeric_dtype(data[x]) == True) or (is_numeric_dtype(type(data[x][data.first_valid_index()])) == True)) and ((is_object_dtype(data[y]) == True) or (is_object_dtype(type(data[y][data.first_valid_index()])) == True) or (is_categorical_dtype(data[y]) == True) or (is_categorical_dtype(type(data[y][data.first_valid_index()])) == True)):
+            elif ((is_numeric_dtype(data[x]) == True) or (is_numeric_dtype(type(data[x][first_valid_index(data)])) == True)) and ((is_object_dtype(data[y]) == True) or (is_object_dtype(type(data[y][first_valid_index(data)])) == True) or (is_categorical_dtype(data[y]) == True) or (is_categorical_dtype(type(data[y][first_valid_index(data)])) == True)):
                 data_pareto_y, idx, counts = numpy.unique(data[y], return_inverse=True, return_counts=True)
                 data_bin_x = numpy.bincount(idx, weights=data[x])
                 data_pareto_x = data_bin_x / counts
