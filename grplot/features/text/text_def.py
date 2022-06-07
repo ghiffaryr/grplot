@@ -36,7 +36,7 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
         # numerical check for main axis of histplot, barplot, countplot, barplot in paretoplot
         numeric = False
         if axislabel in df:
-            if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][0])) == True):
+            if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][df.first_valid_index()])) == True):
                 numeric = True
             else:
                 pass
