@@ -193,10 +193,10 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    version = '0.9.4'
+    version = '0.9.5'
 
     release date
-    03/07/2022
+    04/07/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot

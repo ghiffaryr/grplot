@@ -201,8 +201,11 @@ def tick_sep_def(ax, axis, sep):
             for x in ax.get_xticks():
                 if abs(x) <= 10**lim[0] and abs(x) != 0:
                     mpl.rcParams['axes.formatter.use_locale'] = True
-                    locale.setlocale(locale.LC_NUMERIC, "de")
-                    ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useLocale=False))
+                    try:
+                        locale.setlocale(locale.LC_NUMERIC, "de")
+                    except:
+                        raise Exception("Your environment doesn't support \"de\" locale! Install it or set matplotlib.rcParams['axes.formatter.limits'] bigger than the dataframe.")
+                    ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useLocale=True))
                     xnum = []
                     break
                 else: # abs(x) > 10**lim[0]
@@ -482,8 +485,11 @@ def tick_sep_def(ax, axis, sep):
             for y in ax.get_yticks():
                 if abs(y) <= 10**lim[0] and abs(y) != 0:
                     mpl.rcParams['axes.formatter.use_locale'] = True
-                    locale.setlocale(locale.LC_NUMERIC, "de")
-                    ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useLocale=False))
+                    try:
+                        locale.setlocale(locale.LC_NUMERIC, "de")
+                    except:
+                        raise Exception("Your environment doesn't support \"de\" locale! Install it or set matplotlib.rcParams['axes.formatter.limits'] bigger than the dataframe.")
+                    ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useLocale=True))
                     ynum = []
                     break
                 else: # abs(y) > 10**lim[0]
