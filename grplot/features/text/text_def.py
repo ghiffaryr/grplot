@@ -313,7 +313,7 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
             pass
     else:
         pass
-    if (plot == 'scatterplot') and (text == True):
+    if (plot in ['scatterplot', 'residplot']) and (text == True):
         x_arr, y_arr = numpy.array([x for x, _ in ax.collections[0].get_offsets()]), numpy.array([y for _, y in ax.collections[0].get_offsets()])
         # get max and min y data points
         if y_arr.size != 0:
@@ -321,6 +321,11 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
             min_y = min(y_arr)
         else:
             pass
+        # position calibrator
+        if plot == 'residplot':
+            weight = 5
+        else:
+            weight = 1
         if (x_arr.size != 0) and (y_arr.size != 0):
             for x, y in ax.collections[0].get_offsets():
                 # annotate
@@ -330,19 +335,19 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                     if y > 0:
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*weight*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325), ha='center', va='center')
+                            ax.annotate(f'{x_add}', xy=(x, y-max_y*0.0325*weight), ha='center', va='center')
                     elif y < 0:
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325*weight*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325), ha='center', va='center')
+                            ax.annotate(f'{x_add}', xy=(x, y+min_y*0.0325*weight), ha='center', va='center')
                     else:
                         pass
                 elif axis == 'y':
@@ -351,19 +356,19 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                     if y > 0:
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*weight*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03), ha='center', va='center')
+                            ax.annotate(f'{y_add}', xy=(x, y+max_y*0.03*weight), ha='center', va='center')
                     elif y < 0:
                         if text_fontsize is not None:
                             try:
-                                ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
+                                ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03*weight*text_fontsize/10), fontsize=text_fontsize, ha='center', va='center')
                             except:
                                 raise Exception('Unknown text fontsize argument!')
                         else:
-                            ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03), ha='center', va='center')
+                            ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03*weight), ha='center', va='center')
                     else:
                         pass
                 else:
