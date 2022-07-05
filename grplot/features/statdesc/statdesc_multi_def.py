@@ -15,12 +15,12 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
         raise Exception('Unsupported dtype')
     # drop numpy.nan
     try:
-        data = data[~numpy.isnan(data)]
+        data_notnan = data[~numpy.isnan(data)]
     except:
-        data = numpy.array([value for value in data if str(value) != 'nan'])
+        data_notnan = numpy.array([value for value in data if str(value) != 'nan'])
     if type(statdesc) == str:
         if 'general' in statdesc:
-            statdesc = statdesc.replace('general', 'count+unique+std+min+q1+median+mean+q3+max')
+            statdesc = statdesc.replace('general', 'count+nonzero+unique+std+range+min+q1+median+mean+q3+max')
         elif 'boxplot' in statdesc:
             statdesc = statdesc.replace('boxplot', 'min+whislo+q1+cilo+median+mean+cihi+q3+whishi+max')
         else:
@@ -28,29 +28,44 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
         for stat in statdesc.split('+'):
             if 'count' in stat:
                 try:
-                    count = numpy.count_nonzero(data)
+                    count = data_notnan.size
                     count_sep = statdesc_sep_type(num=count, stat_label='count', sep=sep, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=count, color=None, stat_label='count', stat_fmt=count_sep)
+            elif 'nonzero' in stat:
+                try:
+                    nonzero = numpy.count_nonzero(data_notnan)
+                    nonzero_sep = statdesc_sep_type(num=nonzero, stat_label='non zero count', sep=sep, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=nonzero, color=None, stat_label='non zero count', stat_fmt=nonzero_sep)
             elif 'unique' in stat:
                 try:
-                    unique = len(numpy.unique(data))
+                    unique = len(numpy.unique(data_notnan))
                     unique_sep = statdesc_sep_type(num=unique, stat_label='unique count', sep=sep, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=unique, color=None, stat_label='unique count', stat_fmt=unique_sep)
             elif 'std' in stat:
                 try:
-                    std = numpy.std(data)
+                    std = numpy.std(data_notnan, ddof=1)
                     std_sep = statdesc_sep_type(num=std, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     std_add = statdesc_add_type(num=std_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
                     raise Exception('Label not in the dataframe!')
                 statdesc_plot_def(ax=ax, axis=axis, stat=std, color=None, stat_label='std', stat_fmt=std_add)
+            elif 'range' in stat:
+                try:
+                    range = numpy.ptp(data_notnan)
+                    range_sep = statdesc_sep_type(num=range, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
+                    range_add = statdesc_add_type(num=range_sep, add=add, axislabel=axislabel, axes=axes)
+                except:
+                    raise Exception('Label not in the dataframe!')
+                statdesc_plot_def(ax=ax, axis=axis, stat=range, color=None, stat_label='range', stat_fmt=range_add)
             elif 'min' in stat:
                 try:
-                    mini = numpy.min(data)
+                    mini = numpy.min(data_notnan)
                     mini_sep = statdesc_sep_type(num=mini, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     mini_add = statdesc_add_type(num=mini_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -58,7 +73,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=mini, color='red', stat_label='min', stat_fmt=mini_add)
             elif 'pct1' in stat:
                 try:
-                    pct1 = numpy.percentile(data, 1)
+                    pct1 = numpy.percentile(data_notnan, 1)
                     pct1_sep = statdesc_sep_type(num=pct1, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     pct1_add = statdesc_add_type(num=pct1_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -66,7 +81,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=pct1, color='orange', stat_label='1st pct', stat_fmt=pct1_add)
             elif 'whislo' in stat:
                 try:
-                    whislo = cbook.boxplot_stats(data)[0]['whislo']
+                    whislo = cbook.boxplot_stats(data_notnan)[0]['whislo']
                     whislo_sep = statdesc_sep_type(num=whislo, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     whislo_add = statdesc_add_type(num=whislo_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -74,7 +89,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=whislo, color='orange', stat_label='lower whisker', stat_fmt=whislo_add)
             elif 'pct5' in stat:
                 try:
-                    pct5 = numpy.percentile(data, 5)
+                    pct5 = numpy.percentile(data_notnan, 5)
                     pct5_sep = statdesc_sep_type(num=pct5, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     pct5_add = statdesc_add_type(num=pct5_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -82,7 +97,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=pct5, color='green', stat_label='5th pct', stat_fmt=pct5_add)
             elif 'q1' in stat:
                 try:
-                    q1 = numpy.percentile(data, 25)
+                    q1 = numpy.percentile(data_notnan, 25)
                     q1_sep = statdesc_sep_type(num=q1, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     q1_add = statdesc_add_type(num=q1_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -90,7 +105,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=q1, color='gold', stat_label='q1', stat_fmt=q1_add)
             elif 'cilo' in stat:
                 try:
-                    cilo = cbook.boxplot_stats(data)[0]['cilo']
+                    cilo = cbook.boxplot_stats(data_notnan)[0]['cilo']
                     cilo_sep = statdesc_sep_type(num=cilo, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     cilo_add = statdesc_add_type(num=cilo_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -98,7 +113,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=cilo, color='green', stat_label='95% CI low', stat_fmt=cilo_add)
             elif 'median' in stat:
                 try:
-                    median = numpy.median(data)
+                    median = numpy.median(data_notnan)
                     median_sep = statdesc_sep_type(num=median, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     median_add = statdesc_add_type(num=median_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -106,7 +121,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=median, color='blue', stat_label='median', stat_fmt=median_add)
             elif 'mean' in stat:
                 try:
-                    mean = numpy.mean(data)
+                    mean = numpy.mean(data_notnan)
                     mean_sep = statdesc_sep_type(num=mean, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     mean_add = statdesc_add_type(num=mean_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -114,7 +129,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=mean, color='blue', stat_label='mean', stat_fmt=mean_add)
             elif 'cihi' in stat:
                 try:
-                    cihi = cbook.boxplot_stats(data)[0]['cihi']
+                    cihi = cbook.boxplot_stats(data_notnan)[0]['cihi']
                     cihi_sep = statdesc_sep_type(num=cihi, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     cihi_add = statdesc_add_type(num=cihi_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -122,7 +137,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=cihi, color='green', stat_label='95% CI hi', stat_fmt=cihi_add)
             elif 'q3' in stat:
                 try:
-                    q3 = numpy.percentile(data, 75)
+                    q3 = numpy.percentile(data_notnan, 75)
                     q3_sep = statdesc_sep_type(num=q3, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     q3_add = statdesc_add_type(num=q3_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -130,7 +145,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=q3, color='gold', stat_label='q3', stat_fmt=q3_add)
             elif 'pct95' in stat:
                 try:
-                    pct95 = numpy.percentile(data, 95)
+                    pct95 = numpy.percentile(data_notnan, 95)
                     pct95_sep = statdesc_sep_type(num=pct95, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     pct95_add = statdesc_add_type(num=pct95_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -138,7 +153,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=pct95, color='green', stat_label='95th pct', stat_fmt=pct95_add)
             elif 'whishi' in stat:
                 try:
-                    whishi = cbook.boxplot_stats(data)[0]['whishi']
+                    whishi = cbook.boxplot_stats(data_notnan)[0]['whishi']
                     whishi_sep = statdesc_sep_type(num=whishi, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     whishi_add = statdesc_add_type(num=whishi_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -146,7 +161,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=whishi, color='orange', stat_label='upper whisker', stat_fmt=whishi_add)
             elif 'pct99' in stat:
                 try:
-                    pct99 = numpy.percentile(data, 99)
+                    pct99 = numpy.percentile(data_notnan, 99)
                     pct99_sep = statdesc_sep_type(num=pct99, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     pct99_add = statdesc_add_type(num=pct99_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
@@ -154,7 +169,7 @@ def statdesc_multi_def(df, ax, axis, statdesc, sep, add, axislabel, axes):
                 statdesc_plot_def(ax=ax, axis=axis, stat=pct99, color='orange', stat_label='99th pct', stat_fmt=pct99_add)
             elif 'max' in stat:
                 try:
-                    maxi = numpy.max(data)
+                    maxi = numpy.max(data_notnan)
                     maxi_sep = statdesc_sep_type(num=maxi, stat_label=None, sep=sep, axislabel=axislabel, axes=axes)
                     maxi_add = statdesc_add_type(num=maxi_sep, add=add, axislabel=axislabel, axes=axes)
                 except:
