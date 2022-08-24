@@ -195,7 +195,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    version = '0.10'
+    version = '0.10.2'
 
     release date
     25/08/2022
@@ -242,8 +242,6 @@ def grplot(plot, # default general value
                 fig=fig, 
                 ax=ax, 
                 axes='[{}]'.format(i+1),
-                xaxislabel=ax.get_xlabel(), 
-                yaxislabel=ax.get_ylabel(), 
                 hue=hue,
                 size=size,
                 ci=ci,
@@ -304,8 +302,6 @@ def grplot(plot, # default general value
                 fig=fig, 
                 ax=ax, 
                 axes='[{}]'.format(i+1), 
-                xaxislabel=ax.get_xlabel(), 
-                yaxislabel=ax.get_ylabel(), 
                 hue=hue,
                 size=size,
                 ci=ci,
@@ -366,8 +362,6 @@ def grplot(plot, # default general value
                 fig=fig, 
                 ax=ax,
                 axes='[{}]'.format(i+1), 
-                xaxislabel=ax.get_xlabel(), 
-                yaxislabel=ax.get_ylabel(), 
                 hue=hue,
                 size=size,
                 ci=ci,
@@ -435,8 +429,6 @@ def grplot(plot, # default general value
                         fig=fig, 
                         ax=ax[i], 
                         axes='[{}]'.format(i+1), 
-                        xaxislabel=ax[i].get_xlabel(), 
-                        yaxislabel=ax[i].get_ylabel(), 
                         hue=hue,
                         size=size,
                         ci=ci,
@@ -504,8 +496,6 @@ def grplot(plot, # default general value
                             fig=fig, 
                             ax=ax[i,j], 
                             axes='[{},{}]'.format(i+1,j+1), 
-                            xaxislabel=ax[i,j].get_xlabel(), 
-                            yaxislabel=ax[i,j].get_ylabel(), 
                             hue=hue,
                             size=size,
                             ci=ci,
@@ -574,8 +564,6 @@ def grplot(plot, # default general value
                         fig=fig, 
                         ax=ax[i], 
                         axes='[{}]'.format(i+1), 
-                        xaxislabel=ax[i].get_xlabel(), 
-                        yaxislabel=ax[i].get_ylabel(), 
                         hue=hue,
                         size=size,
                         ci=ci,
@@ -643,8 +631,6 @@ def grplot(plot, # default general value
                             fig=fig, 
                             ax=ax[i,j], 
                             axes='[{},{}]'.format(i+1,j+1), 
-                            xaxislabel=ax[i,j].get_xlabel(), 
-                            yaxislabel=ax[i,j].get_ylabel(), 
                             hue=hue,
                             size=size,
                             ci=ci,
@@ -714,8 +700,6 @@ def grplot(plot, # default general value
                         fig=fig, 
                         ax=ax[i], 
                         axes='[{}]'.format(i+1), 
-                        xaxislabel=ax[i].get_xlabel(), 
-                        yaxislabel=ax[i].get_ylabel(), 
                         hue=hue,
                         size=size,
                         ci=ci,
@@ -782,8 +766,6 @@ def grplot(plot, # default general value
                             fig=fig, 
                             ax=ax[i,j], 
                             axes='[{},{}]'.format(i+1,j+1), 
-                            xaxislabel=ax[i,j].get_xlabel(), 
-                            yaxislabel=ax[i,j].get_ylabel(), 
                             hue=hue,
                             size=size,
                             ci=ci,
