@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import numpy
 import pandas
 from grplot.features.optimizer.optimizer_key import optimizer_key
@@ -21,14 +22,24 @@ def optimizer_data(plot, df, x, y, hue, size, style, units, axes, mode):
         # filter data
         if type(df) == dict:
             if mode == 'numpy':
-                df_ = {k: df[k] for k in numpy.unique(key) if k in df.keys()}
+                df_ = {}
+                for k in numpy.unique(key):
+                    if k in df.keys():
+                        if type(df[k]) == list:
+                            df_[k] = numpy.array(df[k])
+                        elif type(df[k]) == numpy.ndarray:
+                            df_[k] = df[k]
+                        else:
+                            raise Exception('Unsupported dictionary sub data structure!')
+                    else:
+                        pass
             elif mode == 'pandas':
                 df_ = pandas.DataFrame.from_dict({k: df[k] for k in numpy.unique(key) if k in df.keys()})
             else:
                 raise Exception('Unknown optimization mode!')
         elif type(df) == pandas.core.frame.DataFrame:
             if mode == 'numpy':
-                df_ = {k: df[k] for k in numpy.unique(key) if k in df}
+                df_ = {k: df.to_records()[k]for k in numpy.unique(key) if k in df}
             elif mode == 'pandas':
                 df_ = df[[k for k in numpy.unique(key) if k in df]]
                 # if there is only one column

@@ -1,4 +1,5 @@
 import numpy
+from grplot.hotfix.axislabel_fix import axislabel_fix
 from grplot.features.font.check_fontsize import check_fontsize
 from grplot.hotfix.histplot_legend_fix import histplot_legend_fix
 from grplot.features.lim.check_lim import check_lim
@@ -26,8 +27,6 @@ def setting(plot,
             fig,
             ax, 
             axes,
-            xaxislabel, 
-            yaxislabel,  
             hue,
             size,
             ci,
@@ -71,6 +70,9 @@ def setting(plot,
     if plot is None:
         pass
     elif type(plot) == str:
+        ax = axislabel_fix(ax, x, y)
+        xaxislabel = ax.get_xlabel()
+        yaxislabel = ax.get_ylabel()
         plot_, hue_, size_, ci_, multiple_ = plot, hue, size, ci, multiple
         tick_fontsize, \
         legend_fontsize, \
