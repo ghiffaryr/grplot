@@ -5,7 +5,7 @@ from grplot.utils.first_valid_index import first_valid_index
 
 def tick_sep_data_def(df, ax, axis, axislabel, sep):
     if axislabel in df:
-        if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][first_valid_index(df)])) == True):
+        if (is_numeric_dtype(df[axislabel]) == True) or (is_numeric_dtype(type(df[axislabel][first_valid_index(df[axislabel])])) == True):
             tick_sep_def(ax=ax, axis=axis, sep=sep)
         else:
             pass

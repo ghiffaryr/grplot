@@ -10,12 +10,12 @@ def font_def(plot, df, x, y, ax, tick_fontsize, label_fontsize):
         except:
             raise Exception('Unknown tick fontsize argument!')
         if plot == 'paretoplot':
-            if ((is_object_dtype(df[x]) == True) or (is_object_dtype(type(df[x][first_valid_index(df)])) == True) or (is_categorical_dtype(df[x]) == True) or (is_categorical_dtype(type(df[x][first_valid_index(df)])) == True)) and ((is_numeric_dtype(df[y]) == True) or (is_numeric_dtype(type(df[y][first_valid_index(df)])) == True)):
+            if ((is_object_dtype(df[x]) == True) or (is_object_dtype(type(df[x][first_valid_index(df[x])])) == True) or (is_categorical_dtype(df[x]) == True) or (is_categorical_dtype(type(df[x][first_valid_index(df[x])])) == True)) and ((is_numeric_dtype(df[y]) == True) or (is_numeric_dtype(type(df[y][first_valid_index(df[y])])) == True)):
                 try:
                     ax.get_shared_x_axes().get_siblings(ax)[0].tick_params(axis='both', labelsize=tick_fontsize)
                 except:
                     raise Exception('Unknown tick fontsize argument!')
-            elif ((is_numeric_dtype(df[x]) == True) or (is_numeric_dtype(type(df[x][first_valid_index(df)])) == True)) and ((is_object_dtype(df[y]) == True) or (is_object_dtype(type(df[y][first_valid_index(df)])) == True) or (is_categorical_dtype(df[y]) == True) or (is_categorical_dtype(type(df[y][first_valid_index(df)])) == True)):
+            elif ((is_numeric_dtype(df[x]) == True) or (is_numeric_dtype(type(df[x][first_valid_index(df[x])])) == True)) and ((is_object_dtype(df[y]) == True) or (is_object_dtype(type(df[y][first_valid_index(df[y])])) == True) or (is_categorical_dtype(df[y]) == True) or (is_categorical_dtype(type(df[y][first_valid_index(df[y])])) == True)):
                 try:
                     ax.get_shared_y_axes().get_siblings(ax)[0].tick_params(axis='both', labelsize=tick_fontsize)
                 except:
@@ -34,12 +34,12 @@ def font_def(plot, df, x, y, ax, tick_fontsize, label_fontsize):
         except:
             raise Exception('Unknown label fontsize argument!')
         if plot == 'paretoplot':
-            if ((is_object_dtype(df[x]) == True) or (is_object_dtype(type(df[x][first_valid_index(df)])) == True) or (is_categorical_dtype(df[x]) == True) or (is_categorical_dtype(type(df[x][first_valid_index(df)])) == True)) and ((is_numeric_dtype(df[y]) == True) or (is_numeric_dtype(type(df[y][first_valid_index(df)])) == True)):
+            if ((is_object_dtype(df[x]) == True) or (is_object_dtype(type(df[x][first_valid_index(df[x])])) == True) or (is_categorical_dtype(df[x]) == True) or (is_categorical_dtype(type(df[x][first_valid_index(df[x])])) == True)) and ((is_numeric_dtype(df[y]) == True) or (is_numeric_dtype(type(df[y][first_valid_index(df[y])])) == True)):
                 try:
                     ax.get_shared_x_axes().get_siblings(ax)[0].yaxis.get_label().set_fontsize(label_fontsize)
                 except:
                     raise Exception('Unknown label fontsize argument!')
-            elif ((is_numeric_dtype(df[x]) == True) or (is_numeric_dtype(type(df[x][first_valid_index(df)])) == True)) and ((is_object_dtype(df[y]) == True) or (is_object_dtype(type(df[y][first_valid_index(df)])) == True) or (is_categorical_dtype(df[y]) == True) or (is_categorical_dtype(type(df[y][first_valid_index(df)])) == True)):
+            elif ((is_numeric_dtype(df[x]) == True) or (is_numeric_dtype(type(df[x][first_valid_index(df[x])])) == True)) and ((is_object_dtype(df[y]) == True) or (is_object_dtype(type(df[y][first_valid_index(df[y])])) == True) or (is_categorical_dtype(df[y]) == True) or (is_categorical_dtype(type(df[y][first_valid_index(df[y])])) == True)):
                 try:
                     ax.get_shared_y_axes().get_siblings(ax)[0].xaxis.get_label().set_fontsize(label_fontsize)
                 except:
