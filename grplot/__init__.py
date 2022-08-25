@@ -58,7 +58,7 @@ def grplot(plot, # default general value
            title=None, 
            legend_loc=None, 
            saveas=None,
-           optimizer='numpy', 
+           optimizer='perf', 
            style=None, 
            palette=None, 
            hue_order=None, 
@@ -195,7 +195,7 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    version = '0.10.2'
+    version = '0.10.4'
 
     release date
     25/08/2022
