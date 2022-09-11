@@ -1,7 +1,7 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "0.10.4"
+VERSION = "0.11"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -28,10 +28,10 @@ INSTALL_REQUIRES = [
     "numpy>=1.15",
     "scipy>=1.0",
     "matplotlib>=2.2",
-    "seaborn>=0.11.2",
     "pandas>=0.23",
 ]
 PACKAGES = ["grplot",
+            "grplot.analytic",
             "grplot.features",
             "grplot.features.add.label_add",
             "grplot.features.add.log_label_add",
@@ -56,6 +56,10 @@ PACKAGES = ["grplot",
             "grplot.features.title",
             "grplot.hotfix",
             "grplot.utils",
+            "grplot_seaborn",
+            "grplot_seaborn.colors",
+            "grplot_seaborn.external",
+            "grplot_seaborn.tests",
            ]
 
 if __name__ == "__main__":

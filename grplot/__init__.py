@@ -10,7 +10,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-def grplot(plot, # default general value
+def plot2d(plot, # default general value
            df, 
            x=None, 
            y=None, 
@@ -195,14 +195,14 @@ def grplot(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
     
-    version = '0.10.4'
+    version = '0.11'
 
     release date
-    25/08/2022
+    11/09/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot
-    '''    
+    '''
     # initialization
     # creating figure
     Nx, Ny = check_axes(x, y, Nx, Ny)
