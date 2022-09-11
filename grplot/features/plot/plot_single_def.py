@@ -1,5 +1,5 @@
 import numpy
-import seaborn as sns
+import grplot_seaborn as sns
 from matplotlib.ticker import PercentFormatter
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
 from grplot.features.plot.packedbubbles import plot as pb
