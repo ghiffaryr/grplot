@@ -10,6 +10,9 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
+__version__ = '0.12'
+
+
 def plot2d(plot, # default general value
            df, 
            x=None, 
@@ -193,12 +196,12 @@ def plot2d(plot, # default general value
     grplot: lazy statistical data visualization
     
     by ghiffary rifqialdi
-    based on numpy, scipy, matplotlib, seaborn, squarify, and pandas
+    based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '0.11'
+    version = '0.12'
 
     release date
-    11/09/2022
+    12/09/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot

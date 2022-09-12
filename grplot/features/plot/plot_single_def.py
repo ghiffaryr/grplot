@@ -1,5 +1,5 @@
 import numpy
-import grplot_seaborn as sns
+import grplot_seaborn as gs
 from matplotlib.ticker import PercentFormatter
 from pandas.api.types import is_numeric_dtype, is_object_dtype, is_categorical_dtype
 from grplot.features.plot.packedbubbles import plot as pb
@@ -161,7 +161,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.scatterplot(x=x, 
+            gs.scatterplot(x=x, 
                             y=y, 
                             hue=hue, 
                             style=style, 
@@ -217,7 +217,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.lineplot(x=x, 
+            gs.lineplot(x=x, 
                          y=y, 
                          hue=hue, 
                          size=size, 
@@ -303,7 +303,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.histplot(data=data, 
+            gs.histplot(data=data, 
                          x=x, 
                          y=y, 
                          hue=hue, 
@@ -400,7 +400,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.kdeplot(x=x, 
+            gs.kdeplot(x=x, 
                         y=y, 
                         shade=shade, 
                         vertical=vertical, 
@@ -454,7 +454,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.ecdfplot(data=data, 
+            gs.ecdfplot(data=data, 
                          x=x, 
                          y=y, 
                          hue=hue, 
@@ -487,7 +487,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.rugplot(x=x, 
+            gs.rugplot(x=x, 
                         height=height, 
                         ax=ax, 
                         data=data, 
@@ -662,7 +662,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.stripplot(x=x, 
+            gs.stripplot(x=x, 
                           y=y, 
                           hue=hue, 
                           data=data, 
@@ -701,7 +701,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.swarmplot(x=x, 
+            gs.swarmplot(x=x, 
                           y=y, 
                           hue=hue, 
                           data=data, 
@@ -753,7 +753,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.boxplot(x=x, 
+            gs.boxplot(x=x, 
                         y=y, 
                         hue=hue, 
                         data=data, 
@@ -810,7 +810,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.violinplot(x=x, 
+            gs.violinplot(x=x, 
                            y=y, 
                            hue=hue, 
                            data=data, 
@@ -870,7 +870,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.boxenplot(x=x, 
+            gs.boxenplot(x=x, 
                           y=y, 
                           hue=hue, 
                           data=data, 
@@ -921,7 +921,7 @@ def plot_single_def(plot,
                 pass
             # plot
             if estimator is None:
-                sns.pointplot(x=x, 
+                gs.pointplot(x=x, 
                               y=y, 
                               hue=hue, 
                               data=data, 
@@ -944,7 +944,7 @@ def plot_single_def(plot,
                               ax=ax,
                               zorder=zorder)
             else:
-                sns.pointplot(x=x, 
+                gs.pointplot(x=x, 
                               y=y, 
                               hue=hue, 
                               data=data, 
@@ -990,7 +990,7 @@ def plot_single_def(plot,
                 pass
             # plot
             if estimator is None:
-                sns.barplot(x=x, 
+                gs.barplot(x=x, 
                             y=y, 
                             hue=hue, 
                             data=data, 
@@ -1012,7 +1012,7 @@ def plot_single_def(plot,
                             alpha=alpha,
                             zorder=zorder)
             else:
-                sns.barplot(x=x, 
+                gs.barplot(x=x, 
                             y=y, 
                             hue=hue, 
                             data=data, 
@@ -1055,7 +1055,7 @@ def plot_single_def(plot,
                 dodge = True
             else:
                 pass
-            sns.countplot(x=x, 
+            gs.countplot(x=x, 
                           y=y, 
                           hue=hue, 
                           data=data, 
@@ -1109,7 +1109,7 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                sns.barplot(x=x, 
+                gs.barplot(x=x, 
                             y=y, 
                             hue=hue, 
                             data=data, 
@@ -1183,7 +1183,7 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                sns.barplot(x=x, 
+                gs.barplot(x=x, 
                             y=y, 
                             hue=hue, 
                             data=data, 
@@ -1274,7 +1274,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.regplot(x=x, 
+            gs.regplot(x=x, 
                         y=y, 
                         data=data, 
                         x_estimator=x_estimator, 
@@ -1325,7 +1325,7 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            sns.residplot(x=x, 
+            gs.residplot(x=x, 
                           y=y, 
                           data=data, 
                           lowess=lowess, 
