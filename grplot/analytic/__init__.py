@@ -135,7 +135,6 @@ def rank_order(predict_proba, true_label, class_non_event=1, display_table=True)
             else:
                 raise Exception('Pass all class prediction probability as 2 or more dimensional pandas.core.frame.DataFrame to predict_proba!')
         df_rank_order['Decile'] = pandas.qcut(df_rank_order['predict_proba'], 10, labels=False)
-        df_rank_order['Decile'] = df_rank_order['Decile'] + 1
         df_rank_order = df_rank_order.groupby('Decile').apply(lambda x: pandas.Series([numpy.min(x['predict_proba']), numpy.max(x['predict_proba']), numpy.mean(x['predict_proba']), numpy.size(x['predict_proba']), numpy.size(x['true_label'][x['true_label']==class_non_event]), (numpy.size(x['true_label']) - numpy.size(x['true_label'][x['true_label']==class_non_event]))],
                                                             index=(['Minimum Prediction Probability', 'Maximum Prediction Probability', 'Mean Prediction Probability', 'Count Customer', 'Count Non-event', 'Count Event'])
                                                                         )
