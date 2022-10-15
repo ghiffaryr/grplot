@@ -10,7 +10,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-__version__ = '0.12'
+__version__ = '0.12.1'
 
 
 def plot2d(plot, # default general value
@@ -198,10 +198,10 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '0.12'
+    version = '0.12.1'
 
     release date
-    12/09/2022
+    27/09/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot
