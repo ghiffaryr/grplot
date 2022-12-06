@@ -15,9 +15,11 @@ import pytest
         },
         [
             ('test', '1'),
-            ('count', '5'),
+            ('count', '6'),
+            ('non zero count', '5'),
             ('unique count', '6'),
-            ('std', '1,71'),
+            ('std', '1,87'),
+            ('range', '5,00'),
             ('min', '0'),
             ('q1', '1,25'),
             ('median', '2,50'),

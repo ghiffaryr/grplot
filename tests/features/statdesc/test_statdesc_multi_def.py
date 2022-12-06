@@ -53,9 +53,11 @@ input_for_exception_test = [
             'add': None
         },
         [
-            ('count', '5'),
+            ('count', '6'),
+            ('non zero count', '5'),
             ('unique count', '6'),
-            ('std', '1,71'),
+            ('std', '1,87'),
+            ('range', '5,00'),
             ('min', '0'),
             ('q1', '1,25'),
             ('median', '2,50'),
@@ -127,7 +129,7 @@ input_for_exception_test = [
             'add': None
         },
         [
-            ('count', '2')
+            ('count', '3')
         ]
     ), (
         (0, 1),
