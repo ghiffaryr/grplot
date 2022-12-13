@@ -5,6 +5,7 @@ from grplot.features.add.text_add.text_add_type import text_add_type
 from grplot.features.sep.text_sep.text_sep_type import text_sep_type
 from grplot.utils.first_valid_index import first_valid_index
 from pandas.api.types import is_numeric_dtype
+from typing import Callable
 import numpy
 from typing import Union
 class AnnotateParams:
@@ -88,16 +89,12 @@ class AnnotateHistBarCountInParetoplot(IAnnotate):
         dimension: float = None
         add: any = None
 
-        if self.params.text != True:
-            self.ax = ax
-            return self.ax
-
         for p in ax.patches:
+            is_numeric: bool = True
             left, bottom, width, height = p.get_bbox().bounds
 
             if (self.list_height.size == 0) and (self.list_width.size == 0) and (self.numeric != True):
-                self.ax = ax
-                return self.ax
+                is_numeric = False
             
             if self.axis == 'x':
                 width_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=width, sep=self.params.sep, axislabel=self.params.axislabel, axes=self.params.axes)
@@ -112,12 +109,12 @@ class AnnotateHistBarCountInParetoplot(IAnnotate):
                 dimension = height
 
             if dimension is None or dimension == 0:
-                self.ax = ax
-                return self.ax
+                is_numeric = False
             
             rot, ha, va, xy = self.__build_annotate_param(dimension, left, bottom, width, height)
 
-            ax.annotate(
+            if is_numeric == False:
+                ax.annotate(
                 (f'{add}'),
                 xy=xy,
                 ha=ha,
@@ -130,7 +127,7 @@ class AnnotateHistBarCountInParetoplot(IAnnotate):
                 ax = self.annotate_for_lineplot_in_pareto.annotate(ax)
 
         self.ax = ax
-        return self.ax
+        return self.ax        
     
     def __build_annotate_param(self, dimension, left, bottom, width, height):
         rotation: Union[float, int, any] = None
@@ -147,12 +144,12 @@ class AnnotateHistBarCountInParetoplot(IAnnotate):
             if dimension > 0:
                 max_min_dimension = self.max_width
 
-            delta = max_min_dimension*0.0175*self.params.text_fontsize/10 is None if self.params.text_fontsize else max_min_dimension*0.0175
+            delta = max_min_dimension*0.0175*self.params.text_fontsize/10  if self.params.text_fontsize is None else max_min_dimension*0.0175
 
             if self.text in ['h', 'h+o', 'o+h']:
                 ha = 'center'
                 va = 'center'
-                rotation = dimension > 0 if 270 else 90
+                rotation =  270 if dimension > 0 else 90
                 xy = (dimension+delta, bottom+height/2)
 
             if self.text in ['v', 'v+o', 'o+v']:
@@ -183,13 +180,13 @@ class AnnotateHistBarCountInParetoplot(IAnnotate):
             if self.text in ['h', 'h+o', 'o+h']:
                 ha = 'center'
                 va= 'center'
-                xy = (left+width/2, height+delta)
+                xy = (left+width/2, dimension+delta)
     
             if self.text in ['v', 'v+o', 'o+v']:
-                ha = 'bottom' if dimension > 0 else 'top'
-                va = 'center'
+                va = 'bottom' if dimension > 0 else 'top'
+                ha = 'center'
                 rotation = 90
-                xy=(left+width/2, height+delta)
+                xy=(left+width/2, dimension+delta)
 
             if self.text in ['i', 'i+v', 'v+i']:
                 ha = 'center'
@@ -227,7 +224,7 @@ class AnnotateLinePlotInParetoplot(IAnnotate):
 
         for data in ax.get_shared_y_axes().get_siblings(ax)[0].get_lines():
             x_arr, y_arr = data.get_data()
-            if (x_arr.size != 0) and (y_arr.size != 0):
+            if (x_arr.size == 0) and (y_arr.size == 0):
                 continue
 
             x_arr, y_arr = self.__convert_arr_type(x_arr, y_arr)
@@ -242,15 +239,11 @@ class AnnotateLinePlotInParetoplot(IAnnotate):
 
     def __convert_arr_type(self, x_arr, y_arr):
         # check x_arr data type
-        if type(x_arr) == list:
-            x_arr = numpy.array(x_arr)
-        elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+        if (type(x_arr) == list) or (numpy.issubdtype(type(x_arr), numpy.ndarray) == False):
             x_arr = numpy.array(x_arr)
 
         # check y_arr data type
-        if type(y_arr) == list:
-            y_arr = numpy.array(y_arr)
-        elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+        if (type(y_arr) == list) or (numpy.issubdtype(type(y_arr), numpy.ndarray) == False):
             y_arr = numpy.array(y_arr)
         
         return x_arr, y_arr
@@ -266,9 +259,9 @@ class AnnotateLinePlotInParetoplot(IAnnotate):
             x_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=x, sep=self.params.sep, axislabel='Cumulative Percentage', axes=self.params.axes)
             add = text_add_type(plot=self.params.plot, num=x_sep, add='_%', axislabel='Cumulative Percentage', axes=self.params.axes)
             sibling = ax.get_shared_y_axes().get_siblings(ax)[0]
-            if x_arr.size != 0:
-                delta = calc_delta(self.text_fontsize, max(x_arr)) 
-                xy = (x-delta, y)  
+            
+            delta = calc_delta(self.params.text_fontsize, max(x_arr)) 
+            xy = (x-delta, y)  
             
         if self.axis == 'y':
             ha='center'
@@ -276,9 +269,9 @@ class AnnotateLinePlotInParetoplot(IAnnotate):
             y_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=y, sep=self.params.sep, axislabel='Cumulative Percentage', axes=self.params.axes)
             add = text_add_type(plot=self.params.plot, num=y_sep, add='_%', axislabel='Cumulative Percentage', axes=self.params.axes)
             sibling = ax.get_shared_x_axes().get_siblings(ax)[0]
-            if y_arr.size != 0:
-                delta = calc_delta(self.text_fontsize, max(y_arr))
-                xy = (x, y+delta)
+            
+            delta = calc_delta(self.params.text_fontsize, max(y_arr))
+            xy = (x, y+delta)
 
         return ha, va, add, xy, sibling
 
@@ -306,18 +299,16 @@ class AnnotateScatterResidplot(IAnnotate):
             self.ax = ax
             return ax
 
-        x_arr, y_arr = numpy.array(
-            [x for x, _ in ax.collections[0].get_offsets()]), numpy.array([y for _, y in ax.collections[0].get_offsets()]
-        )
+        x_arr, y_arr = numpy.array([x for x, _ in ax.collections[0].get_offsets()]), \
+            numpy.array([y for _, y in ax.collections[0].get_offsets()])
 
-        if (x_arr.size != 0) and (y_arr.size != 0):
+        if (x_arr.size == 0) and (y_arr.size == 0):
             self.ax = ax
             return ax
         
         # get max and min y data points
-        if y_arr.size != 0:
-            max_y = max(y_arr)
-            min_y = min(y_arr)
+        max_y = max(y_arr)
+        min_y = min(y_arr)
  
         # position calibrator
         if self.plot == 'residplot':
@@ -335,22 +326,19 @@ class AnnotateScatterResidplot(IAnnotate):
         self.ax = ax
         return ax
 
-    def __build_annotate_params(self, x, y, max_y, min_y, calc_delta: function):
+    def __build_annotate_params(self, x, y, max_y, min_y, calc_delta: Callable[[Union[float, int], float, float], float]):
         ha = va = 'center'
         delta: float = 0
 
         if self.axis == 'x':
             x_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=x, sep=self.params.sep, axislabel=self.params.axislabel, axes=self.params.axes)
-            add = text_add_type(plot=self.params.plot, num=x_sep, add=self.params.add, axislabel=self.params.axislabel, axes=self.axes)
+            add = text_add_type(plot=self.params.plot, num=x_sep, add=self.params.add, axislabel=self.params.axislabel, axes=self.params.axes)
             
             if y > 0:
-                delta = calc_delta(self.params.text_fontsize, 0.0325, max_y)
+                delta = calc_delta(self.params.text_fontsize, -0.0325, max_y)
             if y < 0:
                 delta = calc_delta(self.params.text_fontsize, 0.0325, min_y)
-
-            xy = (x, y-delta)
             
-
         if self.axis == 'y':
             y_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=y, sep=self.params.sep, axislabel=self.params.axislabel, axes=self.params.axes)
             add = text_add_type(plot=self.params.plot, num=y_sep, add=self.params.add, axislabel=self.params.axislabel, axes=self.params.axes)
@@ -358,9 +346,9 @@ class AnnotateScatterResidplot(IAnnotate):
             if y > 0:
                 delta = calc_delta(self.params.text_fontsize, 0.03, max_y)
             if y < 0:
-                delta = calc_delta(self.params.text_fontsize, 0.03, min_y)
+                delta = calc_delta(self.params.text_fontsize, -0.03, min_y)
 
-            xy = (x, y+delta)
+        xy = (x, y+delta)
 
         return ha, va, add, xy
 
@@ -378,13 +366,15 @@ class AnnotateLineEcdfplot(IAnnotate):
     def get_ax(self) -> any:
         return self.ax
 
+    @check_text_fontsize_type(constant.list_of_type)
+    @check_supported_axis(constant.list_of_axis)
     def annotate(self, ax):
         for data in ax.get_lines():
             x_arr, y_arr = data.get_data()
             if (x_arr.size != 0) and (y_arr.size != 0):
                 continue
 
-            max_y, min_y = self.__get_max_and_min_val(x_arr, y_arr)
+            max_y, min_y, x_arr, y_arr = self.__get_max_and_min_val(x_arr, y_arr)
 
             calc_delta = lambda fontsize, max_min, const: max_min*const*fontsize/10 if fontsize is not None else max_min*const
 
@@ -398,25 +388,20 @@ class AnnotateLineEcdfplot(IAnnotate):
     
     def __get_max_and_min_val(self, x_arr, y_arr):
         # check x_arr data type
-        if type(x_arr) == list:
-            x_arr = numpy.array(x_arr)
-        elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+        if type(x_arr) == list or numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
             x_arr = numpy.array(x_arr)
         
         # check y_arr data type
-        if type(y_arr) == list:
-            y_arr = numpy.array(y_arr)
-        elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+        if type(y_arr) == list or numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
             y_arr = numpy.array(y_arr)
         
         # get max and min y data points
-        if y_arr.size != 0:
-            max_y = max(y_arr)
-            min_y = min(y_arr)
+        max_y = max(y_arr)
+        min_y = min(y_arr)
 
-        return max_y, min_y
+        return max_y, min_y, x_arr, y_arr
 
-    def __build_annotate_params(self, x, y, max_y, min_y, calc_delta: function):
+    def __build_annotate_params(self, x, y, max_y, min_y, calc_delta: Callable[[Union[float, int], float, float], float]):
         const: float = 0
         delta: float = 0
         add: any = None
@@ -433,23 +418,23 @@ class AnnotateLineEcdfplot(IAnnotate):
             x_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=x, sep=self.params.sep, axislabel=self.params.axislabel, axes=self.params.axes)
             add = text_add_type(plot=self.params.plot, num=x_sep, add=self.params.add, axislabel=self.params.axislabel, axes=self.params.axes)
 
-            # for axis x value is reduced by delta
-            xy_fn = lambda val: (x, y-val)
+            if y > 0:
+                delta = calc_delta(self.params.text_fontsize, -max_y, const)
+
+            if y < 0:
+                delta = calc_delta(self.params.text_fontsize, min_y, const)
         
         if self.axis == 'y':
             y_sep = text_sep_type(plot=self.params.plot, df=self.params.df, num=y, sep=self.params.sep, axislabel=self.params.axislabel, axes=self.params.axes)
             add = text_add_type(plot=self.params.plot, num=y_sep, add=self.params.add, axislabel=self.params.axislabel, axes=self.params.axes)
 
-            # for axis y value is added by delta
-            xy_fn = lambda val: (x, y+val)
+            if y > 0:
+                delta = calc_delta(self.params.text_fontsize, max_y, const)
 
-        if y > 0:
-            delta = calc_delta(self.params.text_fontsize, max_y, const)
-
-        if y < 0:
-            delta = calc_delta(self.params.text_fontsize, min_y, const)
-
-        xy = xy_fn(delta)
+            if y < 0:
+                delta = calc_delta(self.params.text_fontsize, -min_y, const)
+            
+        xy = (x, y+delta)
 
         return add, xy, ha, va
 

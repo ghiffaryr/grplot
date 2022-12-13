@@ -14,6 +14,8 @@ class IHandler(IAnnotate, ISetFont):
 
 class TextDefHandler:
     handler_map: Dict[str, IHandler] = dict()
+    def __init__(self, ax):
+        self.ax = ax
 
     def register_handler(self, obj: IHandler, *conditions):
         for condition in conditions:
@@ -22,17 +24,17 @@ class TextDefHandler:
     def get_instance(self, plot: str):
         p = self.handler_map[plot]
         if isinstance(p, IAnnotate):
-            p.annotate()
+            p.annotate(self.ax)
 
         if isinstance(p, ISetFont):
-            p.set_font()
+            p.set_font(self.ax)
         
         return p
         
 
 
 def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
-    text_def_handler = TextDefHandler()
+    text_def_handler = TextDefHandler(ax)
 
     # instantiate object responsible for annotation
     annotate_params = annotate.AnnotateParams(
@@ -70,6 +72,6 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
     text_def_handler.register_handler(annotate_scatter_resid, *['scatterplot', 'residplot'])
     text_def_handler.register_handler(annotate_line_ecdf ,*['lineplot', 'ecdfplot'])
     text_def_handler.register_handler(set_font_pie, 'pieplot')
-    text_def_handler.register_handler(set_font_trees_bubble, ['treemapsplot', 'packedbubblesplot'])
+    text_def_handler.register_handler(set_font_trees_bubble, *['treemapsplot', 'packedbubblesplot'])
 
     return text_def_handler.get_instance(plot).get_ax()

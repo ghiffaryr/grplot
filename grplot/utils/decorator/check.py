@@ -1,9 +1,9 @@
-from grplot.utils.template.annotate_template import Annotate
+from grplot.utils.template.annotate_template import IAnnotate
 
 def check_supported_axis(axis: list):
     def return_func(func):
         def wrapper(*args, **kwargs):
-            obj: Annotate = args[0]
+            obj: IAnnotate = args[0]
 
             if obj.axis not in axis:
                 raise Exception(f'Unsupported axis, axis should be of {" or ".join(axis)}!')
