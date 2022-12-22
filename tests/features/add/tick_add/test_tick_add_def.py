@@ -1,121 +1,53 @@
 from grplot.features.add.tick_add.tick_add_def import tick_add_def
 import pytest
 
-@pytest.mark.parametrize('_ax, input, expected', [
-    (
-        ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': 'Rp (_)',
-        },
-        ['Rp 12', '1.25']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'x',
+
+class TestTickAddDef:
+    @pytest.mark.parametrize('_ax', [(['Time', 'Freq'])], indirect=['_ax'])
+    def test_error_if_there_is_unsupported_axis(self, _ax):
+        input = {
+            'axis': 'k',
             'add': '(_) km',
-        },
-        ['12 km', '1.25']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': 'huge (_) km',
-        },
-        ['huge 12 km', '1.25']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': 'Rp _',
-        },
-        ['Rp 12', '1.25']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': '_ km',
-        },
-        ['12 km', '1.25']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': 'huge _ km',
-        },
-        ['huge 12 km', '1.25']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': 'Rp (_)',
-        },
-        ['12', 'Rp 1.25']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': '(_) km',
-        },
-        ['12', '1.25 km']
-    ), (
-         ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': 'huge (_) km',
-        },
-        ['12', 'huge 1.25 km']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': 'Rp _',
-        },
-        ['12', 'Rp 1.25']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': '_ km',
-        },
-        ['12', '1.25 km']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': 'huge _ km',
-        },
-        ['12', 'huge 1.25 km']
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'x',
-            'add': 'huge',
-        },
-        None
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'y',
-            'add': 'huge',
-        },
-        None
-    ), (
-        ['time', 'freq'],
-        {
-            'axis': 'soy',
-            'add': 'huge',
-        },
-        None
-    )
-], indirect=['_ax'])
-def test_tick_add_def(_ax, input, expected):
-    try:
-        ax = tick_add_def(_ax, **input)
-    except:
-        with pytest.raises(Exception):
+        }
+
+        with pytest.raises(Exception) as exc_info:
             tick_add_def(_ax, **input)
-    else:
+
+        assert 'Unsupported axis!' in str(exc_info.value)
+
+    @pytest.mark.parametrize('_ax, axis', [
+        (['Time', 'Freq'], 'x'),
+        (['Time', 'Freq'], 'y')
+    ], indirect=['_ax'])
+    def test_error_if_there_is_unknown_tick_add_argument(self, axis, _ax):
+        input = {
+            'axis': axis,
+            'add': 'yoyoma',
+        }
+
+        with pytest.raises(Exception) as exc_info:
+            tick_add_def(_ax, **input)
+
+        assert 'Unknown tick add argument' in str(exc_info.value)
+
+    @pytest.mark.parametrize('_ax, axis, add, expected', [
+        *[(['Time', 'Freq'], 'x', add, (expect, '1.25')) for add, expect in zip(['Rp (_)', '(_) km', 'huge (_) km'], ['Rp 12', '12 km', 'huge 12 km'])],
+        *[(['Time', 'Freq'], 'y', add, ('12', expect)) for add, expect in zip(['Rp (_)', '(_) km', 'huge (_) km'], ['Rp 1.25', '1.25 km', 'huge 1.25 km'])],
+    ], indirect=['_ax'])
+    def test_when_add_is_underscore_inside_parenthesis(self, axis, _ax, add, expected):
+        ax = tick_add_def(_ax, axis, add)
+
+        expected_xlabel, expected_ylabel = expected
+        assert ax.get_xticklabels()[-1].get_text() == expected_xlabel
+        assert ax.get_yticklabels()[-1].get_text() == expected_ylabel
+
+    @pytest.mark.parametrize('_ax, axis, add, expected', [
+        *[(['Time', 'Freq'], 'x', add, (expect, '1.25')) for add, expect in zip(['Rp _', '_ km', 'huge _ km'], ['Rp 12', '12 km', 'huge 12 km'])],
+        *[(['Time', 'Freq'], 'y', add, ('12', expect)) for add, expect in zip(['Rp _', '_ km', 'huge _ km'], ['Rp 1.25', '1.25 km', 'huge 1.25 km'])],
+    ], indirect=['_ax'])
+    def test_when_add_is_just_underscore(self, axis, _ax, add, expected):
+        ax = tick_add_def(_ax, axis, add)
+
         expected_xlabel, expected_ylabel = expected
         assert ax.get_xticklabels()[-1].get_text() == expected_xlabel
         assert ax.get_yticklabels()[-1].get_text() == expected_ylabel
