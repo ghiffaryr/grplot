@@ -9,4 +9,5 @@ def _ax():
 
     ax = plt.subplot(221)
     ax.plot(x,y)
-    return ax
+    yield ax
+    plt.close()
