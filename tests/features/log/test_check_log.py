@@ -45,12 +45,7 @@ import pytest
     )
 ])
 def test_check_log(_ax, input, expected):
-    try:
-        ax = check_log(_ax, **input)
-    except:
-        with pytest.raises(Exception):
-            check_log(_ax, **input)
-    else:
-        expected_x, expected_y = expected
-        numpy.testing.assert_array_equal(ax.get_xticks(), expected_x)
-        numpy.testing.assert_array_equal(ax.get_yticks(), expected_y)
+    ax = check_log(_ax, **input)
+    expected_x, expected_y = expected
+    numpy.testing.assert_array_equal(ax.get_xticks(), expected_x)
+    numpy.testing.assert_array_equal(ax.get_yticks(), expected_y)
