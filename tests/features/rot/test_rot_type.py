@@ -1,19 +1,40 @@
 from grplot.features.rot.rot_type import rot_type
-from grplot.utils.arg_axis_ax_type import arg_axis_ax_type
 import pytest
 
-@pytest.mark.parametrize('input,expected', [
-    ([None, None, None, None], 90),
-    (['x', 90, None, None], 90),
-    (['x', 'hola', None, None], None)
-])
-def test_rot_type(_ax: any, input: list, expected: any):
-    try:
-        rotated_ax = rot_type(_ax, *input)
-    except:
-        with pytest.raises(Exception):
-            rot_type(_ax, *input)
-    else:
+
+class TestRotType:
+    def test_rot_is_none(self, _ax):
+        rotated_ax = rot_type(
+            ax=_ax,
+            axes=None,
+            axis='x',
+            axislabel='x',
+            rot=None
+        )
+
         for label in rotated_ax.get_xticklabels():
-            assert label.get_rotation() == expected
-    
+            assert label.get_rotation() == 0
+
+    def test_rot_has_value(self, _ax):
+        rotated_ax = rot_type(
+            ax=_ax,
+            axes=None,
+            axis='x',
+            axislabel='x',
+            rot=90
+        )
+
+        for label in rotated_ax.get_xticklabels():
+            assert label.get_rotation() == 90
+
+    def test_unknown_rot_argument(self, _ax):
+        with pytest.raises(Exception) as exc_info:
+            rot_type(
+                ax=_ax,
+                axes=None,
+                axis='x',
+                axislabel='x',
+                rot='keliling'
+            )
+
+        assert str(exc_info.value) == 'Unknown rot argument!'

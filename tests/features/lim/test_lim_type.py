@@ -36,3 +36,4 @@ def test_lim_type(_ax, input, expected):
             lim_type(_ax, *input)
     else:
         assert ax.get_xticks()[-1] == expected
+
