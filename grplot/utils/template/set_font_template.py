@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod, abstractproperty
+from typing import Any
+
 
 class ISetFont(ABC):
     @abstractproperty
@@ -6,9 +8,9 @@ class ISetFont(ABC):
         pass
 
     @abstractmethod
-    def set_font(self, ax) -> any:
+    def set_font(self, ax) -> Any:
         pass
 
     @abstractmethod
-    def get_ax(self) -> any:
+    def get_ax(self) -> Any:
         pass

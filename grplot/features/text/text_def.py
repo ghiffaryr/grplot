@@ -7,11 +7,10 @@ from grplot.utils.first_valid_index import first_valid_index
 from grplot.features.text import annotate, set_font
 from grplot.utils.template.set_font_template import ISetFont
 from grplot.utils.template.annotate_template import IAnnotate
-from typing import Dict
+from typing import Dict, Union
 
 
-class IHandler(IAnnotate, ISetFont):
-    pass
+IHandler = Union[IAnnotate, ISetFont]
 
 
 class TextDefHandler:
@@ -22,7 +21,7 @@ class TextDefHandler:
 
     def register_handler(self, obj: IHandler, *conditions):
         for condition in conditions:
-            self.handler_map.update(condition, obj)
+            self.handler_map.update({condition: obj})
 
     def get_instance(self, plot: str):
         p = self.handler_map[plot]
@@ -63,16 +62,18 @@ def text_def(
         plot=plot,
         sep=sep,
         text_fontsize=text_fontsize,
+        text=text,
     )
     annotate_line_pareto = annotate.AnnotateLinePlotInParetoplot(annotate_params)
     annotate_hist_bar_count_in_pareto = annotate.AnnotateHistBarCountInParetoplot(
-        annotate_params, text, ci, multiple, hue, annotate_line_pareto
+        ax, annotate_params, ci, multiple, hue, annotate_line_pareto
     )
     annotate_scatter_resid = annotate.AnnotateScatterResidplot(annotate_params)
     annotate_line_ecdf = annotate.AnnotateLineEcdfplot(annotate_params)
 
     # instantiate object responsible for set font
     set_font_params = set_font.SetFontParams(
+        text=text,
         plot=plot,
         add=add,
         axes=axes,
