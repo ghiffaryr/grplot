@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from scipy.cluster import hierarchy
 
-from . import cm
+try:
+    from seaborn import cm  # noqa: F401
+except:
+    from . import cm  # noqa: F401
 from .axisgrid import Grid
 from .utils import (
     despine,

@@ -24,17 +24,17 @@ def optimizer_data(plot, df, x, y, hue, size, style, units, axes, mode):
             for k in numpy.unique(key):
                 if k in df.keys():
                     if type(df[k]) == list:
-                        if mode in ['numpy','saver']:
+                        if mode in ['numpy', 'saver']:
                             df_[k] = numpy.array(df[k])
-                        elif mode in ['pandas','perf']:
+                        elif mode in ['pandas', 'perf']:
                             df_ = pandas.DataFrame.from_dict({k: df[k] for k in numpy.unique(key) if k in df.keys()})
                             break
                         else:
                             raise Exception('Unknown optimizer argument!')
                     elif type(df[k]) == numpy.ndarray:
-                        if mode in ['numpy','saver']:
+                        if mode in ['numpy', 'saver']:
                             df_[k] = df[k]
-                        elif mode in ['pandas','perf']:
+                        elif mode in ['pandas', 'perf']:
                             df_ = pandas.DataFrame.from_dict({k: df[k] for k in numpy.unique(key) if k in df.keys()})
                             break
                         else:
@@ -44,9 +44,9 @@ def optimizer_data(plot, df, x, y, hue, size, style, units, axes, mode):
                 else:
                     pass
         elif type(df) == pandas.core.frame.DataFrame:
-            if mode in ['numpy','saver']:
+            if mode in ['numpy', 'saver']:
                 df_ = {k: df[[k]].to_records()[k] for k in numpy.unique(key) if k in df}
-            elif mode in ['pandas','perf']:
+            elif mode in ['pandas', 'perf']:
                 df_ = df[[k for k in numpy.unique(key) if k in df]]
                 # if there is only one column
                 if type(df_) == pandas.core.series.Series:

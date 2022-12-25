@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy
+from grplot.features.filter.check_filter import check_filter
 from grplot.features.optimizer.optimizer_data import optimizer_data
 from grplot.features.pad.check_pad import check_pad
 from grplot.features.plot.plot_type import plot_type
@@ -10,7 +11,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-__version__ = '0.12.1'
+__version__ = '0.13.1'
 
 
 def plot2d(plot, # default general value
@@ -23,6 +24,7 @@ def plot2d(plot, # default general value
            pad=6, 
            hpad=None, 
            wpad=None, 
+           filter=None, 
            hue=None, 
            size=None, # {5:'stripplot+swarmplot'}
            fontsize=10, 
@@ -198,10 +200,10 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '0.12.1'
+    version = '0.13.1'
 
     release date
-    27/09/2022
+    26/12/2022
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot
@@ -227,8 +229,11 @@ def plot2d(plot, # default general value
     # single plot, x axis
     if (type(x) == str) and (y is None):
         i = 0
+        df_filter = check_filter(df=df, 
+                                 logic=filter, 
+                                 axes='[{}]'.format(i+1))
         df_optimized = optimizer_data(plot=plot, 
-                                      df=df, 
+                                      df=df_filter, 
                                       x=x, 
                                       y=None, 
                                       hue=hue, 
@@ -287,8 +292,11 @@ def plot2d(plot, # default general value
     # single plot, y axis
     elif (x is None) and (type(y) == str):
         i = 0
+        df_filter = check_filter(df=df, 
+                                 logic=filter, 
+                                 axes='[{}]'.format(i+1))
         df_optimized = optimizer_data(plot=plot, 
-                                      df=df, 
+                                      df=df_filter, 
                                       x=None, 
                                       y=y, 
                                       hue=hue, 
@@ -296,7 +304,7 @@ def plot2d(plot, # default general value
                                       style=style, 
                                       units=units, 
                                       axes='[{}]'.format(i+1),
-                                      mode=optimizer)
+                                      mode=optimizer)        
         plot_type(plot=plot, data=df_optimized, x=None, y=y, ax=ax, axes='[{}]'.format(i+1), hue=hue, size=size, style=style, palette=palette, hue_order=hue_order, hue_norm=hue_norm, sizes=sizes, size_order=size_order, size_norm=size_norm, markers=markers, dashes=dashes, style_order=style_order, legend=legend, height=height, units=units, x_bins=x_bins, y_bins=y_bins, estimator=estimator, x_estimator=x_estimator, ci=ci, n_boot=n_boot, alpha=alpha, expand_margins=expand_margins, jitter=jitter, x_jitter=x_jitter, y_jitter=y_jitter, weights=weights, color=color, seed=seed, sort=sort, err_style=err_style, err_kws=err_kws, stat=stat, bins=bins, binwidth=binwidth, binrange=binrange, discrete=discrete, cumulative=cumulative, common_bins=common_bins, common_norm=common_norm, common_grid=common_grid, multiple=multiple, element=element, fill=fill, shrink=shrink, kde=kde, kde_kws=kde_kws, line_kws=line_kws, thresh=thresh, pthresh=pthresh, pmax=pmax, cbar=cbar, cbar_ax=cbar_ax, cbar_kws=cbar_kws, shade=shade, vertical=vertical, kernel=kernel, bw=bw, gridsize=gridsize, cut=cut, clip=clip, shade_lowest=shade_lowest, levels=levels, bw_method=bw_method, bw_adjust=bw_adjust, data2=df2, warn_singular=warn_singular, complementary=complementary, a=a, order=order, orient=orient, edgecolor=edgecolor, linewidth=linewidth, saturation=saturation, width=width, dodge=dodge, fliersize=fliersize, whis=whis, scale=scale, scale_hue=scale_hue, inner=inner, split=split, k_depth=k_depth, outlier_prop=outlier_prop, trust_alpha=trust_alpha, showfliers=showfliers, linestyles=linestyles, join=join, errwidth=errwidth, capsize=capsize, errcolor=errcolor, x_ci=x_ci, scatter=scatter, fit_reg=fit_reg, logistic=logistic, lowess=lowess, robust=robust, regplot_logx=regplot_logx, x_partial=x_partial, y_partial=y_partial, truncate=truncate, scatter_kws=scatter_kws, marker=marker, dropna=dropna, label=label, zorder=zorder, color2=color2, markersize=markersize, explode=explode, colors=colors, autopct=autopct, pctdistance=pctdistance, shadow=shadow, labeldistance=labeldistance, startangle=startangle, radius=radius, counterclock=counterclock, wedgeprops=wedgeprops, textprops=textprops, center=center, frame=frame, rotatelabels=rotatelabels, normalize=normalize, norm_x=norm_x, norm_y=norm_y, treemaps_pad=treemaps_pad, bar_kwargs=bar_kwargs, text_kwargs=text_kwargs, bubble_spacing=bubble_spacing, showmeans=showmeans, meanprops=meanprops, text=text)
         setting(plot=plot,
                 df=df_optimized, 
@@ -347,8 +355,11 @@ def plot2d(plot, # default general value
     # single plot, x and y axis
     elif (type(x) == str) and (type(y) == str):
         i = 0
+        df_filter = check_filter(df=df, 
+                                 logic=filter, 
+                                 axes='[{}]'.format(i+1))
         df_optimized = optimizer_data(plot=plot, 
-                                      df=df, 
+                                      df=df_filter, 
                                       x=x, 
                                       y=y, 
                                       hue=hue, 
@@ -414,8 +425,11 @@ def plot2d(plot, # default general value
                     break
                 else:
                     pass
+                df_filter = check_filter(df=df, 
+                                         logic=filter, 
+                                         axes='[{}]'.format(i+1))
                 df_optimized = optimizer_data(plot=plot, 
-                                              df=df, 
+                                              df=df_filter, 
                                               x=x[flag], 
                                               y=None, 
                                               hue=hue, 
@@ -481,8 +495,11 @@ def plot2d(plot, # default general value
                         break
                     else:
                         pass
+                    df_filter = check_filter(df=df, 
+                                             logic=filter, 
+                                             axes='[{},{}]'.format(i+1,j+1))
                     df_optimized = optimizer_data(plot=plot, 
-                                                  df=df, 
+                                                  df=df_filter, 
                                                   x=x[flag], 
                                                   y=None, 
                                                   hue=hue, 
@@ -549,8 +566,11 @@ def plot2d(plot, # default general value
                     break
                 else:
                     pass
+                df_filter = check_filter(df=df, 
+                                         logic=filter, 
+                                         axes='[{}]'.format(i+1))
                 df_optimized = optimizer_data(plot=plot, 
-                                              df=df, 
+                                              df=df_filter, 
                                               x=None, 
                                               y=y[flag], 
                                               hue=hue, 
@@ -616,8 +636,11 @@ def plot2d(plot, # default general value
                         break
                     else:
                         pass
+                    df_filter = check_filter(df=df, 
+                                             logic=filter, 
+                                             axes='[{},{}]'.format(i+1,j+1))
                     df_optimized = optimizer_data(plot=plot, 
-                                                  df=df, 
+                                                  df=df_filter, 
                                                   x=None, 
                                                   y=y[flag], 
                                                   hue=hue, 
@@ -685,8 +708,11 @@ def plot2d(plot, # default general value
                     break
                 else:
                     pass
+                df_filter = check_filter(df=df, 
+                                         logic=filter, 
+                                         axes='[{}]'.format(i+1))
                 df_optimized = optimizer_data(plot=plot, 
-                                              df=df, 
+                                              df=df_filter, 
                                               x=x[flag], 
                                               y=y[flag], 
                                               hue=hue, 
@@ -751,8 +777,11 @@ def plot2d(plot, # default general value
                         break
                     else:
                         pass
+                    df_filter = check_filter(df=df, 
+                                             logic=filter, 
+                                             axes='[{},{}]'.format(i+1,j+1))
                     df_optimized = optimizer_data(plot=plot, 
-                                                  df=df, 
+                                                  df=df_filter, 
                                                   x=x[flag], 
                                                   y=y[flag], 
                                                   hue=hue, 

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod, abstractproperty
+from typing import Any
+
 
 class IAnnotate(ABC):
     @abstractproperty
@@ -10,9 +12,9 @@ class IAnnotate(ABC):
         pass
 
     @abstractmethod
-    def annotate(self, ax) -> any:
+    def annotate(self, ax) -> Any:
         pass
 
     @abstractmethod
-    def get_ax(self) -> any:
+    def get_ax(self) -> Any:
         pass
