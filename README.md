@@ -29,6 +29,10 @@ The latest stable release (and required dependencies) can be installed from PyPI
 
     pip install grplot
 
+The latest stable release (and required dependencies) can be installed from Conda:
+
+    conda install -c conda-forge grplot
+    
 
 Development
 -----------
