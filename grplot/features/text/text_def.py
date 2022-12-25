@@ -239,16 +239,12 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                 for data in ax.get_shared_y_axes().get_siblings(ax)[0].get_lines():
                     x_arr, y_arr = data.get_data()
                     # check x_arr data type
-                    if type(x_arr) == list:
-                        x_arr = numpy.array(x_arr)
-                    elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+                    if (type(x_arr) == list) or (numpy.issubdtype(type(x_arr), numpy.ndarray) == False):
                         x_arr = numpy.array(x_arr)
                     else:
                         pass
                     # check y_arr data type
-                    if type(y_arr) == list:
-                        y_arr = numpy.array(y_arr)
-                    elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+                    if (type(y_arr) == list) or (numpy.issubdtype(type(y_arr), numpy.ndarray) == False):
                         y_arr = numpy.array(y_arr)
                     else:
                         pass
@@ -275,16 +271,12 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                 for data in ax.get_shared_x_axes().get_siblings(ax)[0].get_lines():
                     x_arr, y_arr = data.get_data()
                     # check x_arr data type
-                    if type(x_arr) == list:
-                        x_arr = numpy.array(x_arr)
-                    elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+                    if (type(x_arr) == list) or (numpy.issubdtype(type(x_arr), numpy.ndarray) == False):
                         x_arr = numpy.array(x_arr)
                     else:
                         pass
                     # check y_arr data type
-                    if type(y_arr) == list:
-                        y_arr = numpy.array(y_arr)
-                    elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+                    if (type(y_arr) == list) or (numpy.issubdtype(type(y_arr), numpy.ndarray) == False):
                         y_arr = numpy.array(y_arr)
                     else:
                         pass
@@ -381,16 +373,12 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
         for data in ax.get_lines():
             x_arr, y_arr = data.get_data()
             # check x_arr data type
-            if type(x_arr) == list:
-                x_arr = numpy.array(x_arr)
-            elif numpy.issubdtype(type(x_arr), numpy.ndarray) == False:
+            if (type(x_arr) == list) or (numpy.issubdtype(type(x_arr), numpy.ndarray) == False):
                 x_arr = numpy.array(x_arr)
             else:
                 pass
             # check y_arr data type
-            if type(y_arr) == list:
-                y_arr = numpy.array(y_arr)
-            elif numpy.issubdtype(type(y_arr), numpy.ndarray) == False:
+            if (type(y_arr) == list) or (numpy.issubdtype(type(y_arr), numpy.ndarray) == False):
                 y_arr = numpy.array(y_arr)
             else:
                 pass
@@ -451,7 +439,7 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
                                 except:
                                     raise Exception('Unknown text fontsize argument!')
                             else:
-                                ax.annotate(f'{y_add}', xy=(x, y-max_y*0.03), ha='center', va='center')
+                                ax.annotate(f'{y_add}', xy=(x, y-min_y*0.03), ha='center', va='center')
                         else:
                             pass
                     else:
