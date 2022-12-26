@@ -1,19 +1,48 @@
 from grplot.features.statdesc.statdesc_type import statdesc_type
 import pytest
 
-@pytest.mark.parametrize('_ax, dataframe, input, expected', [
-    (
-        (0, 0),
-        ['other'],
-        {
-            'axis': 'x',
-            'statdesc': 'general',
-            'sep': '.c',
-            'add': None,
-            'axislabel': 'x',
-            'axes': None
-        },
-        [
+
+class TestStatdescType:
+    def set_ax_vline(self, _ax):
+        _ax.axvline(0.5, color='green', linestyle=':', label='{}: {}'.format('test', '1'))
+        return _ax
+
+    @pytest.mark.parametrize('_ax, dataframe', [((1, 0), ['other'])], indirect=['_ax', 'dataframe'])
+    def test_when_statdesc_is_none(self, _ax, dataframe):
+        ax = self.set_ax_vline(_ax)
+        ax = statdesc_type(
+            ax=ax,
+            df=dataframe,
+            add=None,
+            axes=None,
+            axis='x',
+            axislabel='x',
+            sep='.c',
+            statdesc=None
+        )
+
+        expected = [('test', '1')]
+
+        for line, expected_val in zip(ax.get_lines(), expected):
+            label = line.get_label().split(':')
+            assert label[0] == expected_val[0]
+            assert label[1].strip() == expected_val[1]
+
+    @pytest.mark.parametrize('_ax, dataframe', [((0, 0), ['other'])], indirect=['_ax', 'dataframe'])
+    def test_when_statdesc_is_not_none(self, _ax, dataframe):
+        ax = self.set_ax_vline(_ax)
+        ax = statdesc_type(
+            ax=ax,
+            df=dataframe,
+            add=None,
+            axes=None,
+            axis='x',
+            axislabel='x',
+            sep='.c',
+            statdesc='general'
+        )
+
+        expected = [
             ('test', '1'),
             ('count', '6'),
             ('non zero count', '5'),
@@ -27,51 +56,24 @@ import pytest
             ('q3', '3,75'),
             ('max', '5,00'),
         ]
-    ), (
-        (1, 0),
-        ['other'],
-        {
-            'axis': 'x',
-            'statdesc': None,
-            'sep': '.c',
-            'add': None,
-            'axislabel': 'x',
-            'axes': None
-        },
-        [('test', '1')]
-    ), (
-        (1, 0),
-        ['other'],
-        {
-            'axis': 'x',
-            'statdesc': [],
-            'sep': '.c',
-            'add': None,
-            'axislabel': 'x',
-            'axes': None
-        },
-        [('test', '1')]
-    )
-], indirect=['_ax', 'dataframe'])
-def test_statdesc_multi_def(_ax, dataframe, input, expected):
-    _ax.axvline(0.5, color='green', linestyle=':', label='{}: {}'.format('test', '1'))
-    try:
-        ax = statdesc_type(
-            ax=_ax,
-            df=dataframe,
-            **input
-        )
-    except:
-        with pytest.raises(Exception):
-            statdesc_type(
-                ax=_ax,
-                df=dataframe,
-                **input
-            )
-    else:
+
         for line, expected_val in zip(ax.get_lines(), expected):
             label = line.get_label().split(':')
             assert label[0] == expected_val[0]
             assert label[1].strip() == expected_val[1]
 
+    @pytest.mark.parametrize('_ax, dataframe', [((1, 0), ['other'])], indirect=['_ax', 'dataframe'])
+    def test_error_when_unknown_statdesc_argument(self, _ax, dataframe):
+        with pytest.raises(Exception) as exc_info:
+            statdesc_type(
+                ax=_ax,
+                df=dataframe,
+                add=None,
+                axes=None,
+                axis='x',
+                axislabel='x',
+                sep='.c',
+                statdesc=[]
+            )
 
+        assert str(exc_info.value) == 'Unknown statdesc argument!'
