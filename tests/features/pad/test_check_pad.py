@@ -1,27 +1,36 @@
 from matplotlib.figure import Figure
 from grplot.features.pad.check_pad import check_pad
 import pytest
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+
 
 @pytest.fixture
 def figure():
-    fig = plt.figure()
-    return fig
+    fig, ax = plt.subplots(figsize=(4, 3))
+    ax.plot(range(10), label='A simple plot')
+    fig.canvas.draw()
+    yield fig
+    plt.close()
 
-@pytest.mark.parametrize('input,expected', [
-    ({ "wpad": 1.5, "hpad": None, "pad": None }, (None)),
-    ({ "wpad": None, "hpad": 1.5, "pad": None }, (None)),
-    ({ "wpad": 1.5, "hpad": 1.5, "pad": None }, (None)),
-    ({ "wpad": None, "hpad": None, "pad": 0.5 }, (None)),
-    ({ "wpad": None, "hpad": None, "pad": None }, (None))
-])
-def test_check_pad(figure: Figure, input, expected):
-    try:
-        new_fig = check_pad(figure, **input)
-    except:
-        with pytest.raises(Exception):
+
+class TestCheckPad:
+    @pytest.mark.parametrize('input, expected', [
+        ({"wpad": 1.5, "hpad": None, "pad": None}, 'hpad argument must not be None!'),
+        ({"wpad": None, "hpad": 1.5, "pad": None}, 'wpad argument must not be None!')
+    ])
+    def test_h_or_w_pad_is_none(self, figure: Figure, input, expected):
+        with pytest.raises(Exception) as exc_info:
             check_pad(figure, **input)
-    else:
-        assert type(new_fig) == mpl.figure.Figure
-    
+
+        str(exc_info.value) == expected
+
+    @pytest.mark.parametrize('input', [
+        ({"wpad": 1.5, "hpad": 1.5, "pad": None}),
+        ({"wpad": None, "hpad": None, "pad": 0.5}),
+        ({"wpad": None, "hpad": None, "pad": None}),
+    ])
+    def test_test_no_error(self, figure: Figure, input):
+        try:
+            check_pad(figure, **input)
+        except Exception:
+            pytest.fail('there is error')
