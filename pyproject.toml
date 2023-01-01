@@ -3,7 +3,9 @@ requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=.coveragerc --cov=grplot --cov-report term-missing --cov-report html"
 testpaths = [
     "tests"
 ]
+
+[tool.black]
+line-length = 120
