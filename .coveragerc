@@ -9,3 +9,5 @@ omit =
     grplot/*/**/__init__.py
     grplot/features/plot/*.py
     grplot/features/saveas/*.py
+    grplot/utils/**
+    grplot/hotfix/**
