@@ -25,7 +25,7 @@ def statdesc_sep_def(num, sep):
     # dot
     elif sep in ['.', '.c', '.L', '.cL']:
         if abs(num) < 1:
-            if (sep in [',c', ',cL']) and (abs(num) >= 0.01):
+            if (sep in ['.c', '.cL']) and (abs(num) >= 0.01):
                 num = '{:,.2f}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
             else:
                 num = '{:,}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
