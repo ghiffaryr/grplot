@@ -1,7 +1,7 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "0.14"
+VERSION = "0.14.2"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -26,9 +26,9 @@ CLASSIFIERS = [
 DOWNLOAD_URL = "https://github.com/ghiffaryr/grplot"
 PYTHON_REQUIRES = ">=3.6"
 INSTALL_REQUIRES = [
-    "numpy>=1.15",
+    "numpy>=1.15, <1.27",
     "scipy>=1.0",
-    "matplotlib>=2.2, <4",
+    "matplotlib>=2.2, <3.8",
     "pandas>=0.23, <1.6",
     "ipython>=6.0",
 ]
