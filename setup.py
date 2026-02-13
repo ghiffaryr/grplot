@@ -1,7 +1,7 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "0.14.2"
+VERSION = "0.14.3"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -36,7 +36,6 @@ PACKAGES = ["grplot",
             "grplot.analytic",
             "grplot.features",
             "grplot.features.add.label_add",
-            "grplot.features.add.log_label_add",
             "grplot.features.add.statdesc_add",
             "grplot.features.add.text_add",
             "grplot.features.add.tick_add",

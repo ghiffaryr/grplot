@@ -12,7 +12,6 @@ from grplot.features.rot.check_rot import check_rot
 from grplot.features.statdesc.check_statdesc import check_statdesc
 from grplot.features.text.check_text import check_text
 from grplot.features.add.label_add.check_label_add import check_label_add
-from grplot.features.add.log_label_add.check_log_label_add import check_log_label_add
 from grplot.features.title.check_title import check_title
 from grplot.features.font.font_def import font_def
 from grplot.features.legend.check_legend import check_legend
@@ -190,13 +189,6 @@ def setting(plot,
                         xaxislabel=xaxislabel, 
                         yaxislabel=yaxislabel,
                         axes=axes)
-        check_log_label_add(ax=ax, 
-                            add=log,
-                            xadd=xlog, 
-                            yadd=ylog, 
-                            xaxislabel=xaxislabel, 
-                            yaxislabel=yaxislabel,
-                            axes=axes)
         check_title(ax=ax,
                     title=title,
                     title_fontsize=title_fontsize,
