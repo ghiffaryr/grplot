@@ -11,7 +11,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-__version__ = '0.14.3'
+__version__ = '0.14.4'
 
 
 def plot2d(plot, # default general value
@@ -60,6 +60,8 @@ def plot2d(plot, # default general value
            label_add=None, 
            xlabel_add=None, 
            ylabel_add=None, 
+           xlabel=None,
+           ylabel=None,
            title=None, 
            legend_loc=None, 
            saveas=None,
@@ -200,10 +202,10 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '0.14.3'
+    version = '0.14.4'
 
     release date
-    13/02/2026
+    14/02/2026
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot
@@ -281,6 +283,8 @@ def plot2d(plot, # default general value
                 label_add=label_add,
                 xlabel_add=xlabel_add,
                 ylabel_add=ylabel_add,
+                xlabel=xlabel,
+                ylabel=ylabel,
                 title=title,
                 fontsize=fontsize,
                 tick_fontsize=tick_fontsize,
@@ -344,6 +348,8 @@ def plot2d(plot, # default general value
                 label_add=label_add,
                 xlabel_add=xlabel_add,
                 ylabel_add=ylabel_add,
+                xlabel=xlabel,
+                ylabel=ylabel,
                 title=title,
                 fontsize=fontsize,
                 tick_fontsize=tick_fontsize,
@@ -407,6 +413,8 @@ def plot2d(plot, # default general value
                 label_add=label_add,
                 xlabel_add=xlabel_add,
                 ylabel_add=ylabel_add,
+                xlabel=xlabel,
+                ylabel=ylabel,
                 title=title,
                 fontsize=fontsize,
                 tick_fontsize=tick_fontsize,
@@ -477,6 +485,8 @@ def plot2d(plot, # default general value
                         label_add=label_add,
                         xlabel_add=xlabel_add,
                         ylabel_add=ylabel_add,
+                        xlabel=xlabel,
+                        ylabel=ylabel,
                         title=title,
                         fontsize=fontsize,
                         tick_fontsize=tick_fontsize,
@@ -547,6 +557,8 @@ def plot2d(plot, # default general value
                             label_add=label_add,
                             xlabel_add=xlabel_add,
                             ylabel_add=ylabel_add,
+                            xlabel=xlabel,
+                            ylabel=ylabel,
                             title=title,
                             fontsize=fontsize,
                             tick_fontsize=tick_fontsize,
@@ -618,6 +630,8 @@ def plot2d(plot, # default general value
                         label_add=label_add,
                         xlabel_add=xlabel_add,
                         ylabel_add=ylabel_add,
+                        xlabel=xlabel,
+                        ylabel=ylabel,
                         title=title,
                         fontsize=fontsize,
                         tick_fontsize=tick_fontsize,
@@ -688,6 +702,8 @@ def plot2d(plot, # default general value
                             label_add=label_add,
                             xlabel_add=xlabel_add,
                             ylabel_add=ylabel_add,
+                            xlabel=xlabel,
+                            ylabel=ylabel,
                             title=title,
                             fontsize=fontsize,
                             tick_fontsize=tick_fontsize,
@@ -760,6 +776,8 @@ def plot2d(plot, # default general value
                         label_add=label_add,
                         xlabel_add=xlabel_add,
                         ylabel_add=ylabel_add,
+                        xlabel=xlabel,
+                        ylabel=ylabel,
                         title=title,
                         fontsize=fontsize,
                         tick_fontsize=tick_fontsize,
@@ -829,6 +847,8 @@ def plot2d(plot, # default general value
                             label_add=label_add,
                             xlabel_add=xlabel_add,
                             ylabel_add=ylabel_add,
+                            xlabel=xlabel,
+                            ylabel=ylabel,
                             title=title,
                             fontsize=fontsize,
                             tick_fontsize=tick_fontsize,
