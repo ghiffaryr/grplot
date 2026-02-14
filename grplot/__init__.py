@@ -202,7 +202,7 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '0.14.4'
+    version = '0.14.5'
 
     release date
     14/02/2026

@@ -1,4 +1,5 @@
 from pandas.api.types import is_float_dtype, is_integer_dtype
+from grplot.utils.trim_to_3_nonzero_after_decimal import trim_to_3_nonzero_after_decimal
 
 
 def statdesc_sep_def(num, sep):
@@ -8,8 +9,8 @@ def statdesc_sep_def(num, sep):
             if (sep in [',c', ',cL']) and (abs(num) >= 0.01):
                 num = '{:,.2f}'.format(num)
             else:
-                num = '{:,}'.format(num)
-        else: # abs(num) >= 1
+                num = trim_to_3_nonzero_after_decimal(num, dec_point='.')
+        else:  # abs(num) >= 1
             if sep in [',c', ',cL']:
                 num = '{:,.2f}'.format(num)
             else:
@@ -28,8 +29,8 @@ def statdesc_sep_def(num, sep):
             if (sep in ['.c', '.cL']) and (abs(num) >= 0.01):
                 num = '{:,.2f}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
             else:
-                num = '{:,}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
-        else: # abs(num) >= 1
+                num = trim_to_3_nonzero_after_decimal(num, dec_point=',')
+        else:  # abs(num) >= 1
             if sep in ['.c', '.cL']:
                 num = '{:,.2f}'.format(num).replace(',', '~').replace('.', ',').replace('~', '.')
             else:
