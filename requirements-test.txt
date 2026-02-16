@@ -1,0 +1,18 @@
+# Testing Requirements for grplot
+
+# Core testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.1  # for parallel test execution
+
+# Coverage reporting
+coverage>=7.2.0
+
+# Core dependencies (should match setup.py)
+numpy>=1.20,!=1.24.0
+pandas>=1.2
+matplotlib>=3.4,!=3.6.1
+
+# Optional but useful for testing
+pytest-timeout>=2.1.0  # timeout support
+pytest-mock>=3.11.1    # mocking support
