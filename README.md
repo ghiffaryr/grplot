@@ -5,7 +5,7 @@
 grplot: lazy statistical data visualization
 =======================================
 
-[![PyPI Version](https://img.shields.io/pypi/v/grplot.svg)](https://pypi.org/project/grplot/) [![License](https://img.shields.io/pypi/l/grplot.svg)](https://github.com/ghiffaryr/grplot/blob/master/LICENSE.md)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17159965.svg)](https://doi.org/10.5281/zenodo.17159965) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/grplot) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/downloads.svg)](https://anaconda.org/conda-forge/grplot) ![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/ghiffaryr/8fce7554f72160b59527bd0deecf7666/raw/coverage.json)
+[![PyPI Version](https://img.shields.io/pypi/v/grplot.svg)](https://pypi.org/project/grplot/) [![License](https://img.shields.io/pypi/l/grplot.svg)](https://github.com/ghiffaryr/grplot/blob/master/LICENSE.md)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17159965.svg)](https://doi.org/10.5281/zenodo.17159965) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/grplot) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/downloads.svg)](https://anaconda.org/conda-forge/grplot) ![Coverage Badge](https://gist.githubusercontent.com/ghiffaryr/8fce7554f72160b59527bd0deecf7666/raw/coverage-badge.svg?sanitize=true)
 
 
 grplot is a Python visualization library based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython. It supports human laziness in drawing complete and attractive statistical graphs in just one line of code.
