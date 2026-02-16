@@ -683,6 +683,7 @@ class TestRegressionVariations:
     
     def test_regplot_logistic(self, comprehensive_data):
         """Logistic regression"""
+        pytest.importorskip("statsmodels")
         from grplot import plot2d
         df = comprehensive_data.head(30).copy()
         df['binary'] = (df['numeric2'] > df['numeric2'].median()).astype(int)
@@ -692,6 +693,7 @@ class TestRegressionVariations:
     
     def test_regplot_robust(self, comprehensive_data):
         """Robust regression"""
+        pytest.importorskip("statsmodels")
         from grplot import plot2d
         ax = plot2d(plot='regplot', df=comprehensive_data.head(30), x='numeric1', y='numeric2', robust=True)
         assert ax is not None
