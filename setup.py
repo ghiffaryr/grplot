@@ -1,7 +1,7 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -69,8 +69,8 @@ if __name__ == "__main__":
     from setuptools import setup
 
     import sys
-    if sys.version_info[:2] < (3, 6):
-        raise RuntimeError("grplot requires python >= 3.6.")
+    if sys.version_info[:2] < (3, 10):
+        raise RuntimeError("grplot requires python >= 3.10.")
 
     with open("README.md", "r", encoding="utf-8") as fh:
         long_description = fh.read()

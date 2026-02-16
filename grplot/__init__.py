@@ -11,7 +11,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 
 def plot2d(plot, # default general value
@@ -202,7 +202,7 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '1.0.1'
+    version = '1.0.2'
 
     release date
     16/02/2026
