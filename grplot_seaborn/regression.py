@@ -4,7 +4,6 @@ from textwrap import dedent
 import warnings
 import numpy as np
 import pandas as pd
-from scipy.spatial import distance
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -18,13 +17,12 @@ except ImportError:
 from . import utils
 from . import algorithms as algo
 from .axisgrid import FacetGrid, _facet_docs
-from ._decorators import _deprecate_positional_args
 
 
 __all__ = ["lmplot", "regplot", "residplot"]
 
 
-class _LinearPlotter(object):
+class _LinearPlotter:
     """Base class for plotting relational data in tidy format.
 
     To get anything useful done you'll have to inherit from this, but setup
@@ -187,8 +185,18 @@ class _RegressionPlotter(_LinearPlotter):
 
         return vals, points, cis
 
+    def _check_statsmodels(self):
+        """Check whether statsmodels is installed if any boolean options require it."""
+        options = "logistic", "robust", "lowess"
+        err = "`{}=True` requires statsmodels, an optional dependency, to be installed."
+        for option in options:
+            if getattr(self, option) and not _has_statsmodels:
+                raise RuntimeError(err.format(option))
+
     def fit_regression(self, ax=None, x_range=None, grid=None):
         """Fit the regression model."""
+        self._check_statsmodels()
+
         # Create the grid for the regression
         if grid is None:
             if self.truncate:
@@ -266,14 +274,20 @@ class _RegressionPlotter(_LinearPlotter):
 
     def fit_statsmodels(self, grid, model, **kwargs):
         """More general regression function using statsmodels objects."""
-        import statsmodels.genmod.generalized_linear_model as glm
+        import statsmodels.tools.sm_exceptions as sme
         X, y = np.c_[np.ones(len(self.x)), self.x], self.y
         grid = np.c_[np.ones(len(grid)), grid]
 
         def reg_func(_x, _y):
+            err_classes = (sme.PerfectSeparationError,)
             try:
-                yhat = model(_y, _x, **kwargs).fit().predict(grid)
-            except glm.PerfectSeparationError:
+                with warnings.catch_warnings():
+                    if hasattr(sme, "PerfectSeparationWarning"):
+                        # statsmodels>=0.14.0
+                        warnings.simplefilter("error", sme.PerfectSeparationWarning)
+                        err_classes = (*err_classes, sme.PerfectSeparationWarning)
+                    yhat = model(_y, _x, **kwargs).fit().predict(grid)
+            except err_classes:
                 yhat = np.empty(len(grid))
                 yhat.fill(np.nan)
             return yhat
@@ -318,17 +332,17 @@ class _RegressionPlotter(_LinearPlotter):
 
     def bin_predictor(self, bins):
         """Discretize a predictor by assigning value to closest bin."""
-        x = self.x
+        x = np.asarray(self.x)
         if np.isscalar(bins):
             percentiles = np.linspace(0, 100, bins + 2)[1:-1]
-            bins = np.c_[np.percentile(x, percentiles)]
+            bins = np.percentile(x, percentiles)
         else:
-            bins = np.c_[np.ravel(bins)]
+            bins = np.ravel(bins)
 
-        dist = distance.cdist(np.c_[x], bins)
+        dist = np.abs(np.subtract.outer(x, bins))
         x_binned = bins[np.argmin(dist, axis=1)].ravel()
 
-        return x_binned, bins.ravel()
+        return x_binned, bins
 
     def regress_out(self, a, b):
         """Regress b from a keeping a's original mean."""
@@ -378,7 +392,7 @@ class _RegressionPlotter(_LinearPlotter):
     def scatterplot(self, ax, kws):
         """Draw the data."""
         # Treat the line-based markers specially, explicitly setting larger
-        # linewidth than is provided by the seaborn style defaults.
+        # linewidth than is provided by the grplot_seaborn style defaults.
         # This would ideally be handled better in matplotlib (i.e., distinguish
         # between edgewidth for solid glyphs and linewidth for line glyphs
         # but this should do for now.
@@ -398,6 +412,8 @@ class _RegressionPlotter(_LinearPlotter):
         else:
             # TODO abstraction
             ci_kws = {"color": kws["color"]}
+            if "alpha" in kws:
+                ci_kws["alpha"] = kws["alpha"]
             ci_kws["linewidth"] = mpl.rcParams["lines.linewidth"] * 1.75
             kws.setdefault("s", 50)
 
@@ -557,12 +573,9 @@ _regression_docs = dict(
 _regression_docs.update(_facet_docs)
 
 
-@_deprecate_positional_args
 def lmplot(
-    *,
-    x=None, y=None,
-    data=None,
-    hue=None, col=None, row=None,  # TODO move before data once * is enforced
+    data, *,
+    x=None, y=None, hue=None, col=None, row=None,
     palette=None, col_wrap=None, height=5, aspect=1, markers="o",
     sharex=None, sharey=None, hue_order=None, col_order=None, row_order=None,
     legend=True, legend_out=None, x_estimator=None, x_bins=None,
@@ -570,15 +583,8 @@ def lmplot(
     units=None, seed=None, order=1, logistic=False, lowess=False,
     robust=False, logx=False, x_partial=None, y_partial=None,
     truncate=True, x_jitter=None, y_jitter=None, scatter_kws=None,
-    line_kws=None, facet_kws=None, size=None,
+    line_kws=None, facet_kws=None,
 ):
-
-    # Handle deprecations
-    if size is not None:
-        height = size
-        msg = ("The `size` parameter has been renamed to `height`; "
-               "please update your code.")
-        warnings.warn(msg, UserWarning)
 
     if facet_kws is None:
         facet_kws = {}
@@ -622,12 +628,12 @@ def lmplot(
     if not isinstance(markers, list):
         markers = [markers] * n_markers
     if len(markers) != n_markers:
-        raise ValueError(("markers must be a singeton or a list of markers "
-                          "for each level of the hue variable"))
+        raise ValueError("markers must be a singleton or a list of markers "
+                         "for each level of the hue variable")
     facets.hue_kws = {"marker": markers}
 
     def update_datalim(data, x, y, ax, **kws):
-        xys = np.asarray(data[[x, y]]).astype(float)
+        xys = data[[x, y]].to_numpy().astype(float)
         ax.update_datalim(xys, updatey=False)
         ax.autoscale_view(scaley=False)
 
@@ -672,9 +678,9 @@ lmplot.__doc__ = dedent("""\
 
     Parameters
     ----------
+    {data}
     x, y : strings, optional
         Input variables; these should be column names in ``data``.
-    {data}
     hue, col, row : strings
         Variables that define subsets of the data, which will be drawn on
         separate facets in the grid. See the ``*_order`` parameters to control
@@ -738,107 +744,13 @@ lmplot.__doc__ = dedent("""\
     Examples
     --------
 
-    These examples focus on basic regression model plots to exhibit the
-    various faceting options; see the :func:`regplot` docs for demonstrations
-    of the other options for plotting the data and models. There are also
-    other examples for how to manipulate plot using the returned object on
-    the :class:`FacetGrid` docs.
-
-    Plot a simple linear relationship between two variables:
-
-    .. plot::
-        :context: close-figs
-
-        >>> import grplot_seaborn as sns; sns.set_theme(color_codes=True)
-        >>> tips = sns.load_dataset("tips")
-        >>> g = sns.lmplot(x="total_bill", y="tip", data=tips)
-
-    Condition on a third variable and plot the levels in different colors:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", hue="smoker", data=tips)
-
-    Use different markers as well as colors so the plot will reproduce to
-    black-and-white more easily:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", hue="smoker", data=tips,
-        ...                markers=["o", "x"])
-
-    Use a different color palette:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", hue="smoker", data=tips,
-        ...                palette="Set1")
-
-    Map ``hue`` levels to colors with a dictionary:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", hue="smoker", data=tips,
-        ...                palette=dict(Yes="g", No="m"))
-
-    Plot the levels of the third variable across different columns:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", col="smoker", data=tips)
-
-    Change the height and aspect ratio of the facets:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="size", y="total_bill", hue="day", col="day",
-        ...                data=tips, height=6, aspect=.4, x_jitter=.1)
-
-    Wrap the levels of the column variable into multiple rows:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", col="day", hue="day",
-        ...                data=tips, col_wrap=2, height=3)
-
-    Condition on two variables to make a full grid:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", row="sex", col="time",
-        ...                data=tips, height=3)
-
-    Use methods on the returned :class:`FacetGrid` instance to further tweak
-    the plot:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.lmplot(x="total_bill", y="tip", row="sex", col="time",
-        ...                data=tips, height=3)
-        >>> g = (g.set_axis_labels("Total bill (US Dollars)", "Tip")
-        ...       .set(xlim=(0, 60), ylim=(0, 12),
-        ...            xticks=[10, 30, 50], yticks=[2, 6, 10])
-        ...       .fig.subplots_adjust(wspace=.02))
-
-
+    .. include:: ../docstrings/lmplot.rst
 
     """).format(**_regression_docs)
 
 
-@_deprecate_positional_args
 def regplot(
-    *,
-    x=None, y=None,
-    data=None,
+    data=None, *, x=None, y=None,
     x_estimator=None, x_bins=None, x_ci="ci",
     scatter=True, fit_reg=True, ci=95, n_boot=1000, units=None,
     seed=None, order=1, logistic=False, lowess=False, robust=False,
@@ -926,7 +838,7 @@ regplot.__doc__ = dedent("""\
     {regplot_vs_lmplot}
 
 
-    It's also easy to combine combine :func:`regplot` and :class:`JointGrid` or
+    It's also easy to combine :func:`regplot` and :class:`JointGrid` or
     :class:`PairGrid` through the :func:`jointplot` and :func:`pairplot`
     functions, although these do not directly accept all of :func:`regplot`'s
     parameters.
@@ -934,111 +846,14 @@ regplot.__doc__ = dedent("""\
     Examples
     --------
 
-    Plot the relationship between two variables in a DataFrame:
-
-    .. plot::
-        :context: close-figs
-
-        >>> import grplot_seaborn as sns; sns.set_theme(color_codes=True)
-        >>> tips = sns.load_dataset("tips")
-        >>> ax = sns.regplot(x="total_bill", y="tip", data=tips)
-
-    Plot with two variables defined as numpy arrays; use a different color:
-
-    .. plot::
-        :context: close-figs
-
-        >>> import numpy as np; np.random.seed(8)
-        >>> mean, cov = [4, 6], [(1.5, .7), (.7, 1)]
-        >>> x, y = np.random.multivariate_normal(mean, cov, 80).T
-        >>> ax = sns.regplot(x=x, y=y, color="g")
-
-    Plot with two variables defined as pandas Series; use a different marker:
-
-    .. plot::
-        :context: close-figs
-
-        >>> import pandas as pd
-        >>> x, y = pd.Series(x, name="x_var"), pd.Series(y, name="y_var")
-        >>> ax = sns.regplot(x=x, y=y, marker="+")
-
-    Use a 68% confidence interval, which corresponds with the standard error
-    of the estimate, and extend the regression line to the axis limits:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x=x, y=y, ci=68, truncate=False)
-
-    Plot with a discrete ``x`` variable and add some jitter:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x="size", y="total_bill", data=tips, x_jitter=.1)
-
-    Plot with a discrete ``x`` variable showing means and confidence intervals
-    for unique values:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x="size", y="total_bill", data=tips,
-        ...                  x_estimator=np.mean)
-
-    Plot with a continuous variable divided into discrete bins:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x=x, y=y, x_bins=4)
-
-    Fit a higher-order polynomial regression:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ans = sns.load_dataset("anscombe")
-        >>> ax = sns.regplot(x="x", y="y", data=ans.loc[ans.dataset == "II"],
-        ...                  scatter_kws={{"s": 80}},
-        ...                  order=2, ci=None)
-
-    Fit a robust regression and don't plot a confidence interval:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x="x", y="y", data=ans.loc[ans.dataset == "III"],
-        ...                  scatter_kws={{"s": 80}},
-        ...                  robust=True, ci=None)
-
-    Fit a logistic regression; jitter the y variable and use fewer bootstrap
-    iterations:
-
-    .. plot::
-        :context: close-figs
-
-        >>> tips["big_tip"] = (tips.tip / tips.total_bill) > .175
-        >>> ax = sns.regplot(x="total_bill", y="big_tip", data=tips,
-        ...                  logistic=True, n_boot=500, y_jitter=.03)
-
-    Fit the regression model using log(x):
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.regplot(x="size", y="total_bill", data=tips,
-        ...                  x_estimator=np.mean, logx=True)
+    .. include:: ../docstrings/regplot.rst
 
     """).format(**_regression_docs)
 
 
-@_deprecate_positional_args
 def residplot(
-    *,
-    x=None, y=None,
-    data=None,
-    lowess=False, x_partial=None, y_partial=None,
+    data=None, *, x=None, y=None,
+    x_partial=None, y_partial=None, lowess=False,
     order=1, robust=False, dropna=True, label=None, color=None,
     scatter_kws=None, line_kws=None, ax=None
 ):
@@ -1051,18 +866,17 @@ def residplot(
 
     Parameters
     ----------
+    data : DataFrame, optional
+        DataFrame to use if `x` and `y` are column names.
     x : vector or string
         Data or column name in `data` for the predictor variable.
     y : vector or string
         Data or column name in `data` for the response variable.
-    data : DataFrame, optional
-        DataFrame to use if `x` and `y` are column names.
-    lowess : boolean, optional
-        Fit a lowess smoother to the residual scatterplot.
-    {x, y}_partial : matrix or string(s) , optional
-        Matrix with same first dimension as `x`, or column name(s) in `data`.
+    {x, y}_partial : vectors or string(s) , optional
         These variables are treated as confounding and are removed from
         the `x` or `y` variables before plotting.
+    lowess : boolean, optional
+        Fit a lowess smoother to the residual scatterplot.
     order : int, optional
         Order of the polynomial to fit when calculating the residuals.
     robust : boolean, optional
@@ -1091,6 +905,11 @@ def residplot(
     regplot : Plot a simple linear regression model.
     jointplot : Draw a :func:`residplot` with univariate marginal distributions
                 (when used with ``kind="resid"``).
+
+    Examples
+    --------
+
+    .. include:: ../docstrings/residplot.rst
 
     """
     plotter = _RegressionPlotter(x, y, data, ci=None,

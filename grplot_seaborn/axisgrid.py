@@ -1,24 +1,30 @@
+from __future__ import annotations
 from itertools import product
 from inspect import signature
 import warnings
 from textwrap import dedent
-from distutils.version import LooseVersion
 
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from ._core import VectorPlotter, variable_type, categorical_order
+from ._base import VectorPlotter, variable_type, categorical_order
+from ._core.data import handle_data_source
+from ._compat import share_axis, get_legend_handles
 from . import utils
-from .utils import _check_argument, adjust_legend_subtitles, _draw_figure
+from .utils import (
+    adjust_legend_subtitles,
+    set_hls_values,
+    _check_argument,
+    _draw_figure,
+    _disable_autolayout
+)
 from .palettes import color_palette, blend_palette
-from ._decorators import _deprecate_positional_args
 from ._docstrings import (
     DocstringComponents,
     _core_docs,
 )
-
 
 __all__ = ["FacetGrid", "PairGrid", "JointGrid", "pairplot", "jointplot"]
 
@@ -51,6 +57,35 @@ class _BaseGrid:
     def figure(self):
         """Access the :class:`matplotlib.figure.Figure` object underlying the grid."""
         return self._figure
+
+    def apply(self, func, *args, **kwargs):
+        """
+        Pass the grid to a user-supplied function and return self.
+
+        The `func` must accept an object of this type for its first
+        positional argument. Additional arguments are passed through.
+        The return value of `func` is ignored; this method returns self.
+        See the `pipe` method if you want the return value.
+
+        Added in v0.12.0.
+
+        """
+        func(self, *args, **kwargs)
+        return self
+
+    def pipe(self, func, *args, **kwargs):
+        """
+        Pass the grid to a user-supplied function and return its value.
+
+        The `func` must accept an object of this type for its first
+        positional argument. Additional arguments are passed through.
+        The return value of `func` becomes the return value of this method.
+        See the `apply` method if you want to return self instead.
+
+        Added in v0.12.0.
+
+        """
+        return func(self, *args, **kwargs)
 
     def savefig(self, *args, **kwargs):
         """
@@ -86,6 +121,7 @@ class Grid(_BaseGrid):
         if self._tight_layout_pad is not None:
             kwargs.setdefault("pad", self._tight_layout_pad)
         self._figure.tight_layout(*args, **kwargs)
+        return self
 
     def add_legend(self, legend_data=None, title=None, label_order=None,
                    adjust_subtitles=False, **kwargs):
@@ -125,15 +161,9 @@ class Grid(_BaseGrid):
                 label_order = list(map(utils.to_utf8, self.hue_names))
 
         blank_handle = mpl.patches.Patch(alpha=0, linewidth=0)
-        handles = [legend_data.get(l, blank_handle) for l in label_order]
+        handles = [legend_data.get(lab, blank_handle) for lab in label_order]
         title = self._hue_var if title is None else title
-        if LooseVersion(mpl.__version__) < LooseVersion("3.0"):
-            try:
-                title_size = mpl.rcParams["axes.labelsize"] * .85
-            except TypeError:  # labelsize is something like "large"
-                title_size = mpl.rcParams["axes.labelsize"]
-        else:
-            title_size = mpl.rcParams["legend.title_fontsize"]
+        title_size = mpl.rcParams["legend.title_fontsize"]
 
         # Unpack nested labels from a hierarchical legend
         labels = []
@@ -204,12 +234,12 @@ class Grid(_BaseGrid):
         # Get data directly from the legend, which is necessary
         # for newer functions that don't add labeled proxy artists
         if ax.legend_ is not None and self._extract_legend_handles:
-            handles = ax.legend_.legendHandles
+            handles = get_legend_handles(ax.legend_)
             labels = [t.get_text() for t in ax.legend_.texts]
-            data.update({l: h for h, l in zip(handles, labels)})
+            data.update({label: handle for handle, label in zip(handles, labels)})
 
         handles, labels = ax.get_legend_handles_labels()
-        data.update({l: h for h, l in zip(handles, labels)})
+        data.update({label: handle for handle, label in zip(handles, labels)})
 
         self._legend_data.update(data)
 
@@ -253,6 +283,27 @@ class Grid(_BaseGrid):
             return self._legend
         except AttributeError:
             return None
+
+    def tick_params(self, axis='both', **kwargs):
+        """Modify the ticks, tick labels, and gridlines.
+
+        Parameters
+        ----------
+        axis : {'x', 'y', 'both'}
+            The axis on which to apply the formatting.
+        kwargs : keyword arguments
+            Additional keyword arguments to pass to
+            :meth:`matplotlib.axes.Axes.tick_params`.
+
+        Returns
+        -------
+        self : Grid instance
+            Returns self for easy chaining.
+
+        """
+        for ax in self.figure.axes:
+            ax.tick_params(axis=axis, **kwargs)
+        return self
 
 
 _facet_docs = dict(
@@ -316,7 +367,7 @@ _facet_docs = dict(
 
 class FacetGrid(Grid):
     """Multi-plot grid for plotting conditional relationships."""
-    @_deprecate_positional_args
+
     def __init__(
         self, data, *,
         row=None, col=None, hue=None, col_wrap=None,
@@ -324,17 +375,11 @@ class FacetGrid(Grid):
         row_order=None, col_order=None, hue_order=None, hue_kws=None,
         dropna=False, legend_out=True, despine=True,
         margin_titles=False, xlim=None, ylim=None, subplot_kws=None,
-        gridspec_kws=None, size=None
+        gridspec_kws=None,
     ):
 
-        super(FacetGrid, self).__init__()
-
-        # Handle deprecations
-        if size is not None:
-            height = size
-            msg = ("The `size` parameter has been renamed to `height`; "
-                   "please update your code.")
-            warnings.warn(msg, UserWarning)
+        super().__init__()
+        data = handle_data_source(data)
 
         # Determine the hue facet layer information
         hue_var = hue
@@ -404,8 +449,7 @@ class FacetGrid(Grid):
 
         # --- Initialize the subplot grid
 
-        # Disable autolayout so legend_out works properly
-        with mpl.rc_context({"figure.autolayout": False}):
+        with _disable_autolayout():
             fig = plt.figure(figsize=figsize)
 
         if col_wrap is None:
@@ -477,12 +521,16 @@ class FacetGrid(Grid):
         self._legend_data = {}
         self._x_var = None
         self._y_var = None
+        self._sharex = sharex
+        self._sharey = sharey
         self._dropna = dropna
         self._not_na = not_na
 
         # --- Make the axes look good
 
+        self.set_titles()
         self.tight_layout()
+
         if despine:
             self.despine()
 
@@ -525,9 +573,9 @@ class FacetGrid(Grid):
 
         .. warning::
 
-            When using seaborn functions that infer semantic mappings from a
+            When using grplot_seaborn functions that infer semantic mappings from a
             dataset, care must be taken to synchronize those mappings across
-            facets (e.g., by defing the ``hue`` mapping with a palette dict or
+            facets (e.g., by defining the ``hue`` mapping with a palette dict or
             setting the data type of the variables to ``category``). In most cases,
             it will be better to use a figure-level function (e.g. :func:`relplot`
             or :func:`catplot`) than to use :class:`FacetGrid` directly.
@@ -583,7 +631,7 @@ class FacetGrid(Grid):
 
         .. note::
 
-            These examples use seaborn functions to demonstrate some of the
+            These examples use grplot_seaborn functions to demonstrate some of the
             advanced features of the class, but in most cases you will want
             to use figue-level functions (e.g. :func:`displot`, :func:`relplot`)
             to make the plots shown here.
@@ -662,7 +710,7 @@ class FacetGrid(Grid):
         func_module = str(getattr(func, "__module__", ""))
 
         # Check for categorical plots without order information
-        if func_module == "seaborn.categorical":
+        if func_module == "grplot_seaborn.categorical":
             if "order" not in kwargs:
                 warning = ("Using the {} function without specifying "
                            "`order` is likely to produce an incorrect "
@@ -682,7 +730,7 @@ class FacetGrid(Grid):
                 continue
 
             # Get the current axis
-            modify_state = not func_module.startswith("seaborn")
+            modify_state = not func_module.startswith("grplot_seaborn")
             ax = self.facet_axis(row_i, col_j, modify_state)
 
             # Decide what color to plot with
@@ -700,7 +748,7 @@ class FacetGrid(Grid):
             plot_data = data_ijk[list(args)]
             if self._dropna:
                 plot_data = plot_data.dropna()
-            plot_args = [v for k, v in plot_data.iteritems()]
+            plot_args = [v for k, v in plot_data.items()]
 
             # Some matplotlib functions don't handle pandas objects correctly
             if func_module.startswith("matplotlib"):
@@ -754,7 +802,7 @@ class FacetGrid(Grid):
                 continue
 
             # Get the current axis
-            modify_state = not str(func.__module__).startswith("seaborn")
+            modify_state = not str(func.__module__).startswith("grplot_seaborn")
             ax = self.facet_axis(row_i, col_j, modify_state)
 
             # Decide what color to plot with
@@ -796,7 +844,7 @@ class FacetGrid(Grid):
     def _facet_plot(self, func, ax, plot_args, plot_kwargs):
 
         # Draw the plot
-        if str(func.__module__).startswith("seaborn"):
+        if str(func.__module__).startswith("grplot_seaborn"):
             plot_kwargs = plot_kwargs.copy()
             semantics = ["x", "y", "hue", "size", "style"]
             for key, val in zip(semantics, plot_args):
@@ -811,7 +859,6 @@ class FacetGrid(Grid):
     def _finalize_grid(self, axlabels):
         """Finalize the annotations and layout."""
         self.set_axis_labels(*axlabels)
-        self.set_titles()
         self.tight_layout()
 
     def facet_axis(self, row_i, col_j, modify_state=True):
@@ -872,7 +919,7 @@ class FacetGrid(Grid):
             curr_ticks = ax.get_xticks()
             ax.set_xticks(curr_ticks)
             if labels is None:
-                curr_labels = [l.get_text() for l in ax.get_xticklabels()]
+                curr_labels = [label.get_text() for label in ax.get_xticklabels()]
                 if step is not None:
                     xticks = ax.get_xticks()[::step]
                     curr_labels = curr_labels[::step]
@@ -888,14 +935,13 @@ class FacetGrid(Grid):
             curr_ticks = ax.get_yticks()
             ax.set_yticks(curr_ticks)
             if labels is None:
-                curr_labels = [l.get_text() for l in ax.get_yticklabels()]
+                curr_labels = [label.get_text() for label in ax.get_yticklabels()]
                 ax.set_yticklabels(curr_labels, **kwargs)
             else:
                 ax.set_yticklabels(labels, **kwargs)
         return self
 
-    def set_titles(self, template=None, row_template=None, col_template=None,
-                   **kwargs):
+    def set_titles(self, template=None, row_template=None, col_template=None, **kwargs):
         """Draw titles either above each facet or on the grid margins.
 
         Parameters
@@ -908,7 +954,7 @@ class FacetGrid(Grid):
             Template for the row variable when titles are drawn on the grid
             margins. Must have {row_var} and {row_name} formatting keys.
         col_template:
-            Template for the row variable when titles are drawn on the grid
+            Template for the column variable when titles are drawn on the grid
             margins. Must have {col_var} and {col_name} formatting keys.
 
         Returns
@@ -1017,6 +1063,8 @@ class FacetGrid(Grid):
 
         if y is not None:
             self.map(plt.axhline, y=y, **line_kws)
+
+        return self
 
     # ------ Properties that are part of the public API and documented by Sphinx
 
@@ -1132,7 +1180,7 @@ class PairGrid(Grid):
     This object maps each variable in a dataset onto a column and row in a
     grid of multiple axes. Different axes-level plotting functions can be
     used to draw bivariate plots in the upper and lower triangles, and the
-    the marginal distribution of each variable can be shown on the diagonal.
+    marginal distribution of each variable can be shown on the diagonal.
 
     Several different common plots can be generated in a single line using
     :func:`pairplot`. Use :class:`PairGrid` when you need more flexibility.
@@ -1140,13 +1188,10 @@ class PairGrid(Grid):
     See the :ref:`tutorial <grid_tutorial>` for more information.
 
     """
-    @_deprecate_positional_args
     def __init__(
-        self, data, *,
-        hue=None, hue_order=None, palette=None,
-        hue_kws=None, vars=None, x_vars=None, y_vars=None,
-        corner=False, diag_sharey=True, height=2.5, aspect=1,
-        layout_pad=.5, despine=True, dropna=False, size=None
+        self, data, *, hue=None, vars=None, x_vars=None, y_vars=None,
+        hue_order=None, palette=None, hue_kws=None, corner=False, diag_sharey=True,
+        height=2.5, aspect=1, layout_pad=.5, despine=True, dropna=False,
     ):
         """Initialize the plot figure and PairGrid object.
 
@@ -1158,21 +1203,21 @@ class PairGrid(Grid):
         hue : string (variable name)
             Variable in ``data`` to map plot aspects to different colors. This
             variable will be excluded from the default x and y variables.
-        hue_order : list of strings
-            Order for the levels of the hue variable in the palette
-        palette : dict or seaborn color palette
-            Set of colors for mapping the ``hue`` variable. If a dict, keys
-            should be values  in the ``hue`` variable.
-        hue_kws : dictionary of param -> list of values mapping
-            Other keyword arguments to insert into the plotting call to let
-            other plot attributes vary across levels of the hue variable (e.g.
-            the markers in a scatterplot).
         vars : list of variable names
             Variables within ``data`` to use, otherwise use every column with
             a numeric datatype.
         {x, y}_vars : lists of variable names
             Variables within ``data`` to use separately for the rows and
             columns of the figure; i.e. to make a non-square plot.
+        hue_order : list of strings
+            Order for the levels of the hue variable in the palette
+        palette : dict or grplot_seaborn color palette
+            Set of colors for mapping the ``hue`` variable. If a dict, keys
+            should be values  in the ``hue`` variable.
+        hue_kws : dictionary of param -> list of values mapping
+            Other keyword arguments to insert into the plotting call to let
+            other plot attributes vary across levels of the hue variable (e.g.
+            the markers in a scatterplot).
         corner : bool
             If True, don't add axes to the upper (off-diagonal) triangle of the
             grid, making this a "corner" plot.
@@ -1199,14 +1244,8 @@ class PairGrid(Grid):
 
         """
 
-        super(PairGrid, self).__init__()
-
-        # Handle deprecations
-        if size is not None:
-            height = size
-            msg = ("The `size` parameter has been renamed to `height`; "
-                   "please update your code.")
-            warnings.warn(UserWarning(msg))
+        super().__init__()
+        data = handle_data_source(data)
 
         # Sort out the variables that define the grid
         numeric_cols = self._find_numeric_cols(data)
@@ -1237,8 +1276,7 @@ class PairGrid(Grid):
         # Create the figure and the array of subplots
         figsize = len(x_vars) * height * aspect, len(y_vars) * height
 
-        # Disable autolayout so legend_out works
-        with mpl.rc_context({"figure.autolayout": False}):
+        with _disable_autolayout():
             fig = plt.figure(figsize=figsize)
 
         axes = fig.subplots(len(y_vars), len(x_vars),
@@ -1437,14 +1475,11 @@ class PairGrid(Grid):
                             # when drawing a corner plot?
 
             if self.diag_sharey and diag_axes:
-                # This may change in future matplotlibs
-                # See https://github.com/matplotlib/matplotlib/pull/9923
-                group = diag_axes[0].get_shared_y_axes()
                 for ax in diag_axes[1:]:
-                    group.join(ax, diag_axes[0])
+                    share_axis(diag_axes[0], ax, "y")
 
-            self.diag_vars = np.array(diag_vars, np.object_)
-            self.diag_axes = np.array(diag_axes, np.object_)
+            self.diag_vars = diag_vars
+            self.diag_axes = diag_axes
 
         if "hue" not in signature(func).parameters:
             return self._map_diag_iter_hue(func, **kwargs)
@@ -1453,7 +1488,7 @@ class PairGrid(Grid):
         for var, ax in zip(self.diag_vars, self.diag_axes):
 
             plot_kwargs = kwargs.copy()
-            if str(func.__module__).startswith("seaborn"):
+            if str(func.__module__).startswith("grplot_seaborn"):
                 plot_kwargs["ax"] = ax
             else:
                 plt.sca(ax)
@@ -1487,10 +1522,10 @@ class PairGrid(Grid):
         fixed_color = kwargs.pop("color", None)
 
         for var, ax in zip(self.diag_vars, self.diag_axes):
-            hue_grouped = self.data[var].groupby(self.hue_vals)
+            hue_grouped = self.data[var].groupby(self.hue_vals, observed=True)
 
             plot_kwargs = kwargs.copy()
-            if str(func.__module__).startswith("seaborn"):
+            if str(func.__module__).startswith("grplot_seaborn"):
                 plot_kwargs["ax"] = ax
             else:
                 plt.sca(ax)
@@ -1511,7 +1546,7 @@ class PairGrid(Grid):
                 if self._dropna:
                     data_k = utils.remove_na(data_k)
 
-                if str(func.__module__).startswith("seaborn"):
+                if str(func.__module__).startswith("grplot_seaborn"):
                     func(x=data_k, label=label_k, color=color, **plot_kwargs)
                 else:
                     func(data_k, label=label_k, color=color, **plot_kwargs)
@@ -1549,7 +1584,7 @@ class PairGrid(Grid):
             return
 
         kwargs = kwargs.copy()
-        if str(func.__module__).startswith("seaborn"):
+        if str(func.__module__).startswith("grplot_seaborn"):
             kwargs["ax"] = ax
         else:
             plt.sca(ax)
@@ -1573,9 +1608,10 @@ class PairGrid(Grid):
         else:
             hue = data.get(self._hue_var)
 
-        kwargs.setdefault("hue", hue)
-        kwargs.setdefault("hue_order", self._hue_order)
-        kwargs.setdefault("palette", self._orig_palette)
+        if "hue" not in kwargs:
+            kwargs.update({
+                "hue": hue, "hue_order": self._hue_order, "palette": self._orig_palette,
+            })
         func(x=x, y=y, **kwargs)
 
         self._update_legend_data(ax)
@@ -1583,7 +1619,7 @@ class PairGrid(Grid):
     def _plot_bivariate_iter_hue(self, x_var, y_var, ax, func, **kwargs):
         """Draw a bivariate plot while iterating over hue subsets."""
         kwargs = kwargs.copy()
-        if str(func.__module__).startswith("seaborn"):
+        if str(func.__module__).startswith("grplot_seaborn"):
             kwargs["ax"] = ax
         else:
             plt.sca(ax)
@@ -1593,7 +1629,7 @@ class PairGrid(Grid):
         else:
             axes_vars = [x_var, y_var]
 
-        hue_grouped = self.data.groupby(self.hue_vals)
+        hue_grouped = self.data.groupby(self.hue_vals, observed=True)
         for k, label_k in enumerate(self._hue_order):
 
             kws = kwargs.copy()
@@ -1617,7 +1653,7 @@ class PairGrid(Grid):
             if self._hue_var is not None:
                 kws["label"] = label_k
 
-            if str(func.__module__).startswith("seaborn"):
+            if str(func.__module__).startswith("grplot_seaborn"):
                 func(x=x, y=y, **kws)
             else:
                 func(x, y, **kws)
@@ -1630,8 +1666,6 @@ class PairGrid(Grid):
             ax.set_xlabel(label)
         for ax, label in zip(self.axes[:, 0], self.y_vars):
             ax.set_ylabel(label)
-        if self._corner:
-            self.axes[0, 0].set_ylabel("")
 
     def _find_numeric_cols(self, data):
         """Find which variables in a DataFrame are numeric."""
@@ -1650,21 +1684,13 @@ class JointGrid(_BaseGrid):
 
     """
 
-    @_deprecate_positional_args
     def __init__(
-        self, *,
-        x=None, y=None,
-        data=None,
+        self, data=None, *,
+        x=None, y=None, hue=None,
         height=6, ratio=5, space=.2,
-        dropna=False, xlim=None, ylim=None, size=None, marginal_ticks=False,
-        hue=None, palette=None, hue_order=None, hue_norm=None,
+        palette=None, hue_order=None, hue_norm=None,
+        dropna=False, xlim=None, ylim=None, marginal_ticks=False,
     ):
-        # Handle deprecations
-        if size is not None:
-            height = size
-            msg = ("The `size` parameter has been renamed to `height`; "
-                   "please update your code.")
-            warnings.warn(msg, UserWarning)
 
         # Set up the subplot grid
         f = plt.figure(figsize=(height, height))
@@ -1779,7 +1805,7 @@ class JointGrid(_BaseGrid):
         Parameters
         ----------
         func : plotting callable
-            If a seaborn function, it should accept ``x`` and ``y``. Otherwise,
+            If a grplot_seaborn function, it should accept ``x`` and ``y``. Otherwise,
             it must accept ``x`` and ``y`` vectors of data as the first two
             positional arguments, and it must plot on the "current" axes.
             If ``hue`` was defined in the class constructor, the function must
@@ -1794,7 +1820,7 @@ class JointGrid(_BaseGrid):
 
         """
         kwargs = kwargs.copy()
-        if str(func.__module__).startswith("seaborn"):
+        if str(func.__module__).startswith("grplot_seaborn"):
             kwargs["ax"] = self.ax_joint
         else:
             plt.sca(self.ax_joint)
@@ -1802,7 +1828,7 @@ class JointGrid(_BaseGrid):
             kwargs["hue"] = self.hue
             self._inject_kwargs(func, kwargs, self._hue_params)
 
-        if str(func.__module__).startswith("seaborn"):
+        if str(func.__module__).startswith("grplot_seaborn"):
             func(x=self.x, y=self.y, **kwargs)
         else:
             func(self.x, self.y, **kwargs)
@@ -1815,7 +1841,7 @@ class JointGrid(_BaseGrid):
         Parameters
         ----------
         func : plotting callable
-            If a seaborn function, it should  accept ``x`` and ``y`` and plot
+            If a grplot_seaborn function, it should  accept ``x`` and ``y`` and plot
             when only one of them is defined. Otherwise, it must accept a vector
             of data as the first positional argument and determine its orientation
             using the ``vertical`` parameter, and it must plot on the "current" axes.
@@ -1830,8 +1856,8 @@ class JointGrid(_BaseGrid):
             Returns ``self`` for easy method chaining.
 
         """
-        seaborn_func = (
-            str(func.__module__).startswith("seaborn")
+        grplot_seaborn_func = (
+            str(func.__module__).startswith("grplot_seaborn")
             # deprecated distplot has a legacy API, special case it
             and not func.__name__ == "distplot"
         )
@@ -1853,13 +1879,13 @@ class JointGrid(_BaseGrid):
             orient_kw_x = {"vertical": False}
             orient_kw_y = {"vertical": True}
 
-        if seaborn_func:
+        if grplot_seaborn_func:
             func(x=self.x, ax=self.ax_marg_x, **kwargs)
         else:
             plt.sca(self.ax_marg_x)
             func(self.x, **orient_kw_x, **kwargs)
 
-        if seaborn_func:
+        if grplot_seaborn_func:
             func(y=self.y, ax=self.ax_marg_y, **kwargs)
         else:
             plt.sca(self.ax_marg_y)
@@ -1943,8 +1969,8 @@ Set up the grid of subplots and store data internally for easy plotting.
 
 Parameters
 ----------
-{params.core.xy}
 {params.core.data}
+{params.core.xy}
 height : number
     Size of each side of the figure in inches (it will be square).
 ratio : number
@@ -1977,12 +2003,10 @@ Examples
 
 """.format(
     params=_param_docs,
-    returns=_core_docs["returns"],
     seealso=_core_docs["seealso"],
 )
 
 
-@_deprecate_positional_args
 def pairplot(
     data, *,
     hue=None, hue_order=None, palette=None,
@@ -2015,7 +2039,7 @@ def pairplot(
         Variable in ``data`` to map plot aspects to different colors.
     hue_order : list of strings
         Order for the levels of the hue variable in the palette
-    palette : dict or seaborn color palette
+    palette : dict or grplot_seaborn color palette
         Set of colors for mapping the ``hue`` variable. If a dict, keys
         should be values  in the ``hue`` variable.
     vars : list of variable names
@@ -2077,8 +2101,7 @@ def pairplot(
 
     if not isinstance(data, pd.DataFrame):
         raise TypeError(
-            "'data' must be pandas DataFrame object, not: {typefound}".format(
-                typefound=type(data)))
+            f"'data' must be pandas DataFrame object, not: {type(data)}")
 
     plot_kws = {} if plot_kws is None else plot_kws.copy()
     diag_kws = {} if diag_kws is None else diag_kws.copy()
@@ -2109,8 +2132,8 @@ def pairplot(
             if not isinstance(markers, list):
                 markers = [markers] * n_markers
             if len(markers) != n_markers:
-                raise ValueError(("markers must be a singleton or a list of "
-                                  "markers for each level of the hue variable"))
+                raise ValueError("markers must be a singleton or a list of "
+                                 "markers for each level of the hue variable")
             grid.hue_kws = {"marker": markers}
         elif kind == "scatter":
             if isinstance(markers, str):
@@ -2158,15 +2181,11 @@ def pairplot(
     return grid
 
 
-@_deprecate_positional_args
 def jointplot(
-    *,
-    x=None, y=None,
-    data=None,
-    kind="scatter", color=None, height=6, ratio=5, space=.2,
-    dropna=False, xlim=None, ylim=None, marginal_ticks=False,
+    data=None, *, x=None, y=None, hue=None, kind="scatter",
+    height=6, ratio=5, space=.2, dropna=False, xlim=None, ylim=None,
+    color=None, palette=None, hue_order=None, hue_norm=None, marginal_ticks=False,
     joint_kws=None, marginal_kws=None,
-    hue=None, palette=None, hue_order=None, hue_norm=None,
     **kwargs
 ):
     # Avoid circular imports
@@ -2174,12 +2193,9 @@ def jointplot(
     from .regression import regplot, residplot
     from .distributions import histplot, kdeplot, _freedman_diaconis_bins
 
-    # Handle deprecations
-    if "size" in kwargs:
-        height = kwargs.pop("size")
-        msg = ("The `size` parameter has been renamed to `height`; "
-               "please update your code.")
-        warnings.warn(msg, UserWarning)
+    if kwargs.pop("ax", None) is not None:
+        msg = "Ignoring `ax`; jointplot is a figure-level function."
+        warnings.warn(msg, UserWarning, stacklevel=2)
 
     # Set up empty default kwarg dicts
     joint_kws = {} if joint_kws is None else joint_kws.copy()
@@ -2208,9 +2224,7 @@ def jointplot(
 
     # Raise early if using `hue` with a kind that does not support it
     if hue is not None and kind in ["hex", "reg", "resid"]:
-        msg = (
-            f"Use of `hue` with `kind='{kind}'` is not currently supported."
-        )
+        msg = f"Use of `hue` with `kind='{kind}'` is not currently supported."
         raise ValueError(msg)
 
     # Make a colormap based off the plot color
@@ -2218,8 +2232,7 @@ def jointplot(
     if color is None:
         color = "C0"
     color_rgb = mpl.colors.colorConverter.to_rgb(color)
-    colors = [utils.set_hls_values(color_rgb, l=l)  # noqa
-              for l in np.linspace(1, 0, 12)]
+    colors = [set_hls_values(color_rgb, l=val) for val in np.linspace(1, 0, 12)]
     cmap = blend_palette(colors, as_cmap=True)
 
     # Matplotlib's hexbin plot is not na-robust
@@ -2256,7 +2269,7 @@ def jointplot(
     elif kind.startswith("hist"):
 
         # TODO process pair parameters for bins, etc. and pass
-        # to both jount and marginal plots
+        # to both joint and marginal plots
 
         joint_kws.setdefault("color", color)
         grid.plot_joint(histplot, **joint_kws)
@@ -2322,6 +2335,9 @@ def jointplot(
         histplot(x=x, hue=hue, ax=grid.ax_marg_x, **marginal_kws)
         histplot(y=y, hue=hue, ax=grid.ax_marg_y, **marginal_kws)
 
+    # Make the main axes active in the matplotlib state machine
+    plt.sca(grid.ax_joint)
+
     return grid
 
 
@@ -2335,11 +2351,11 @@ lightweight wrapper; if you need more flexibility, you should use
 
 Parameters
 ----------
-{params.core.xy}
 {params.core.data}
+{params.core.xy}
+{params.core.hue}
 kind : {{ "scatter" | "kde" | "hist" | "hex" | "reg" | "resid" }}
     Kind of plot to draw. See the examples for references to the underlying functions.
-{params.core.color}
 height : numeric
     Size of the figure (it will be square).
 ratio : numeric
@@ -2350,15 +2366,14 @@ dropna : bool
     If True, remove observations that are missing from ``x`` and ``y``.
 {{x, y}}lim : pairs of numbers
     Axis limits to set before plotting.
+{params.core.color}
+{params.core.palette}
+{params.core.hue_order}
+{params.core.hue_norm}
 marginal_ticks : bool
     If False, suppress ticks on the count/density axis of the marginal plots.
 {{joint, marginal}}_kws : dicts
     Additional keyword arguments for the plot components.
-{params.core.hue}
-    Semantic variable that is mapped to determine the color of plot elements.
-{params.core.palette}
-{params.core.hue_order}
-{params.core.hue_norm}
 kwargs
     Additional keyword arguments are passed to the function used to
     draw the plot on the joint Axes, superseding items in the

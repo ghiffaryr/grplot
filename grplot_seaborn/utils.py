@@ -1,32 +1,28 @@
 """Utility functions, mostly for internal use."""
 import os
-import re
 import inspect
 import warnings
 import colorsys
+from contextlib import contextmanager
 from urllib.request import urlopen, urlretrieve
+from types import ModuleType
 
 import numpy as np
-from scipy import stats
 import pandas as pd
 import matplotlib as mpl
-import matplotlib.colors as mplcol
+from matplotlib.colors import to_rgb
 import matplotlib.pyplot as plt
 from matplotlib.cbook import normalize_kwargs
 
+from grplot_seaborn._core.typing import deprecated
+from grplot_seaborn.external.version import Version
+from grplot_seaborn.external.appdirs import user_cache_dir
 
 __all__ = ["desaturate", "saturate", "set_hls_values", "move_legend",
            "despine", "get_dataset_names", "get_data_home", "load_dataset"]
 
-
-def sort_df(df, *args, **kwargs):
-    """Wrapper to handle different pandas sorting API pre/post 0.17."""
-    msg = "This function is deprecated and will be removed in a future version"
-    warnings.warn(msg)
-    try:
-        return df.sort_values(*args, **kwargs)
-    except AttributeError:
-        return df.sort(*args, **kwargs)
+DATASET_SOURCE = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+DATASET_NAMES_URL = f"{DATASET_SOURCE}/dataset_names.txt"
 
 
 def ci_to_errsize(cis, heights):
@@ -59,36 +55,6 @@ def ci_to_errsize(cis, heights):
     return errsize
 
 
-def pmf_hist(a, bins=10):
-    """Return arguments to plt.bar for pmf-like histogram of an array.
-
-    DEPRECATED: will be removed in a future version.
-
-    Parameters
-    ----------
-    a: array-like
-        array to make histogram of
-    bins: int
-        number of bins
-
-    Returns
-    -------
-    x: array
-        left x position of bars
-    h: array
-        height of bars
-    w: float
-        width of bars
-
-    """
-    msg = "This function is deprecated and will be removed in a future version"
-    warnings.warn(msg, FutureWarning)
-    n, x = np.histogram(a, bins)
-    h = n / n.sum()
-    w = x[1] - x[0]
-    return x[:-1], h, w
-
-
 def _draw_figure(fig):
     """Force draw of a matplotlib figure, accounting for back-compat."""
     # See https://github.com/matplotlib/matplotlib/issues/19197 for context
@@ -98,6 +64,84 @@ def _draw_figure(fig):
             fig.draw(fig.canvas.get_renderer())
         except AttributeError:
             pass
+
+
+def _default_color(method, hue, color, kws, saturation=1):
+    """If needed, get a default color by using the matplotlib property cycle."""
+
+    if hue is not None:
+        # This warning is probably user-friendly, but it's currently triggered
+        # in a FacetGrid context and I don't want to mess with that logic right now
+        #  if color is not None:
+        #      msg = "`color` is ignored when `hue` is assigned."
+        #      warnings.warn(msg)
+        return None
+
+    kws = kws.copy()
+    kws.pop("label", None)
+
+    if color is not None:
+        if saturation < 1:
+            color = desaturate(color, saturation)
+        return color
+
+    elif method.__name__ == "plot":
+
+        color = normalize_kwargs(kws, mpl.lines.Line2D).get("color")
+        scout, = method([], [], scalex=False, scaley=False, color=color)
+        color = scout.get_color()
+        scout.remove()
+
+    elif method.__name__ == "scatter":
+
+        # Matplotlib will raise if the size of x/y don't match s/c,
+        # and the latter might be in the kws dict
+        scout_size = max(
+            np.atleast_1d(kws.get(key, [])).shape[0]
+            for key in ["s", "c", "fc", "facecolor", "facecolors"]
+        )
+        scout_x = scout_y = np.full(scout_size, np.nan)
+
+        scout = method(scout_x, scout_y, **kws)
+        facecolors = scout.get_facecolors()
+
+        if not len(facecolors):
+            # Handle bug in matplotlib <= 3.2 (I think)
+            # This will limit the ability to use non color= kwargs to specify
+            # a color in versions of matplotlib with the bug, but trying to
+            # work out what the user wanted by re-implementing the broken logic
+            # of inspecting the kwargs is probably too brittle.
+            single_color = False
+        else:
+            single_color = np.unique(facecolors, axis=0).shape[0] == 1
+
+        # Allow the user to specify an array of colors through various kwargs
+        if "c" not in kws and single_color:
+            color = to_rgb(facecolors[0])
+
+        scout.remove()
+
+    elif method.__name__ == "bar":
+
+        # bar() needs masked, not empty data, to generate a patch
+        scout, = method([np.nan], [np.nan], **kws)
+        color = to_rgb(scout.get_facecolor())
+        scout.remove()
+        # Axes.bar adds both a patch and a container
+        method.__self__.containers.pop(-1)
+
+    elif method.__name__ == "fill_between":
+
+        kws = normalize_kwargs(kws, mpl.collections.PolyCollection)
+        scout = method([], [], **kws)
+        facecolor = scout.get_facecolor()
+        color = to_rgb(facecolor[0])
+        scout.remove()
+
+    if saturation < 1:
+        color = desaturate(color, saturation)
+
+    return color
 
 
 def desaturate(color, prop):
@@ -121,7 +165,11 @@ def desaturate(color, prop):
         raise ValueError("prop must be between 0 and 1")
 
     # Get rgb tuple rep
-    rgb = mplcol.colorConverter.to_rgb(color)
+    rgb = to_rgb(color)
+
+    # Short circuit to avoid floating point issues
+    if prop == 1:
+        return rgb
 
     # Convert to hls
     h, l, s = colorsys.rgb_to_hls(*rgb)
@@ -169,7 +217,7 @@ def set_hls_values(color, h=None, l=None, s=None):  # noqa
 
     """
     # Get an RGB tuple representation
-    rgb = mplcol.colorConverter.to_rgb(color)
+    rgb = to_rgb(color)
     vals = list(colorsys.rgb_to_hls(*rgb))
     for i, val in enumerate([h, l, s]):
         if val is not None:
@@ -339,7 +387,7 @@ def move_legend(obj, loc, **kwargs):
     Parameters
     ----------
     obj : the object with the plot
-        This argument can be either a seaborn or matplotlib object:
+        This argument can be either a grplot_seaborn or matplotlib object:
 
         - :class:`grplot_seaborn.FacetGrid` or :class:`grplot_seaborn.PairGrid`
         - :class:`matplotlib.axes.Axes` or :class:`matplotlib.figure.Figure`
@@ -376,7 +424,7 @@ def move_legend(obj, loc, **kwargs):
             old_legend = None
         legend_func = obj.legend
     else:
-        err = "`obj` must be a seaborn Grid or matplotlib Axes or Figure instance."
+        err = "`obj` must be a grplot_seaborn Grid or matplotlib Axes or Figure instance."
         raise TypeError(err)
 
     if old_legend is None:
@@ -384,8 +432,17 @@ def move_legend(obj, loc, **kwargs):
         raise ValueError(err)
 
     # Extract the components of the legend we need to reuse
-    handles = old_legend.legendHandles
+    # Import here to avoid a circular import
+    from grplot_seaborn._compat import get_legend_handles
+    handles = get_legend_handles(old_legend)
     labels = [t.get_text() for t in old_legend.get_texts()]
+
+    # Handle the case where the user is trying to override the labels
+    if (new_labels := kwargs.pop("labels", None)) is not None:
+        if len(new_labels) != len(labels):
+            err = "Length of new labels does not match existing legend."
+            raise ValueError(err)
+        labels = new_labels
 
     # Extract legend properties that can be passed to the recreation method
     # (Vexingly, these don't all round-trip)
@@ -427,87 +484,10 @@ def _kde_support(data, bw, gridsize, cut, clip):
     return support
 
 
-def percentiles(a, pcts, axis=None):
-    """Like scoreatpercentile but can take and return array of percentiles.
-
-    DEPRECATED: will be removed in a future version.
-
-    Parameters
-    ----------
-    a : array
-        data
-    pcts : sequence of percentile values
-        percentile or percentiles to find score at
-    axis : int or None
-        if not None, computes scores over this axis
-
-    Returns
-    -------
-    scores: array
-        array of scores at requested percentiles
-        first dimension is length of object passed to ``pcts``
-
-    """
-    msg = "This function is deprecated and will be removed in a future version"
-    warnings.warn(msg, FutureWarning)
-
-    scores = []
-    try:
-        n = len(pcts)
-    except TypeError:
-        pcts = [pcts]
-        n = 0
-    for i, p in enumerate(pcts):
-        if axis is None:
-            score = stats.scoreatpercentile(a.ravel(), p)
-        else:
-            score = np.apply_along_axis(stats.scoreatpercentile, axis, a, p)
-        scores.append(score)
-    scores = np.asarray(scores)
-    if not n:
-        scores = scores.squeeze()
-    return scores
-
-
 def ci(a, which=95, axis=None):
     """Return a percentile range from an array of values."""
     p = 50 - which / 2, 50 + which / 2
     return np.nanpercentile(a, p, axis)
-
-
-def sig_stars(p):
-    """Return a R-style significance string corresponding to p values.
-
-    DEPRECATED: will be removed in a future version.
-
-    """
-    msg = "This function is deprecated and will be removed in a future version"
-    warnings.warn(msg, FutureWarning)
-
-    if p < 0.001:
-        return "***"
-    elif p < 0.01:
-        return "**"
-    elif p < 0.05:
-        return "*"
-    elif p < 0.1:
-        return "."
-    return ""
-
-
-def iqr(a):
-    """Calculate the IQR for an array of numbers.
-
-    DEPRECATED: will be removed in a future version.
-
-    """
-    msg = "This function is deprecated and will be removed in a future version"
-    warnings.warn(msg, FutureWarning)
-
-    a = np.asarray(a)
-    q1 = stats.scoreatpercentile(a, 25)
-    q3 = stats.scoreatpercentile(a, 75)
-    return q3 - q1
 
 
 def get_dataset_names():
@@ -516,27 +496,25 @@ def get_dataset_names():
     Requires an internet connection.
 
     """
-    url = "https://github.com/mwaskom/seaborn-data"
-    with urlopen(url) as resp:
-        html = resp.read()
+    with urlopen(DATASET_NAMES_URL) as resp:
+        txt = resp.read()
 
-    pat = r"/mwaskom/seaborn-data/blob/master/(\w*).csv"
-    datasets = re.findall(pat, html.decode())
-    return datasets
+    dataset_names = [name.strip() for name in txt.decode().split("\n")]
+    return list(filter(None, dataset_names))
 
 
 def get_data_home(data_home=None):
     """Return a path to the cache directory for example datasets.
 
-    This directory is then used by :func:`load_dataset`.
+    This directory is used by :func:`load_dataset`.
 
-    If the ``data_home`` argument is not specified, it tries to read from the
-    ``SEABORN_DATA`` environment variable and defaults to ``~/seaborn-data``.
+    If the ``data_home`` argument is not provided, it will use a directory
+    specified by the `SEABORN_DATA` environment variable (if it exists)
+    or otherwise default to an OS-appropriate user cache location.
 
     """
     if data_home is None:
-        data_home = os.environ.get('SEABORN_DATA',
-                                   os.path.join('~', 'seaborn-data'))
+        data_home = os.environ.get("SEABORN_DATA", user_cache_dir("grplot_seaborn"))
     data_home = os.path.expanduser(data_home)
     if not os.path.exists(data_home):
         os.makedirs(data_home)
@@ -547,7 +525,7 @@ def load_dataset(name, cache=True, data_home=None, **kws):
     """Load an example dataset from the online repository (requires internet).
 
     This function provides quick access to a small number of example datasets
-    that are useful for documenting seaborn or generating reproducible examples
+    that are useful for documenting grplot_seaborn or generating reproducible examples
     for bug reports. It is not necessary for normal usage.
 
     Note that some of the datasets have a small amount of preprocessing applied
@@ -559,7 +537,7 @@ def load_dataset(name, cache=True, data_home=None, **kws):
     ----------
     name : str
         Name of the dataset (``{name}.csv`` on
-        https://github.com/mwaskom/seaborn-data).
+        https://github.com/mwaskom/grplot_seaborn-data).
     cache : boolean, optional
         If True, try to load from the local cache first, and save to the cache
         if a download is required.
@@ -576,7 +554,7 @@ def load_dataset(name, cache=True, data_home=None, **kws):
 
     """
     # A common beginner mistake is to assume that one's personal data needs
-    # to be passed through this function to be usable with seaborn.
+    # to be passed through this function to be usable with grplot_seaborn.
     # Let's provide a more helpful error than you would otherwise get.
     if isinstance(name, pd.DataFrame):
         err = (
@@ -586,7 +564,7 @@ def load_dataset(name, cache=True, data_home=None, **kws):
         )
         raise TypeError(err)
 
-    url = f"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/{name}.csv"
+    url = f"{DATASET_SOURCE}/{name}.csv"
 
     if cache:
         cache_path = os.path.join(get_data_home(data_home), os.path.basename(url))
@@ -611,23 +589,23 @@ def load_dataset(name, cache=True, data_home=None, **kws):
         df["time"] = pd.Categorical(df["time"], ["Lunch", "Dinner"])
         df["smoker"] = pd.Categorical(df["smoker"], ["Yes", "No"])
 
-    if name == "flights":
+    elif name == "flights":
         months = df["month"].str[:3]
         df["month"] = pd.Categorical(months, months.unique())
 
-    if name == "exercise":
+    elif name == "exercise":
         df["time"] = pd.Categorical(df["time"], ["1 min", "15 min", "30 min"])
         df["kind"] = pd.Categorical(df["kind"], ["rest", "walking", "running"])
         df["diet"] = pd.Categorical(df["diet"], ["no fat", "low fat"])
 
-    if name == "titanic":
+    elif name == "titanic":
         df["class"] = pd.Categorical(df["class"], ["First", "Second", "Third"])
         df["deck"] = pd.Categorical(df["deck"], list("ABCDEFG"))
 
-    if name == "penguins":
+    elif name == "penguins":
         df["sex"] = df["sex"].str.title()
 
-    if name == "diamonds":
+    elif name == "diamonds":
         df["color"] = pd.Categorical(
             df["color"], ["D", "E", "F", "G", "H", "I", "J"],
         )
@@ -637,6 +615,16 @@ def load_dataset(name, cache=True, data_home=None, **kws):
         df["cut"] = pd.Categorical(
             df["cut"], ["Ideal", "Premium", "Very Good", "Good", "Fair"],
         )
+
+    elif name == "taxis":
+        df["pickup"] = pd.to_datetime(df["pickup"])
+        df["dropoff"] = pd.to_datetime(df["dropoff"])
+
+    elif name == "seaice":
+        df["Date"] = pd.to_datetime(df["Date"])
+
+    elif name == "dowjones":
+        df["Date"] = pd.to_datetime(df["Date"])
 
     return df
 
@@ -697,13 +685,13 @@ def locator_to_legend_entries(locator, limits, dtype):
         formatter = mpl.ticker.LogFormatter()
     else:
         formatter = mpl.ticker.ScalarFormatter()
+        # Avoid having an offset/scientific notation which we don't currently
+        # have any way of representing in the legend
+        formatter.set_useOffset(False)
+        formatter.set_scientific(False)
     formatter.axis = dummy_axis()
 
-    # TODO: The following two lines should be replaced
-    # once pinned matplotlib>=3.1.0 with:
-    # formatted_levels = formatter.format_ticks(raw_levels)
-    formatter.set_locs(raw_levels)
-    formatted_levels = [formatter(x) for x in raw_levels]
+    formatted_levels = formatter.format_ticks(raw_levels)
 
     return raw_levels, formatted_levels
 
@@ -759,32 +747,18 @@ def to_utf8(obj):
         return str(obj)
 
 
-def _normalize_kwargs(kws, artist):
-    """Wrapper for mpl.cbook.normalize_kwargs that supports <= 3.2.1."""
-    _alias_map = {
-        'color': ['c'],
-        'linewidth': ['lw'],
-        'linestyle': ['ls'],
-        'facecolor': ['fc'],
-        'edgecolor': ['ec'],
-        'markerfacecolor': ['mfc'],
-        'markeredgecolor': ['mec'],
-        'markeredgewidth': ['mew'],
-        'markersize': ['ms']
-    }
-    try:
-        kws = normalize_kwargs(kws, artist)
-    except AttributeError:
-        kws = normalize_kwargs(kws, _alias_map)
-    return kws
-
-
-def _check_argument(param, options, value):
+def _check_argument(param, options, value, prefix=False):
     """Raise if value for param is not in options."""
-    if value not in options:
+    if prefix and value is not None:
+        failure = not any(value.startswith(p) for p in options if isinstance(p, str))
+    else:
+        failure = value not in options
+    if failure:
         raise ValueError(
-            f"`{param}` must be one of {options}, but {value} was passed.`"
+            f"The value for `{param}` must be one of {options}, "
+            f"but {repr(value)} was passed."
         )
+    return value
 
 
 def _assign_default_kwargs(kws, call_func, source_func):
@@ -792,7 +766,7 @@ def _assign_default_kwargs(kws, call_func, source_func):
     # This exists so that axes-level functions and figure-level functions can
     # both call a Plotter method while having the default kwargs be defined in
     # the signature of the axes-level function.
-    # An alternative would be to  have a decorator on the method that sets its
+    # An alternative would be to have a decorator on the method that sets its
     # defaults based on those defined in the axes-level function.
     # Then the figure-level function would not need to worry about defaults.
     # I am not sure which is better.
@@ -807,7 +781,12 @@ def _assign_default_kwargs(kws, call_func, source_func):
 
 
 def adjust_legend_subtitles(legend):
-    """Make invisible-handle "subtitles" entries look more like titles."""
+    """
+    Make invisible-handle "subtitles" entries look more like titles.
+
+    Note: This function is not part of the public API and may be changed or removed.
+
+    """
     # Legend title not in rcParams until 3.0
     font_size = plt.rcParams.get("legend.title_fontsize", None)
     hpackers = legend.findobj(mpl.offsetbox.VPacker)[0].get_children()
@@ -819,3 +798,100 @@ def adjust_legend_subtitles(legend):
             for text in text_area.get_children():
                 if font_size is not None:
                     text.set_size(font_size)
+
+
+def _deprecate_ci(errorbar, ci):
+    """
+    Warn on usage of ci= and convert to appropriate errorbar= arg.
+
+    ci was deprecated when errorbar was added in 0.12. It should not be removed
+    completely for some time, but it can be moved out of function definitions
+    (and extracted from kwargs) after one cycle.
+
+    """
+    if ci is not deprecated and ci != "deprecated":
+        if ci is None:
+            errorbar = None
+        elif ci == "sd":
+            errorbar = "sd"
+        else:
+            errorbar = ("ci", ci)
+        msg = (
+            "\n\nThe `ci` parameter is deprecated. "
+            f"Use `errorbar={repr(errorbar)}` for the same effect.\n"
+        )
+        warnings.warn(msg, FutureWarning, stacklevel=3)
+
+    return errorbar
+
+
+def _get_transform_functions(ax, axis):
+    """Return the forward and inverse transforms for a given axis."""
+    axis_obj = getattr(ax, f"{axis}axis")
+    transform = axis_obj.get_transform()
+    return transform.transform, transform.inverted().transform
+
+
+@contextmanager
+def _disable_autolayout():
+    """Context manager for preventing rc-controlled auto-layout behavior."""
+    # This is a workaround for an issue in matplotlib, for details see
+    # https://github.com/mwaskom/grplot_seaborn/issues/2914
+    # The only affect of this rcParam is to set the default value for
+    # layout= in plt.figure, so we could just do that instead.
+    # But then we would need to own the complexity of the transition
+    # from tight_layout=True -> layout="tight". This seems easier,
+    # but can be removed when (if) that is simpler on the matplotlib side,
+    # or if the layout algorithms are improved to handle figure legends.
+    orig_val = mpl.rcParams["figure.autolayout"]
+    try:
+        mpl.rcParams["figure.autolayout"] = False
+        yield
+    finally:
+        mpl.rcParams["figure.autolayout"] = orig_val
+
+
+def _version_predates(lib: ModuleType, version: str) -> bool:
+    """Helper function for checking version compatibility."""
+    return Version(lib.__version__) < Version(version)
+
+
+def _scatter_legend_artist(**kws):
+
+    kws = normalize_kwargs(kws, mpl.collections.PathCollection)
+
+    edgecolor = kws.pop("edgecolor", None)
+    rc = mpl.rcParams
+    line_kws = {
+        "linestyle": "",
+        "marker": kws.pop("marker", "o"),
+        "markersize": np.sqrt(kws.pop("s", rc["lines.markersize"] ** 2)),
+        "markerfacecolor": kws.pop("facecolor", kws.get("color")),
+        "markeredgewidth": kws.pop("linewidth", 0),
+        **kws,
+    }
+
+    if edgecolor is not None:
+        if edgecolor == "face":
+            line_kws["markeredgecolor"] = line_kws["markerfacecolor"]
+        else:
+            line_kws["markeredgecolor"] = edgecolor
+
+    return mpl.lines.Line2D([], [], **line_kws)
+
+
+def _get_patch_legend_artist(fill):
+
+    def legend_artist(**kws):
+
+        color = kws.pop("color", None)
+        if color is not None:
+            if fill:
+                kws["facecolor"] = color
+            else:
+                kws["edgecolor"] = color
+                kws["facecolor"] = "none"
+
+        return mpl.patches.Rectangle((0, 0), 0, 0, **kws)
+
+    return legend_artist

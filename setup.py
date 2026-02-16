@@ -1,7 +1,7 @@
 from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "0.14.5"
+VERSION = "1.0.1"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -12,11 +12,10 @@ PROJECT_URLS = {
                }
 CLASSIFIERS = [
                "Intended Audience :: Science/Research",
-               "Programming Language :: Python :: 3.6",
-               "Programming Language :: Python :: 3.7",
-               "Programming Language :: Python :: 3.8",
-               "Programming Language :: Python :: 3.9",
                "Programming Language :: Python :: 3.10",
+               "Programming Language :: Python :: 3.11",
+               "Programming Language :: Python :: 3.12",
+               "Programming Language :: Python :: 3.13",
                "License :: OSI Approved :: BSD License",
                "Topic :: Scientific/Engineering :: Visualization",
                "Topic :: Multimedia :: Graphics",
@@ -24,13 +23,11 @@ CLASSIFIERS = [
                "Framework :: Matplotlib",
               ]
 DOWNLOAD_URL = "https://github.com/ghiffaryr/grplot"
-PYTHON_REQUIRES = ">=3.6"
+PYTHON_REQUIRES = ">=3.10"
 INSTALL_REQUIRES = [
-    "numpy>=1.15, <1.27",
-    "scipy>=1.0",
-    "matplotlib>=2.2, <3.8",
-    "pandas>=0.23, <1.6",
-    "ipython>=6.0",
+    "numpy>=1.20, !=1.24.0",
+    "pandas>=1.2",
+    "matplotlib>=3.4, !=3.6.1",
 ]
 PACKAGES = ["grplot",
             "grplot.analytic",
@@ -60,9 +57,11 @@ PACKAGES = ["grplot",
             "grplot.hotfix",
             "grplot.utils",
             "grplot_seaborn",
+            "grplot_seaborn._core",
+            "grplot_seaborn._marks",
+            "grplot_seaborn._stats",
             "grplot_seaborn.colors",
-            "grplot_seaborn.external",
-            "grplot_seaborn.tests",
+            "grplot_seaborn.external",            
            ]
 
 if __name__ == "__main__":

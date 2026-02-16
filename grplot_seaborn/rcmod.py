@@ -1,7 +1,5 @@
 """Control plot style and scaling using the matplotlib rcParams interface."""
-import warnings
 import functools
-from distutils.version import LooseVersion
 import matplotlib as mpl
 from cycler import cycler
 from . import palettes
@@ -60,6 +58,7 @@ _context_keys = [
     "xtick.labelsize",
     "ytick.labelsize",
     "legend.fontsize",
+    "legend.title_fontsize",
 
     "axes.linewidth",
     "grid.linewidth",
@@ -79,18 +78,15 @@ _context_keys = [
 
 ]
 
-if LooseVersion(mpl.__version__) >= "3.0":
-    _context_keys.append("legend.title_fontsize")
-
 
 def set_theme(context="notebook", style="darkgrid", palette="deep",
               font="sans-serif", font_scale=1, color_codes=True, rc=None):
     """
-    Set aspects of the visual theme for all matplotlib and seaborn plots.
+    Set aspects of the visual theme for all matplotlib and grplot_seaborn plots.
 
     This function changes the global defaults for all plots using the
-    :ref:`matplotlib rcParams system <matplotlib:matplotlib-rcparams>`.
-    The themeing is decomposed into several distinct sets of parameter values.
+    matplotlib rcParams system. The themeing is decomposed into several distinct
+    sets of parameter values.
 
     The options are illustrated in the :doc:`aesthetics <../tutorial/aesthetics>`
     and :doc:`color palette <../tutorial/color_palettes>` tutorials.
@@ -109,7 +105,7 @@ def set_theme(context="notebook", style="darkgrid", palette="deep",
         Separate scaling factor to independently scale the size of the
         font elements.
     color_codes : bool
-        If ``True`` and ``palette`` is a seaborn palette, remap the shorthand
+        If ``True`` and ``palette`` is a grplot_seaborn palette, remap the shorthand
         color codes (e.g. "b", "g", "r", etc.) to the colors from this palette.
     rc : dict or None
         Dictionary of rc parameter mappings to override the above.
@@ -144,9 +140,7 @@ def reset_defaults():
 def reset_orig():
     """Restore all RC params to original settings (respects custom rc)."""
     from . import _orig_rc_params
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore', mpl.cbook.MatplotlibDeprecationWarning)
-        mpl.rcParams.update(_orig_rc_params)
+    mpl.rcParams.update(_orig_rc_params)
 
 
 def axes_style(style=None, rc=None):
@@ -155,7 +149,7 @@ def axes_style(style=None, rc=None):
 
     The style parameters control properties like the color of the background and
     whether a grid is enabled by default. This is accomplished using the
-    :ref:`matplotlib rcParams system <matplotlib:matplotlib-rcparams>`.
+    matplotlib rcParams system.
 
     The options are illustrated in the
     :doc:`aesthetics tutorial <../tutorial/aesthetics>`.
@@ -169,7 +163,7 @@ def axes_style(style=None, rc=None):
     style : None, dict, or one of {darkgrid, whitegrid, dark, white, ticks}
         A dictionary of parameters or the name of a preconfigured style.
     rc : dict, optional
-        Parameter mappings to override the values in the preset seaborn
+        Parameter mappings to override the values in the preset grplot_seaborn
         style dictionaries. This only updates parameters that are
         considered part of the style definition.
 
@@ -188,7 +182,7 @@ def axes_style(style=None, rc=None):
     else:
         styles = ["white", "dark", "whitegrid", "darkgrid", "ticks"]
         if style not in styles:
-            raise ValueError("style must be one of %s" % ", ".join(styles))
+            raise ValueError(f"style must be one of {', '.join(styles)}")
 
         # Define colors here
         dark_gray = ".15"
@@ -312,7 +306,7 @@ def set_style(style=None, rc=None):
 
     The style parameters control properties like the color of the background and
     whether a grid is enabled by default. This is accomplished using the
-    :ref:`matplotlib rcParams system <matplotlib:matplotlib-rcparams>`.
+    matplotlib rcParams system.
 
     The options are illustrated in the
     :doc:`aesthetics tutorial <../tutorial/aesthetics>`.
@@ -324,7 +318,7 @@ def set_style(style=None, rc=None):
     style : dict, or one of {darkgrid, whitegrid, dark, white, ticks}
         A dictionary of parameters or the name of a preconfigured style.
     rc : dict, optional
-        Parameter mappings to override the values in the preset seaborn
+        Parameter mappings to override the values in the preset grplot_seaborn
         style dictionaries. This only updates parameters that are
         considered part of the style definition.
 
@@ -342,9 +336,8 @@ def plotting_context(context=None, font_scale=1, rc=None):
     """
     Get the parameters that control the scaling of plot elements.
 
-    This affects things like the size of the labels, lines, and other elements
-    of the plot, but not the overall style. This is accomplished using the
-    :ref:`matplotlib rcParams system <matplotlib:matplotlib-rcparams>`.
+    These parameters correspond to label size, line thickness, etc. For more
+    information, see the :doc:`aesthetics tutorial <../tutorial/aesthetics>`.
 
     The base context is "notebook", and the other contexts are "paper", "talk",
     and "poster", which are version of the notebook parameters scaled by different
@@ -363,7 +356,7 @@ def plotting_context(context=None, font_scale=1, rc=None):
         Separate scaling factor to independently scale the size of the
         font elements.
     rc : dict, optional
-        Parameter mappings to override the values in the preset seaborn
+        Parameter mappings to override the values in the preset grplot_seaborn
         context dictionaries. This only updates parameters that are
         considered part of the context definition.
 
@@ -383,7 +376,7 @@ def plotting_context(context=None, font_scale=1, rc=None):
 
         contexts = ["paper", "notebook", "talk", "poster"]
         if context not in contexts:
-            raise ValueError("context must be in %s" % ", ".join(contexts))
+            raise ValueError(f"context must be in {', '.join(contexts)}")
 
         # Set up dictionary of default parameters
         texts_base_context = {
@@ -394,11 +387,9 @@ def plotting_context(context=None, font_scale=1, rc=None):
             "xtick.labelsize": 11,
             "ytick.labelsize": 11,
             "legend.fontsize": 11,
+            "legend.title_fontsize": 12,
 
         }
-
-        if LooseVersion(mpl.__version__) >= "3.0":
-            texts_base_context["legend.title_fontsize"] = 12
 
         base_context = {
 
@@ -445,9 +436,9 @@ def set_context(context=None, font_scale=1, rc=None):
     """
     Set the parameters that control the scaling of plot elements.
 
-    This affects things like the size of the labels, lines, and other elements
-    of the plot, but not the overall style. This is accomplished using the
-    :ref:`matplotlib rcParams system <matplotlib:matplotlib-rcparams>`.
+    These parameters correspond to label size, line thickness, etc.
+    Calling this function modifies the global matplotlib `rcParams`. For more
+    information, see the :doc:`aesthetics tutorial <../tutorial/aesthetics>`.
 
     The base context is "notebook", and the other contexts are "paper", "talk",
     and "poster", which are version of the notebook parameters scaled by different
@@ -464,7 +455,7 @@ def set_context(context=None, font_scale=1, rc=None):
         Separate scaling factor to independently scale the size of the
         font elements.
     rc : dict, optional
-        Parameter mappings to override the values in the preset seaborn
+        Parameter mappings to override the values in the preset grplot_seaborn
         context dictionaries. This only updates parameters that are
         considered part of the context definition.
 
@@ -508,13 +499,12 @@ class _PlottingContext(_RCAesthetics):
 
 
 def set_palette(palette, n_colors=None, desat=None, color_codes=False):
-    """Set the matplotlib color cycle using a seaborn palette.
+    """Set the matplotlib color cycle using a grplot_seaborn palette.
 
     Parameters
     ----------
-    palette : seaborn color paltte | matplotlib colormap | hls | husl
-        Palette definition. Should be something that :func:`color_palette`
-        can process.
+    palette : grplot_seaborn color palette | matplotlib colormap | hls | husl
+        Palette definition. Should be something :func:`color_palette` can process.
     n_colors : int
         Number of colors in the cycle. The default number of colors will depend
         on the format of ``palette``, see the :func:`color_palette`
@@ -522,14 +512,8 @@ def set_palette(palette, n_colors=None, desat=None, color_codes=False):
     desat : float
         Proportion to desaturate each color by.
     color_codes : bool
-        If ``True`` and ``palette`` is a seaborn palette, remap the shorthand
+        If ``True`` and ``palette`` is a grplot_seaborn palette, remap the shorthand
         color codes (e.g. "b", "g", "r", etc.) to the colors from this palette.
-
-    Examples
-    --------
-    >>> set_palette("Reds")
-
-    >>> set_palette("Set1", 8, .75)
 
     See Also
     --------
@@ -542,7 +526,6 @@ def set_palette(palette, n_colors=None, desat=None, color_codes=False):
     colors = palettes.color_palette(palette, n_colors, desat)
     cyl = cycler('color', colors)
     mpl.rcParams['axes.prop_cycle'] = cyl
-    mpl.rcParams["patch.facecolor"] = colors[0]
     if color_codes:
         try:
             palettes.set_color_codes(palette)

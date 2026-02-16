@@ -8,12 +8,13 @@ from grplot.utils.first_valid_index import first_valid_index
 
 
 def plot_single_def(plot,
+                    data, 
                     x,
                     y, 
+                    ax, 
                     hue, 
                     size, 
                     style, 
-                    data, 
                     palette, 
                     hue_order, 
                     hue_norm, 
@@ -27,7 +28,6 @@ def plot_single_def(plot,
                     height, 
                     units, 
                     x_bins,
-                    y_bins,
                     estimator, 
                     x_estimator,
                     ci,
@@ -37,7 +37,6 @@ def plot_single_def(plot,
                     jitter,
                     x_jitter,
                     y_jitter,
-                    ax,
                     weights,
                     color,
                     seed,
@@ -66,21 +65,14 @@ def plot_single_def(plot,
                     cbar,
                     cbar_ax,
                     cbar_kws,
-                    shade,
-                    vertical,
-                    kernel,
-                    bw, 
                     gridsize, 
                     cut, 
                     clip, 
-                    shade_lowest,
                     levels,
                     bw_method,
                     bw_adjust,
-                    data2,
                     warn_singular,
                     complementary,
-                    a,
                     order, 
                     orient,
                     edgecolor,
@@ -90,8 +82,6 @@ def plot_single_def(plot,
                     dodge, 
                     fliersize,
                     whis,
-                    scale, 
-                    scale_hue,
                     inner,
                     split,
                     k_depth,
@@ -99,10 +89,7 @@ def plot_single_def(plot,
                     trust_alpha,
                     showfliers,
                     linestyles,
-                    join,
-                    errwidth,
                     capsize,
-                    errcolor,
                     x_ci,
                     scatter,
                     fit_reg,
@@ -120,9 +107,10 @@ def plot_single_def(plot,
                     zorder,
                     color2,
                     markersize,
-                    text, 
+                    alpha2,
                     explode, 
                     colors, 
+                    hatch, 
                     autopct, 
                     pctdistance, 
                     shadow, 
@@ -143,7 +131,19 @@ def plot_single_def(plot,
                     text_kwargs,
                     bubble_spacing,
                     showmeans, 
-                    meanprops):
+                    meanprops, 
+                    errorbar,
+                    gap,
+                    log_scale,
+                    native_scale,
+                    formatter,
+                    linecolor,
+                    width_method,
+                    box_kws,
+                    flier_kws,
+                    density_norm,
+                    inner_kws, 
+                    text):
     # relational plot family
     if plot == 'scatterplot':
         if x is not None or y is not None:
@@ -152,21 +152,17 @@ def plot_single_def(plot,
                 markers = True
             else:
                 pass
-            if n_boot is None:
-                n_boot = 1000
-            else:
-                pass
             if legend is None:
                 legend = 'auto'
             else:
                 pass
             # plot
-            gs.scatterplot(x=x, 
+            gs.scatterplot(data=data, 
+                            x=x, 
                             y=y, 
                             hue=hue, 
+                             size=size,
                             style=style, 
-                            size=size, 
-                            data=data, 
                             palette=palette, 
                             hue_order=hue_order, 
                             hue_norm=hue_norm, 
@@ -175,16 +171,8 @@ def plot_single_def(plot,
                             size_norm=size_norm, 
                             markers=markers, 
                             style_order=style_order, 
-                            x_bins=x_bins, 
-                            y_bins=y_bins, 
-                            units=units, 
-                            estimator=estimator, 
-                            ci=ci, 
-                            n_boot=n_boot, 
-                            alpha=alpha, 
-                            x_jitter=x_jitter, 
-                            y_jitter=y_jitter, 
                             legend=legend, 
+                            alpha=alpha, 
                             ax=ax,
                             zorder=zorder)
         else:
@@ -200,8 +188,16 @@ def plot_single_def(plot,
                 estimator = 'mean'
             else:
                 pass
+            if errorbar is None:
+                errorbar = ('ci', 95)
+            else:
+                pass
             if n_boot is None:
                 n_boot = 1000
+            else:
+                pass
+            if orient is None:
+                orient = 'x'
             else:
                 pass
             if sort is None:
@@ -217,12 +213,14 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            gs.lineplot(x=x, 
+            gs.lineplot(data=data, 
+                         x=x, 
                          y=y, 
                          hue=hue, 
                          size=size, 
                          style=style, 
-                         data=data, 
+                         units=units, 
+                         weights=weights, 
                          palette=palette, 
                          hue_order=hue_order, 
                          hue_norm=hue_norm, 
@@ -233,15 +231,16 @@ def plot_single_def(plot,
                          marker=marker, 
                          markers=markers, 
                          style_order=style_order, 
-                         units=units, 
                          estimator=estimator, 
-                         ci=ci, 
+                         errorbar=errorbar, 
                          n_boot=n_boot, 
                          seed=seed, 
+                         orient=orient, 
                          sort=sort, 
                          err_style=err_style, 
                          err_kws=err_kws, 
                          legend=legend, 
+                        #  ci=ci, 
                          ax=ax,
                          alpha=alpha,
                          zorder=zorder)
@@ -334,7 +333,7 @@ def plot_single_def(plot,
                          hue_order=hue_order, 
                          hue_norm=hue_norm, 
                          color=color, 
-                         log_scale=None, 
+                         log_scale=log_scale, 
                          legend=legend, 
                          ax=ax,
                          alpha=alpha,
@@ -344,26 +343,10 @@ def plot_single_def(plot,
     elif plot == 'kdeplot':
         if x is not None or y is not None:
             # default value
-            if vertical is None:
-                vertical = False
-            else:
-                pass
-            if gridsize is None:
-                gridsize = 200
-            else:
-                pass
-            if cut is None:
-                cut = 3
-            else:
-                pass
-            if cumulative is None: 
-                cumulative = False
-            else: 
-                pass
-            if cbar is None: 
-                cbar = False
-            else:
-                pass
+            # if vertical is None:
+            #     vertical = False
+            # else:
+            #     pass
             if multiple is None: 
                 multiple = 'layer'
             else: 
@@ -376,13 +359,9 @@ def plot_single_def(plot,
                 common_grid = False
             else: 
                 pass
-            if levels is None: 
-                levels = 10
+            if cumulative is None: 
+                cumulative = False
             else: 
-                pass
-            if thresh is None:
-                thresh = 0.05
-            else:
                 pass
             if bw_method is None:
                 bw_method = 'scott'
@@ -396,45 +375,59 @@ def plot_single_def(plot,
                 warn_singular = True
             else:
                 pass
+            if levels is None: 
+                levels = 10
+            else: 
+                pass
+            if thresh is None:
+                thresh = 0.05
+            else:
+                pass
+            if gridsize is None:
+                gridsize = 200
+            else:
+                pass
+            if cut is None:
+                cut = 3
+            else:
+                pass
             if legend is None:
                 legend = True
             else:
                 pass
+            if cbar is None: 
+                cbar = False
+            else:
+                pass
             # plot
-            gs.kdeplot(x=x, 
+            gs.kdeplot(data=data, 
+                        x=x, 
                         y=y, 
-                        shade=shade, 
-                        vertical=vertical, 
-                        kernel=kernel, 
-                        bw=bw, 
+                        hue=hue, 
+                        weights=weights, 
+                        palette=palette, 
+                        hue_order=hue_order, 
+                        hue_norm=hue_norm, 
+                        color=color, 
+                        fill=fill, 
+                        multiple=multiple, 
+                        common_norm=common_norm, 
+                        common_grid=common_grid, 
+                        cumulative=cumulative, 
+                        bw_method=bw_method, 
+                        bw_adjust=bw_adjust, 
+                        warn_singular=warn_singular,
+                        log_scale=log_scale, 
+                        levels=levels, 
+                        thresh=thresh, 
                         gridsize=gridsize, 
                         cut=cut, 
                         clip=clip, 
                         legend=legend, 
-                        cumulative=cumulative, 
-                        shade_lowest=shade_lowest, 
                         cbar=cbar, 
                         cbar_ax=cbar_ax, 
                         cbar_kws=cbar_kws, 
                         ax=ax, 
-                        weights=weights, 
-                        hue=hue, 
-                        palette=palette, 
-                        hue_order=hue_order, 
-                        hue_norm=hue_norm, 
-                        multiple=multiple, 
-                        common_norm=common_norm, 
-                        common_grid=common_grid, 
-                        levels=levels, 
-                        thresh=thresh, 
-                        bw_method=bw_method, 
-                        bw_adjust=bw_adjust, 
-                        log_scale=None, 
-                        color=color, 
-                        fill=fill, 
-                        data=data, 
-                        data2=data2, 
-                        warn_singular=warn_singular,
                         alpha=alpha,
                         zorder=zorder)
         else:
@@ -465,7 +458,7 @@ def plot_single_def(plot,
                          palette=palette, 
                          hue_order=hue_order, 
                          hue_norm=hue_norm, 
-                         log_scale=None, 
+                         log_scale=log_scale,  
                          legend=legend, 
                          ax=ax,
                          alpha=alpha,
@@ -488,18 +481,17 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            gs.rugplot(x=x, 
+            gs.rugplot(data=data, 
+                        x=x, 
                         height=height, 
-                        ax=ax, 
-                        data=data, 
+                        ax=ax,                         
                         y=y, 
                         hue=hue, 
+                        expand_margins=expand_margins, 
                         palette=palette, 
                         hue_order=hue_order, 
                         hue_norm=hue_norm, 
-                        expand_margins=expand_margins, 
                         legend=legend, 
-                        a=a,
                         alpha=alpha,
                         zorder=zorder)
         else:
@@ -539,7 +531,7 @@ def plot_single_def(plot,
         else:
             pass
         if center is None:
-            center = [0, 0]
+            center = (0, 0)
         else:
             pass
         if frame is None:
@@ -563,10 +555,11 @@ def plot_single_def(plot,
                labels=label,
                explode=explode,
                colors=colors,
+               hatch=hatch, 
                autopct=autopct,
                pctdistance=pctdistance,
-               shadow=shadow,
                labeldistance=labeldistance,
+               shadow=shadow,
                startangle=startangle,
                radius=radius,
                counterclock=counterclock,
@@ -662,11 +655,19 @@ def plot_single_def(plot,
                 linewidth = 0
             else:
                 pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
+            else:
+                pass
             # plot
-            gs.stripplot(x=x, 
+            gs.stripplot(data=data, 
+                          x=x, 
                           y=y, 
                           hue=hue, 
-                          data=data, 
                           order=order, 
                           hue_order=hue_order, 
                           jitter=jitter, 
@@ -677,6 +678,11 @@ def plot_single_def(plot,
                           size=size, 
                           edgecolor=edgecolor, 
                           linewidth=linewidth, 
+                          hue_norm=hue_norm, 
+                          log_scale=log_scale, 
+                          native_scale=native_scale, 
+                          formatter=formatter, 
+                          legend=legend, 
                           ax=ax,
                           alpha=alpha,
                           zorder=zorder)
@@ -693,19 +699,23 @@ def plot_single_def(plot,
                 size = 5
             else:
                 pass
-            if edgecolor is None:
-                edgecolor = 'gray'
-            else:
-                pass
             if linewidth is None:
                 linewidth = 0
             else:
                 pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
+            else:
+                pass
             # plot
-            gs.swarmplot(x=x, 
+            gs.swarmplot(data=data, 
+                          x=x, 
                           y=y, 
                           hue=hue, 
-                          data=data, 
                           order=order, 
                           hue_order=hue_order, 
                           dodge=dodge, 
@@ -715,6 +725,10 @@ def plot_single_def(plot,
                           size=size, 
                           edgecolor=edgecolor, 
                           linewidth=linewidth, 
+                          log_scale=log_scale, 
+                          native_scale=native_scale, 
+                          formatter=formatter, 
+                          legend=legend, 
                           ax=ax,
                           alpha=alpha,
                           zorder=zorder)
@@ -727,20 +741,36 @@ def plot_single_def(plot,
                 saturation = 0.75
             else:
                 pass
-            if width is None:
-                width = 0.8
+            if fill is None:
+                fill = True
             else:
                 pass
             if dodge is None:
                 dodge = True
             else:
                 pass
-            if fliersize is None:
-                fliersize = 5
+            if width is None:
+                width = 0.8
+            else:
+                pass
+            if gap is None:
+                gap = 0
             else:
                 pass
             if whis is None:
                 whis = 1.5
+            else:
+                pass
+            if linecolor is None:
+                linecolor = 'auto'
+            else:
+                pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
             else:
                 pass
             if showmeans is None:
@@ -754,21 +784,29 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            gs.boxplot(x=x, 
+            gs.boxplot(data=data, 
+                        x=x, 
                         y=y, 
                         hue=hue, 
-                        data=data, 
                         order=order, 
                         hue_order=hue_order, 
                         orient=orient, 
                         color=color, 
                         palette=palette, 
                         saturation=saturation, 
-                        width=width, 
+                        fill=fill, 
                         dodge=dodge, 
-                        fliersize=fliersize, 
-                        linewidth=linewidth, 
+                        width=width, 
+                        gap=gap, 
                         whis=whis, 
+                        linecolor=linecolor, 
+                        linewidth=linewidth, 
+                        fliersize=fliersize, 
+                        hue_norm=hue_norm, 
+                        log_scale=log_scale, 
+                        native_scale=native_scale, 
+                        formatter=formatter, 
+                        legend=legend, 
                         showmeans=showmeans,
                         meanprops=meanprops,
                         ax=ax,
@@ -778,60 +816,102 @@ def plot_single_def(plot,
     elif plot == 'violinplot':
         if x is not None or y is not None:
             # default value
-            if bw is None:
-                bw = 'scott'
+            if saturation is None:
+                saturation = 0.75
             else:
                 pass
-            if cut is None:
-                cut = 2
+            if fill is None:
+                fill = True
             else:
                 pass
-            if scale is None:
-                scale = 'area'
-            else:
-                pass
-            if gridsize is None:
-                gridsize = 100
-            else:
-                pass
-            if width is None:
-                width = 0.8
+            if inner is None:
+                inner = 'box'
             else:
                 pass
             if split is None:
                 split = False
             else:
                 pass
-            if dodge is None:
-                dodge = True
+            if width is None:
+                width = 0.8
             else:
                 pass
-            if saturation is None:
-                saturation = 0.75
+            if dodge is None:
+                dodge = 'auto'
+            else:
+                pass
+            if gap is None:
+                gap = 0
+            else:
+                pass
+            if linecolor is None:
+                linecolor = 'auto'
+            else:
+                pass
+            if cut is None:
+                cut = 2
+            else:
+                pass
+            if gridsize is None:
+                gridsize = 100
+            else:
+                pass
+            if bw_method is None:
+                bw_method = 'scott'
+            else:
+                pass
+            if bw_adjust is None:
+                bw_adjust = 1
+            else:
+                pass
+            if density_norm is None:
+                density_norm = 'area'
+            else:
+                pass
+            if common_norm is None:
+                common_norm = True
+            else:
+                pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
             else:
                 pass
             # plot
-            gs.violinplot(x=x, 
+            gs.violinplot(data=data, 
+                           x=x, 
                            y=y, 
                            hue=hue, 
-                           data=data, 
                            order=order, 
                            hue_order=hue_order, 
-                           bw=bw, 
-                           cut=cut, 
-                           scale=scale, 
-                           scale_hue=scale_hue, 
-                           gridsize=gridsize, 
-                           width=width, 
-                           inner=inner, 
-                           split=split, 
-                           dodge=dodge, 
                            orient=orient, 
-                           linewidth=linewidth, 
                            color=color, 
                            palette=palette, 
                            saturation=saturation, 
+                           fill=fill, 
+                           inner=inner, 
+                           split=split, 
+                           width=width, 
+                           dodge=dodge, 
+                           gap=gap, 
+                           linewidth=linewidth, 
+                           linecolor=linecolor, 
+                           cut=cut, 
+                           gridsize=gridsize, 
+                           bw_method=bw_method, 
+                           bw_adjust=bw_adjust, 
+                           density_norm=density_norm, 
+                           common_norm=common_norm, 
+                           hue_norm=hue_norm, 
+                           formatter=formatter, 
+                           log_scale=log_scale, 
+                           native_scale=native_scale, 
+                           inner_kws=inner_kws, 
                            ax=ax,
+                           alpha=alpha,
                            zorder=zorder)
         else:
             raise Exception('Define axis label!')
@@ -842,12 +922,24 @@ def plot_single_def(plot,
                 saturation = 0.75
             else:
                 pass
-            if width is None:
-                width = 0.8
+            if fill is None:
+                fill = True
             else:
                 pass
             if dodge is None:
                 dodge = True
+            else:
+                pass
+            if width is None:
+                width = 0.8
+            else:
+                pass
+            if gap is None:
+                gap = 0
+            else:
+                pass
+            if width_method is None:
+                width_method = 'exponential'
             else:
                 pass
             if k_depth is None:
@@ -866,36 +958,60 @@ def plot_single_def(plot,
                 showfliers = True
             else:
                 pass
-            if scale is None:
-                scale = 'exponential'
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
             else:
                 pass
             # plot
-            gs.boxenplot(x=x, 
+            gs.boxenplot(data=data, 
+                          x=x, 
                           y=y, 
                           hue=hue, 
-                          data=data, 
                           order=order, 
                           hue_order=hue_order, 
                           orient=orient, 
                           color=color, 
                           palette=palette, 
                           saturation=saturation, 
-                          width=width, 
+                          fill=fill, 
                           dodge=dodge, 
-                          k_depth=k_depth, 
+                          width=width, 
+                          gap=gap, 
                           linewidth=linewidth, 
-                          scale=scale, 
+                          linecolor=linecolor, 
+                          width_method=width_method, 
+                          k_depth=k_depth, 
                           outlier_prop=outlier_prop, 
                           trust_alpha=trust_alpha, 
                           showfliers=showfliers, 
+                          hue_norm=hue_norm, 
+                          log_scale=log_scale, 
+                          native_scale=native_scale, 
+                          formatter=formatter, 
+                          legend=legend, 
+                          box_kws=box_kws, 
+                          line_kws=line_kws, 
+                          flier_kws=flier_kws, 
                           ax=ax,
+                          alpha=alpha,
                           zorder=zorder)
         else:
             raise Exception('Define axis label!')
     elif plot == 'pointplot':
         if x is not None or y is not None:
             # default value
+            if estimator is None:
+                estimator = 'mean'
+            else:
+                pass
+            if errorbar is None:
+                errorbar = ('ci', 95)
+            else:
+                pass
             if n_boot is None:
                 n_boot = 1000
             else:
@@ -912,67 +1028,59 @@ def plot_single_def(plot,
                 dodge = False
             else:
                 pass
-            if join is None:
-                join = True
+            if native_scale is None:
+                native_scale = False
             else:
                 pass
-            if scale is None:
-                scale = 1
+            if capsize is None:
+                capsize = 0
             else:
                 pass
-            # plot
-            if estimator is None:
-                gs.pointplot(x=x, 
-                              y=y, 
-                              hue=hue, 
-                              data=data, 
-                              order=order, 
-                              hue_order=hue_order, 
-                              ci=ci, 
-                              n_boot=n_boot, 
-                              units=units, 
-                              seed=seed, 
-                              markers=markers, 
-                              linestyles=linestyles, 
-                              dodge=dodge, 
-                              join=join, 
-                              scale=scale, 
-                              orient=orient, 
-                              color=color, 
-                              palette=palette, 
-                              errwidth=errwidth, 
-                              capsize=capsize, 
-                              ax=ax,
-                              zorder=zorder)
+            if legend is None:
+                legend = 'auto'
             else:
-                gs.pointplot(x=x, 
-                              y=y, 
-                              hue=hue, 
-                              data=data, 
-                              order=order, 
-                              hue_order=hue_order, 
-                              estimator=estimator, 
-                              ci=ci, 
-                              n_boot=n_boot, 
-                              units=units, 
-                              seed=seed, 
-                              markers=markers, 
-                              linestyles=linestyles, 
-                              dodge=dodge, 
-                              join=join, 
-                              scale=scale, 
-                              orient=orient, 
-                              color=color, 
-                              palette=palette, 
-                              errwidth=errwidth, 
-                              capsize=capsize, 
-                              ax=ax,
-                              zorder=zorder)
+                pass
+            # plot            
+            gs.pointplot(data=data,
+                            x=x,  
+                            y=y, 
+                            hue=hue, 
+                            order=order, 
+                            hue_order=hue_order, 
+                            estimator=estimator, 
+                            errorbar=errorbar, 
+                            n_boot=n_boot, 
+                            seed=seed, 
+                            units=units, 
+                            weights=weights, 
+                            color=color, 
+                            palette=palette, 
+                            markers=markers, 
+                            linestyles=linestyles, 
+                            dodge=dodge, 
+                            log_scale=log_scale, 
+                            native_scale=native_scale, 
+                            orient=orient, 
+                            capsize=capsize, 
+                            formatter=formatter, 
+                            legend=legend, 
+                            err_kws=err_kws, 
+                            ax=ax,
+                            alpha=0.5,
+                            zorder=zorder)
         else:
             raise Exception('Define axis label!')
     elif plot == 'barplot':
         if x is not None or y is not None:
             # default value
+            if estimator is None:
+                estimator = 'mean'
+            else:
+                pass
+            if errorbar is None:
+                errorbar = ('ci', 95)
+            else:
+                pass
             if n_boot is None:
                 n_boot = 1000
             else:
@@ -981,60 +1089,65 @@ def plot_single_def(plot,
                 saturation = 0.75
             else:
                 pass
-            if errcolor is None:
-                errcolor = '.26'
+            if fill is None:
+                fill = True
+            else:
+                pass
+            if width is None:
+                width = 0.8
             else:
                 pass
             if dodge is None:
-                dodge = True
+                dodge = 'auto'
+            else:
+                pass
+            if gap is None:
+                gap = 0
+            else:
+                pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
+            else:
+                pass
+            if capsize is None:
+                capsize = 0
             else:
                 pass
             # plot
-            if estimator is None:
-                gs.barplot(x=x, 
-                            y=y, 
-                            hue=hue, 
-                            data=data, 
-                            order=order, 
-                            hue_order=hue_order, 
-                            ci=ci, 
-                            n_boot=n_boot, 
-                            units=units, 
-                            seed=seed, 
-                            orient=orient, 
-                            color=color, 
-                            palette=palette, 
-                            saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
-                            dodge=dodge, 
-                            ax=ax,
-                            alpha=alpha,
-                            zorder=zorder)
-            else:
-                gs.barplot(x=x, 
-                            y=y, 
-                            hue=hue, 
-                            data=data, 
-                            order=order, 
-                            hue_order=hue_order, 
-                            estimator=estimator, 
-                            ci=ci, 
-                            n_boot=n_boot, 
-                            units=units, 
-                            seed=seed, 
-                            orient=orient, 
-                            color=color, 
-                            palette=palette, 
-                            saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
-                            dodge=dodge, 
-                            ax=ax,
-                            alpha=alpha,
-                            zorder=zorder)
+            gs.barplot(data=data, 
+                        x=x, 
+                        y=y, 
+                        hue=hue,                             
+                        order=order, 
+                        hue_order=hue_order, 
+                        estimator=estimator, 
+                        errorbar=errorbar, 
+                        n_boot=n_boot, 
+                        seed=seed, 
+                        units=units, 
+                        weights=weights, 
+                        orient=orient, 
+                        color=color, 
+                        palette=palette, 
+                        saturation=saturation, 
+                        fill=fill, 
+                        hue_norm=hue_norm, 
+                        width=width, 
+                        dodge=dodge, 
+                        gap=gap, 
+                        log_scale=log_scale, 
+                        native_scale=native_scale, 
+                        formatter=formatter, 
+                        legend=legend, 
+                        capsize=capsize, 
+                        err_kws=err_kws, 
+                        ax=ax,
+                        alpha=alpha,
+                        zorder=zorder)
             if x is not None:
                 ax.set_xlabel(x)
             else:
@@ -1052,21 +1165,49 @@ def plot_single_def(plot,
                 saturation = 0.75
             else:
                 pass
-            if dodge is None:
-                dodge = True
+            if fill is None:
+                fill = True
             else:
                 pass
-            gs.countplot(x=x, 
+            if stat is None:
+                stat = 'count'
+            else:
+                pass
+            if width is None:
+                width = 0.8
+            else:
+                pass
+            if dodge is None:
+                dodge = 'auto'
+            else:
+                pass
+            if native_scale is None:
+                native_scale = False
+            else:
+                pass
+            if legend is None:
+                legend = 'auto'
+            else:
+                pass
+            # plot
+            gs.countplot(data=data, 
+                          x=x, 
                           y=y, 
                           hue=hue, 
-                          data=data, 
                           order=order, 
                           hue_order=hue_order, 
                           orient=orient, 
                           color=color, 
                           palette=palette, 
                           saturation=saturation, 
+                          hue_norm=hue_norm, 
+                          stat=stat, 
+                          width=width, 
                           dodge=dodge, 
+                          log_scale=log_scale, 
+                          native_scale=native_scale, 
+                          formatter=formatter, 
+                          legend=legend, 
                           ax=ax,
                           alpha=alpha,
                           zorder=zorder)
@@ -1081,6 +1222,18 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_y.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
+                if estimator is None:
+                    estimator = 'mean'
+                else:
+                    pass
+                if errorbar is None:
+                    errorbar = ('ci', 95)
+                else:
+                    pass
+                if n_boot is None:
+                    n_boot = 1000
+                else:
+                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1089,14 +1242,32 @@ def plot_single_def(plot,
                     saturation = 0.75
                 else:
                     pass
-                if errcolor is None:
-                    errcolor = '.26'
+                if fill is None:
+                    fill = True
+                else:
+                    pass
+                if width is None:
+                    width = 0.8
                 else:
                     pass
                 if dodge is None:
                     dodge = True
                 else:
                     pass
+                if gap is None:
+                    gap = 0
+                else:
+                    pass
+                if native_scale is None:
+                    native_scale = False
+                else:
+                    pass
+                if legend is None:
+                    legend = 'auto'
+                else:
+                    pass
+                if capsize is None:
+                    capsize = 0
                 if color2 is None:
                     color2 = '.26'
                 else:
@@ -1110,24 +1281,33 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                gs.barplot(x=x, 
+                gs.barplot(data=data, 
+                            x=x, 
                             y=y, 
-                            hue=hue, 
-                            data=data, 
+                            hue=hue,                             
                             order=data_pareto_x, 
                             hue_order=hue_order, 
-                            ci=ci, 
+                            estimator=estimator, 
+                            errorbar=errorbar, 
                             n_boot=n_boot, 
-                            units=units, 
                             seed=seed, 
+                            units=units, 
+                            weights=weights, 
                             orient=orient, 
                             color=color, 
                             palette=palette, 
                             saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
+                            fill=fill, 
+                            hue_norm=hue_norm, 
+                            width=width, 
                             dodge=dodge, 
+                            gap=gap, 
+                            log_scale=log_scale, 
+                            native_scale=native_scale, 
+                            formatter=formatter, 
+                            legend=legend, 
+                            capsize=capsize, 
+                            err_kws=err_kws, 
                             ax=ax,
                             alpha=alpha,
                             zorder=zorder)
@@ -1143,7 +1323,7 @@ def plot_single_def(plot,
                     pass
                 data_cum_percentage = numpy.cumsum(data_pareto_y)/numpy.sum(data_pareto_y)*100
                 ax2 = ax.twinx()
-                ax2.plot(data_pareto_x, data_cum_percentage, color=color2, marker=marker, markersize=markersize)
+                ax2.plot(data_pareto_x, data_cum_percentage, color=color2, marker=marker, markersize=markersize, alpha=alpha2)
                 ax2.yaxis.set_major_formatter(PercentFormatter())
                 ax2.grid(False)
                 ax2.set_ylabel('Cumulative Percentage')
@@ -1155,6 +1335,18 @@ def plot_single_def(plot,
                 sorting_formula = numpy.flip(data_pareto_x.argsort())
                 data_pareto_x, data_pareto_y = data_pareto_x[sorting_formula], data_pareto_y[sorting_formula]
                 # default value
+                if estimator is None:
+                    estimator = 'mean'
+                else:
+                    pass
+                if errorbar is None:
+                    errorbar = ('ci', 95)
+                else:
+                    pass
+                if n_boot is None:
+                    n_boot = 1000
+                else:
+                    pass
                 if n_boot is None:
                     n_boot = 1000
                 else:
@@ -1163,14 +1355,32 @@ def plot_single_def(plot,
                     saturation = 0.75
                 else:
                     pass
-                if errcolor is None:
-                    errcolor = '.26'
+                if fill is None:
+                    fill = True
+                else:
+                    pass
+                if width is None:
+                    width = 0.8
                 else:
                     pass
                 if dodge is None:
                     dodge = True
                 else:
                     pass
+                if gap is None:
+                    gap = 0
+                else:
+                    pass
+                if native_scale is None:
+                    native_scale = False
+                else:
+                    pass
+                if legend is None:
+                    legend = 'auto'
+                else:
+                    pass
+                if capsize is None:
+                    capsize = 0
                 if color2 is None:
                     color2 = '.26'
                 else:
@@ -1184,24 +1394,33 @@ def plot_single_def(plot,
                 else:
                     pass
                 # plot
-                gs.barplot(x=x, 
+                gs.barplot(data=data, 
+                            x=x, 
                             y=y, 
-                            hue=hue, 
-                            data=data, 
+                            hue=hue,                             
                             order=data_pareto_y, 
                             hue_order=hue_order, 
-                            ci=ci, 
+                            estimator=estimator, 
+                            errorbar=errorbar, 
                             n_boot=n_boot, 
-                            units=units, 
                             seed=seed, 
+                            units=units, 
+                            weights=weights, 
                             orient=orient, 
                             color=color, 
                             palette=palette, 
                             saturation=saturation, 
-                            errcolor=errcolor, 
-                            errwidth=errwidth, 
-                            capsize=capsize, 
+                            fill=fill, 
+                            hue_norm=hue_norm, 
+                            width=width, 
                             dodge=dodge, 
+                            gap=gap, 
+                            log_scale=log_scale, 
+                            native_scale=native_scale, 
+                            formatter=formatter, 
+                            legend=legend, 
+                            capsize=capsize, 
+                            err_kws=err_kws, 
                             ax=ax,
                             alpha=alpha,
                             zorder=zorder)
@@ -1217,7 +1436,7 @@ def plot_single_def(plot,
                     pass
                 data_cum_percentage = numpy.cumsum(data_pareto_x)/numpy.sum(data_pareto_x)*100
                 ax2 = ax.twiny()
-                ax2.plot(data_cum_percentage, data_pareto_y, color=color2, marker=marker, markersize=markersize)
+                ax2.plot(data_cum_percentage, data_pareto_y, color=color2, marker=marker, markersize=markersize, alpha=alpha2)
                 ax2.xaxis.set_major_formatter(PercentFormatter())
                 ax2.grid(False)
                 ax2.set_xlabel('Cumulative Percentage')
@@ -1236,6 +1455,10 @@ def plot_single_def(plot,
                 pass
             if fit_reg is None:
                 fit_reg = True
+            else:
+                pass
+            if ci is None:
+                ci = 95
             else:
                 pass
             if n_boot is None:
@@ -1326,12 +1549,12 @@ def plot_single_def(plot,
             else:
                 pass
             # plot
-            gs.residplot(x=x, 
+            gs.residplot(data=data, 
+                          x=x, 
                           y=y, 
-                          data=data, 
-                          lowess=lowess, 
                           x_partial=x_partial, 
                           y_partial=y_partial, 
+                          lowess=lowess, 
                           order=order, 
                           robust=robust, 
                           dropna=dropna, 

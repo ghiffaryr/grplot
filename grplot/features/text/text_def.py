@@ -391,11 +391,11 @@ def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsiz
             if (x_arr.size != 0) and (y_arr.size != 0):
                 for x, y in zip(x_arr, y_arr):
                     # temporary bug fix for ecdfplot
-                    if x == numpy.NINF:
+                    if x == -numpy.inf:
                         x = 0
                     else:
                         pass
-                    if y == numpy.NINF:
+                    if y == -numpy.inf:
                         y = 0
                     else:
                         pass

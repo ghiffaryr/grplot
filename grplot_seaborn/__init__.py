@@ -1,4 +1,4 @@
-# import grplot_seaborn objects
+# Import grplot_seaborn objects
 from .rcmod import *  # noqa: F401,F403
 from .utils import *  # noqa: F401,F403
 from .palettes import *  # noqa: F401,F403
@@ -11,14 +11,11 @@ from .miscplot import *  # noqa: F401,F403
 from .axisgrid import *  # noqa: F401,F403
 from .widgets import *  # noqa: F401,F403
 from .colors import xkcd_rgb, crayons  # noqa: F401
-try:
-    from seaborn import cm  # noqa: F401
-except:
-    from . import cm  # noqa: F401
+from . import cm  # noqa: F401
 
 # Capture the original matplotlib rcParams
 import matplotlib as mpl
 _orig_rc_params = mpl.rcParams.copy()
 
-# Define the seaborn version
-__version__ = "0.11.2"
+# Define the grplot_seaborn version
+__version__ = "0.13.2"

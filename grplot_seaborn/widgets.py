@@ -2,26 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-# Lots of different places that widgets could come from...
 try:
     from ipywidgets import interact, FloatSlider, IntSlider
 except ImportError:
-    import warnings
-    # ignore ShimWarning raised by IPython, see GH #892
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        try:
-            from IPython.html.widgets import interact, FloatSlider, IntSlider
-        except ImportError:
-            try:
-                from IPython.html.widgets import (interact,
-                                                  FloatSliderWidget,
-                                                  IntSliderWidget)
-                FloatSlider = FloatSliderWidget
-                IntSlider = IntSliderWidget
-            except ImportError:
-                pass
-
+    def interact(f):
+        msg = "Interactive palettes require `ipywidgets`, which is not installed."
+        raise ImportError(msg)
 
 from .miscplot import palplot
 from .palettes import (color_palette, dark_palette, light_palette,
@@ -62,12 +48,12 @@ def choose_colorbrewer_palette(data_type, as_cmap=False):
     """Select a palette from the ColorBrewer set.
 
     These palettes are built into matplotlib and can be used by name in
-    many seaborn functions, or by passing the object returned by this function.
+    many grplot_seaborn functions, or by passing the object returned by this function.
 
     Parameters
     ----------
     data_type : {'sequential', 'diverging', 'qualitative'}
-        This describes the kind of data you want to visualize. See the seaborn
+        This describes the kind of data you want to visualize. See the grplot_seaborn
         color palette docs for more information about how to choose this value.
         Note that you can pass substrings (e.g. 'q' for 'qualitative.
 

@@ -6,8 +6,8 @@ of the public API.
 The classes should behave roughly in the style of scikit-learn.
 
 - All data-independent parameters should be passed to the class constructor.
-- Each class should impelment a default transformation that is exposed through
-  __call__. These are currently written for vector arguements, but I think
+- Each class should implement a default transformation that is exposed through
+  __call__. These are currently written for vector arguments, but I think
   consuming a whole `plot_data` DataFrame and return it with transformed
   variables would make more sense.
 - Some class have data-dependent preprocessing that should be cached and used
@@ -24,12 +24,18 @@ The classes should behave roughly in the style of scikit-learn.
   class instantiation.
 
 """
-from distutils.version import LooseVersion
 from numbers import Number
+from statistics import NormalDist
 import numpy as np
-import scipy as sp
-from scipy import stats
+import pandas as pd
+try:
+    from scipy.stats import gaussian_kde
+    _no_scipy = False
+except ImportError:
+    from .external.kde import gaussian_kde
+    _no_scipy = True
 
+from .algorithms import bootstrap
 from .utils import _check_argument
 
 
@@ -63,7 +69,7 @@ class KDE:
         clip : pair of numbers or None, or a pair of such pairs
             Do not evaluate the density outside of these limits.
         cumulative : bool, optional
-            If True, estimate a cumulative distribution function.
+            If True, estimate a cumulative distribution function. Requires scipy.
 
         """
         if clip is None:
@@ -75,6 +81,9 @@ class KDE:
         self.cut = cut
         self.clip = clip
         self.cumulative = cumulative
+
+        if cumulative and _no_scipy:
+            raise RuntimeError("Cumulative KDE evaluation requires scipy")
 
         self.support = None
 
@@ -129,12 +138,9 @@ class KDE:
         """Fit the scipy kde while adding bw_adjust logic and version check."""
         fit_kws = {"bw_method": self.bw_method}
         if weights is not None:
-            if LooseVersion(sp.__version__) < "1.2.0":
-                msg = "Weighted KDE requires scipy >= 1.2.0"
-                raise RuntimeError(msg)
             fit_kws["weights"] = weights
 
-        kde = stats.gaussian_kde(fit_data, **fit_kws)
+        kde = gaussian_kde(fit_data, **fit_kws)
         kde.set_bandwidth(kde.factor * self.bw_adjust)
 
         return kde
@@ -189,6 +195,8 @@ class KDE:
             return self._eval_bivariate(x1, x2, weights)
 
 
+# Note: we no longer use this for univariate histograms in histplot,
+# preferring _stats.Hist. We'll deprecate this once we have a bivariate Stat class.
 class Histogram:
     """Univariate and bivariate histogram estimator."""
     def __init__(
@@ -209,7 +217,7 @@ class Histogram:
 
             - `count`: show the number of observations in each bin
             - `frequency`: show the number of observations divided by the bin width
-            - `probability`: or `proportion`: normalize such that bar heights sum to 1
+            - `probability` or `proportion`: normalize such that bar heights sum to 1
             - `percent`: normalize such that bar heights sum to 100
             - `density`: normalize such that the total area of the histogram equals 1
 
@@ -256,6 +264,9 @@ class Histogram:
         elif binwidth is not None:
             step = binwidth
             bin_edges = np.arange(start, stop + step, step)
+            # Handle roundoff error (maybe there is a less clumsy way?)
+            if bin_edges.max() < stop or len(bin_edges) < 2:
+                bin_edges = np.append(bin_edges, bin_edges.max() + step)
         else:
             bin_edges = np.histogram_bin_edges(
                 x, bins, binrange, weights,
@@ -391,17 +402,17 @@ class Histogram:
 class ECDF:
     """Univariate empirical cumulative distribution estimator."""
     def __init__(self, stat="proportion", complementary=False):
-        """Initialize the class with its paramters
+        """Initialize the class with its parameters
 
         Parameters
         ----------
-        stat : {{"proportion", "count"}}
+        stat : {{"proportion", "percent", "count"}}
             Distribution statistic to compute.
         complementary : bool
             If True, use the complementary CDF (1 - CDF)
 
         """
-        _check_argument("stat", ["count", "proportion"], stat)
+        _check_argument("stat", ["count", "percent", "proportion"], stat)
         self.stat = stat
         self.complementary = complementary
 
@@ -416,8 +427,10 @@ class ECDF:
         weights = weights[sorter]
         y = weights.cumsum()
 
-        if self.stat == "proportion":
+        if self.stat in ["percent", "proportion"]:
             y = y / y.max()
+        if self.stat == "percent":
+            y = y * 100
 
         x = np.r_[-np.inf, x]
         y = np.r_[0, y]
@@ -439,3 +452,247 @@ class ECDF:
             return self._eval_univariate(x1, weights)
         else:
             return self._eval_bivariate(x1, x2, weights)
+
+
+class EstimateAggregator:
+
+    def __init__(self, estimator, errorbar=None, **boot_kws):
+        """
+        Data aggregator that produces an estimate and error bar interval.
+
+        Parameters
+        ----------
+        estimator : callable or string
+            Function (or method name) that maps a vector to a scalar.
+        errorbar : string, (string, number) tuple, or callable
+            Name of errorbar method (either "ci", "pi", "se", or "sd"), or a tuple
+            with a method name and a level parameter, or a function that maps from a
+            vector to a (min, max) interval, or None to hide errorbar. See the
+            :doc:`errorbar tutorial </tutorial/error_bars>` for more information.
+        boot_kws
+            Additional keywords are passed to bootstrap when error_method is "ci".
+
+        """
+        self.estimator = estimator
+
+        method, level = _validate_errorbar_arg(errorbar)
+        self.error_method = method
+        self.error_level = level
+
+        self.boot_kws = boot_kws
+
+    def __call__(self, data, var):
+        """Aggregate over `var` column of `data` with estimate and error interval."""
+        vals = data[var]
+        if callable(self.estimator):
+            # You would think we could pass to vals.agg, and yet:
+            # https://github.com/mwaskom/grplot_seaborn/issues/2943
+            estimate = self.estimator(vals)
+        else:
+            estimate = vals.agg(self.estimator)
+
+        # Options that produce no error bars
+        if self.error_method is None:
+            err_min = err_max = np.nan
+        elif len(data) <= 1:
+            err_min = err_max = np.nan
+
+        # Generic errorbars from user-supplied function
+        elif callable(self.error_method):
+            err_min, err_max = self.error_method(vals)
+
+        # Parametric options
+        elif self.error_method == "sd":
+            half_interval = vals.std() * self.error_level
+            err_min, err_max = estimate - half_interval, estimate + half_interval
+        elif self.error_method == "se":
+            half_interval = vals.sem() * self.error_level
+            err_min, err_max = estimate - half_interval, estimate + half_interval
+
+        # Nonparametric options
+        elif self.error_method == "pi":
+            err_min, err_max = _percentile_interval(vals, self.error_level)
+        elif self.error_method == "ci":
+            units = data.get("units", None)
+            boots = bootstrap(vals, units=units, func=self.estimator, **self.boot_kws)
+            err_min, err_max = _percentile_interval(boots, self.error_level)
+
+        return pd.Series({var: estimate, f"{var}min": err_min, f"{var}max": err_max})
+
+
+class WeightedAggregator:
+
+    def __init__(self, estimator, errorbar=None, **boot_kws):
+        """
+        Data aggregator that produces a weighted estimate and error bar interval.
+
+        Parameters
+        ----------
+        estimator : string
+            Function (or method name) that maps a vector to a scalar. Currently
+            supports only "mean".
+        errorbar : string or (string, number) tuple
+            Name of errorbar method or a tuple with a method name and a level parameter.
+            Currently the only supported method is "ci".
+        boot_kws
+            Additional keywords are passed to bootstrap when error_method is "ci".
+
+        """
+        if estimator != "mean":
+            # Note that, while other weighted estimators may make sense (e.g. median),
+            # I'm not aware of an implementation in our dependencies. We can add one
+            # in grplot_seaborn later, if there is sufficient interest. For now, limit to mean.
+            raise ValueError(f"Weighted estimator must be 'mean', not {estimator!r}.")
+        self.estimator = estimator
+
+        method, level = _validate_errorbar_arg(errorbar)
+        if method is not None and method != "ci":
+            # As with the estimator, weighted 'sd' or 'pi' error bars may make sense.
+            # But we'll keep things simple for now and limit to (bootstrap) CI.
+            raise ValueError(f"Error bar method must be 'ci', not {method!r}.")
+        self.error_method = method
+        self.error_level = level
+
+        self.boot_kws = boot_kws
+
+    def __call__(self, data, var):
+        """Aggregate over `var` column of `data` with estimate and error interval."""
+        vals = data[var]
+        weights = data["weight"]
+
+        estimate = np.average(vals, weights=weights)
+
+        if self.error_method == "ci" and len(data) > 1:
+
+            def error_func(x, w):
+                return np.average(x, weights=w)
+
+            boots = bootstrap(vals, weights, func=error_func, **self.boot_kws)
+            err_min, err_max = _percentile_interval(boots, self.error_level)
+
+        else:
+            err_min = err_max = np.nan
+
+        return pd.Series({var: estimate, f"{var}min": err_min, f"{var}max": err_max})
+
+
+class LetterValues:
+
+    def __init__(self, k_depth, outlier_prop, trust_alpha):
+        """
+        Compute percentiles of a distribution using various tail stopping rules.
+
+        Parameters
+        ----------
+        k_depth: "tukey", "proportion", "trustworthy", or "full"
+            Stopping rule for choosing tail percentiled to show:
+
+            - tukey: Show a similar number of outliers as in a conventional boxplot.
+            - proportion: Show approximately `outlier_prop` outliers.
+            - trust_alpha: Use `trust_alpha` level for most extreme tail percentile.
+
+        outlier_prop: float
+            Parameter for `k_depth="proportion"` setting the expected outlier rate.
+        trust_alpha: float
+            Parameter for `k_depth="trustworthy"` setting the confidence threshold.
+
+        Notes
+        -----
+        Based on the proposal in this paper:
+        https://vita.had.co.nz/papers/letter-value-plot.pdf
+
+        """
+        k_options = ["tukey", "proportion", "trustworthy", "full"]
+        if isinstance(k_depth, str):
+            _check_argument("k_depth", k_options, k_depth)
+        elif not isinstance(k_depth, int):
+            err = (
+                "The `k_depth` parameter must be either an integer or string "
+                f"(one of {k_options}), not {k_depth!r}."
+            )
+            raise TypeError(err)
+
+        self.k_depth = k_depth
+        self.outlier_prop = outlier_prop
+        self.trust_alpha = trust_alpha
+
+    def _compute_k(self, n):
+
+        # Select the depth, i.e. number of boxes to draw, based on the method
+        if self.k_depth == "full":
+            # extend boxes to 100% of the data
+            k = int(np.log2(n)) + 1
+        elif self.k_depth == "tukey":
+            # This results with 5-8 points in each tail
+            k = int(np.log2(n)) - 3
+        elif self.k_depth == "proportion":
+            k = int(np.log2(n)) - int(np.log2(n * self.outlier_prop)) + 1
+        elif self.k_depth == "trustworthy":
+            normal_quantile_func = np.vectorize(NormalDist().inv_cdf)
+            point_conf = 2 * normal_quantile_func(1 - self.trust_alpha / 2) ** 2
+            k = int(np.log2(n / point_conf)) + 1
+        else:
+            # Allow having k directly specified as input
+            k = int(self.k_depth)
+
+        return max(k, 1)
+
+    def __call__(self, x):
+        """Evaluate the letter values."""
+        k = self._compute_k(len(x))
+        exp = np.arange(k + 1, 1, -1), np.arange(2, k + 2)
+        levels = k + 1 - np.concatenate([exp[0], exp[1][1:]])
+        percentiles = 100 * np.concatenate([0.5 ** exp[0], 1 - 0.5 ** exp[1]])
+        if self.k_depth == "full":
+            percentiles[0] = 0
+            percentiles[-1] = 100
+        values = np.percentile(x, percentiles)
+        fliers = np.asarray(x[(x < values.min()) | (x > values.max())])
+        median = np.percentile(x, 50)
+
+        return {
+            "k": k,
+            "levels": levels,
+            "percs": percentiles,
+            "values": values,
+            "fliers": fliers,
+            "median": median,
+        }
+
+
+def _percentile_interval(data, width):
+    """Return a percentile interval from data of a given width."""
+    edge = (100 - width) / 2
+    percentiles = edge, 100 - edge
+    return np.nanpercentile(data, percentiles)
+
+
+def _validate_errorbar_arg(arg):
+    """Check type and value of errorbar argument and assign default level."""
+    DEFAULT_LEVELS = {
+        "ci": 95,
+        "pi": 95,
+        "se": 1,
+        "sd": 1,
+    }
+
+    usage = "`errorbar` must be a callable, string, or (string, number) tuple"
+
+    if arg is None:
+        return None, None
+    elif callable(arg):
+        return arg, None
+    elif isinstance(arg, str):
+        method = arg
+        level = DEFAULT_LEVELS.get(method, None)
+    else:
+        try:
+            method, level = arg
+        except (ValueError, TypeError) as err:
+            raise err.__class__(usage) from err
+
+    _check_argument("errorbar", list(DEFAULT_LEVELS), method)
+    if level is not None and not isinstance(level, Number):
+        raise TypeError(usage)
+
+    return method, level

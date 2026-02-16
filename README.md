@@ -5,6 +5,9 @@
 grplot: lazy statistical data visualization
 =======================================
 
+[![PyPI Version](https://img.shields.io/pypi/v/grplot.svg)](https://pypi.org/project/grplot/) [![License](https://img.shields.io/pypi/l/grplot.svg)](https://github.com/ghiffaryr/grplot/blob/master/LICENSE.md)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17159965.svg)](https://doi.org/10.5281/zenodo.17159965) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/grplot) [![Anaconda-Server Badge](https://anaconda.org/conda-forge/grplot/badges/downloads.svg)](https://anaconda.org/conda-forge/grplot)
+
+
 grplot is a Python visualization library based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython. It supports human laziness in drawing complete and attractive statistical graphs in just one line of code.
 
 
@@ -17,7 +20,7 @@ Documentation at [grplot repository](https://github.com/ghiffaryr/grplot) includ
 Dependencies
 ------------
 
-grplot supports Python 3.6+.
+grplot supports Python 3.10+.
 
 Installation requires [numpy](https://numpy.org), [scipy](https://www.scipy.org), [matplotlib](https://matplotlib.org), [pandas](https://pandas.pydata.org), and [ipython](https://ipython.readthedocs.io/). Some functions will optionally use [statsmodels](https://www.statsmodels.org) if it is installed.
 

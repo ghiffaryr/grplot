@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
 import pandas as pd
-from scipy.cluster import hierarchy
-
 try:
-    from seaborn import cm  # noqa: F401
-except:
-    from . import cm  # noqa: F401
+    from scipy.cluster import hierarchy
+    _no_scipy = False
+except ImportError:
+    _no_scipy = True
+
+from . import cm
 from .axisgrid import Grid
+from ._compat import get_colormap
 from .utils import (
     despine,
     axis_ticklabels_overlap,
@@ -21,7 +23,6 @@ from .utils import (
     to_utf8,
     _draw_figure,
 )
-from ._decorators import _deprecate_positional_args
 
 
 __all__ = ["heatmap", "clustermap"]
@@ -53,7 +54,7 @@ def _convert_colors(colors):
         return list(map(to_rgb, colors))
     except ValueError:
         # If we get here, we have nested lists
-        return [list(map(to_rgb, l)) for l in colors]
+        return [list(map(to_rgb, color_list)) for color_list in colors]
 
 
 def _matrix_mask(data, mask):
@@ -108,7 +109,7 @@ class _HeatMapper:
             plot_data = np.asarray(data)
             data = pd.DataFrame(plot_data)
 
-        # Validate the mask and convet to DataFrame
+        # Validate the mask and convert to DataFrame
         mask = _matrix_mask(data, mask)
 
         plot_data = np.ma.masked_where(np.asarray(mask), plot_data)
@@ -213,7 +214,7 @@ class _HeatMapper:
             else:
                 self.cmap = cm.icefire
         elif isinstance(cmap, str):
-            self.cmap = mpl.cm.get_cmap(cmap)
+            self.cmap = get_colormap(cmap)
         elif isinstance(cmap, list):
             self.cmap = mpl.colors.ListedColormap(cmap)
         else:
@@ -251,7 +252,7 @@ class _HeatMapper:
         height, width = self.annot_data.shape
         xpos, ypos = np.meshgrid(np.arange(width) + .5, np.arange(height) + .5)
         for x, y, m, color, val in zip(xpos.flat, ypos.flat,
-                                       mesh.get_array(), mesh.get_facecolors(),
+                                       mesh.get_array().flat, mesh.get_facecolors(),
                                        self.annot_data.flat):
             if m is not np.ma.masked:
                 lum = relative_luminance(color)
@@ -297,7 +298,7 @@ class _HeatMapper:
 
         # setting vmin/vmax in addition to norm is deprecated
         # so avoid setting if norm is set
-        if "norm" not in kws:
+        if kws.get("norm") is None:
             kws.setdefault("vmin", self.vmin)
             kws.setdefault("vmax", self.vmax)
 
@@ -351,7 +352,6 @@ class _HeatMapper:
             self._annotate_heatmap(ax, mesh)
 
 
-@_deprecate_positional_args
 def heatmap(
     data, *,
     vmin=None, vmax=None, cmap=None, center=None, robust=False,
@@ -382,7 +382,7 @@ def heatmap(
         The mapping from data values to color space. If not provided, the
         default will depend on whether ``center`` is set.
     center : float, optional
-        The value at which to center the colormap when plotting divergant data.
+        The value at which to center the colormap when plotting divergent data.
         Using this parameter will change the default ``cmap`` if none is
         specified.
     robust : bool, optional
@@ -433,111 +433,14 @@ def heatmap(
 
     See Also
     --------
-    clustermap : Plot a matrix using hierachical clustering to arrange the
+    clustermap : Plot a matrix using hierarchical clustering to arrange the
                  rows and columns.
 
     Examples
     --------
 
-    Plot a heatmap for a numpy array:
+    .. include:: ../docstrings/heatmap.rst
 
-    .. plot::
-        :context: close-figs
-
-        >>> import numpy as np; np.random.seed(0)
-        >>> import grplot_seaborn as sns; sns.set_theme()
-        >>> uniform_data = np.random.rand(10, 12)
-        >>> ax = sns.heatmap(uniform_data)
-
-    Change the limits of the colormap:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(uniform_data, vmin=0, vmax=1)
-
-    Plot a heatmap for data centered on 0 with a diverging colormap:
-
-    .. plot::
-        :context: close-figs
-
-        >>> normal_data = np.random.randn(10, 12)
-        >>> ax = sns.heatmap(normal_data, center=0)
-
-    Plot a dataframe with meaningful row and column labels:
-
-    .. plot::
-        :context: close-figs
-
-        >>> flights = sns.load_dataset("flights")
-        >>> flights = flights.pivot("month", "year", "passengers")
-        >>> ax = sns.heatmap(flights)
-
-    Annotate each cell with the numeric value using integer formatting:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(flights, annot=True, fmt="d")
-
-    Add lines between each cell:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(flights, linewidths=.5)
-
-    Use a different colormap:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(flights, cmap="YlGnBu")
-
-    Center the colormap at a specific value:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(flights, center=flights.loc["Jan", 1955])
-
-    Plot every other column label and don't plot row labels:
-
-    .. plot::
-        :context: close-figs
-
-        >>> data = np.random.randn(50, 20)
-        >>> ax = sns.heatmap(data, xticklabels=2, yticklabels=False)
-
-    Don't draw a colorbar:
-
-    .. plot::
-        :context: close-figs
-
-        >>> ax = sns.heatmap(flights, cbar=False)
-
-    Use different axes for the colorbar:
-
-    .. plot::
-        :context: close-figs
-
-        >>> grid_kws = {"height_ratios": (.9, .05), "hspace": .3}
-        >>> f, (ax, cbar_ax) = plt.subplots(2, gridspec_kw=grid_kws)
-        >>> ax = sns.heatmap(flights, ax=ax,
-        ...                  cbar_ax=cbar_ax,
-        ...                  cbar_kws={"orientation": "horizontal"})
-
-    Use a mask to plot only part of a matrix
-
-    .. plot::
-        :context: close-figs
-
-        >>> corr = np.corrcoef(np.random.randn(10, 200))
-        >>> mask = np.zeros_like(corr)
-        >>> mask[np.triu_indices_from(mask)] = True
-        >>> with sns.axes_style("white"):
-        ...     f, ax = plt.subplots(figsize=(7, 5))
-        ...     ax = sns.heatmap(corr, mask=mask, vmax=.3, square=True)
     """
     # Initialize the plotter object
     plotter = _HeatMapper(data, vmin, vmax, cmap, center, robust, annot, fmt,
@@ -557,7 +460,7 @@ def heatmap(
     return ax
 
 
-class _DendrogramPlotter(object):
+class _DendrogramPlotter:
     """Object for drawing tree of similarities between data rows/columns"""
 
     def __init__(self, data, linkage, metric, method, axis, label, rotate):
@@ -651,7 +554,7 @@ class _DendrogramPlotter(object):
         try:
             return self._calculate_linkage_fastcluster()
         except ImportError:
-            if np.product(self.shape) >= 10000:
+            if np.prod(self.shape) >= 10000:
                 msg = ("Clustering large matrix with scipy. Installing "
                        "`fastcluster` may give better performance.")
                 warnings.warn(msg)
@@ -736,7 +639,6 @@ class _DendrogramPlotter(object):
         return self
 
 
-@_deprecate_positional_args
 def dendrogram(
     data, *,
     linkage=None, axis=1, label=True, metric='euclidean',
@@ -779,6 +681,9 @@ def dendrogram(
     dendrogramplotter.reordered_ind
 
     """
+    if _no_scipy:
+        raise RuntimeError("dendrogram requires scipy to be installed")
+
     plotter = _DendrogramPlotter(data, linkage=linkage, axis=axis,
                                  metric=metric, method=method,
                                  label=label, rotate=rotate)
@@ -794,6 +699,8 @@ class ClusterGrid(Grid):
                  figsize=None, row_colors=None, col_colors=None, mask=None,
                  dendrogram_ratio=None, colors_ratio=None, cbar_pos=None):
         """Grid object for organizing clustered heatmap input on to axes"""
+        if _no_scipy:
+            raise RuntimeError("ClusterGrid requires scipy to be available")
 
         if isinstance(data, pd.DataFrame):
             self.data = data
@@ -995,7 +902,7 @@ class ClusterGrid(Grid):
         ratios = [dendrogram_ratio]
 
         if colors is not None:
-            # Colors are encoded as rgb, so ther is an extra dimention
+            # Colors are encoded as rgb, so there is an extra dimension
             if np.ndim(colors) > 2:
                 n_colors = len(colors)
             else:
@@ -1236,7 +1143,6 @@ class ClusterGrid(Grid):
         return self
 
 
-@_deprecate_positional_args
 def clustermap(
     data, *,
     pivot_kws=None, method='average', metric='euclidean',
@@ -1250,6 +1156,8 @@ def clustermap(
 ):
     """
     Plot a matrix dataset as a hierarchically-clustered heatmap.
+
+    This function requires scipy to be available.
 
     Parameters
     ----------
@@ -1335,71 +1243,12 @@ def clustermap(
     Examples
     --------
 
-    Plot a clustered heatmap:
+    .. include:: ../docstrings/clustermap.rst
 
-    .. plot::
-        :context: close-figs
-
-        >>> import grplot_seaborn as sns; sns.set_theme(color_codes=True)
-        >>> iris = sns.load_dataset("iris")
-        >>> species = iris.pop("species")
-        >>> g = sns.clustermap(iris)
-
-    Change the size and layout of the figure:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris,
-        ...                    figsize=(7, 5),
-        ...                    row_cluster=False,
-        ...                    dendrogram_ratio=(.1, .2),
-        ...                    cbar_pos=(0, .2, .03, .4))
-
-    Add colored labels to identify observations:
-
-    .. plot::
-        :context: close-figs
-
-        >>> lut = dict(zip(species.unique(), "rbg"))
-        >>> row_colors = species.map(lut)
-        >>> g = sns.clustermap(iris, row_colors=row_colors)
-
-    Use a different colormap and adjust the limits of the color range:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris, cmap="mako", vmin=0, vmax=10)
-
-    Use a different similarity metric:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris, metric="correlation")
-
-    Use a different clustering method:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris, method="single")
-
-    Standardize the data within the columns:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris, standard_scale=1)
-
-    Normalize the data within the rows:
-
-    .. plot::
-        :context: close-figs
-
-        >>> g = sns.clustermap(iris, z_score=0, cmap="vlag")
     """
+    if _no_scipy:
+        raise RuntimeError("clustermap requires scipy to be available")
+
     plotter = ClusterGrid(data, pivot_kws=pivot_kws, figsize=figsize,
                           row_colors=row_colors, col_colors=col_colors,
                           z_score=z_score, standard_scale=standard_scale,

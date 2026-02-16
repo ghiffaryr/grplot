@@ -34,7 +34,7 @@ def cohort(df,
         preprocessing['Signup Date'] = pandas.to_datetime(preprocessing['Signup Date']).dt.tz_localize(None).dt.to_period('M').dt.to_timestamp()
         preprocessing['Last Active Date'] = pandas.to_datetime(preprocessing['Last Active Date']).dt.tz_localize(None).dt.to_period('M').dt.to_timestamp()
         preprocessing.set_index('Customer ID', inplace=True)
-        preprocessing['Metric'] = [pandas.period_range(s, e, freq='m') for s, e in zip(preprocessing['Signup Date'], preprocessing['Last Active Date'])]
+        preprocessing['Metric'] = [pandas.period_range(s, e, freq='M') for s, e in zip(preprocessing['Signup Date'], preprocessing['Last Active Date'])]
         preprocessing = preprocessing.explode('Metric')
         preprocessing['Cohort Group'] = preprocessing.groupby(level=0)['Metric'].min().dt.strftime('%Y-%m')
         preprocessing.reset_index(inplace=True)
@@ -43,7 +43,7 @@ def cohort(df,
         def cohort_period(df):
             df['Cohort Period'] = numpy.arange(len(df))
             return df
-        cohort = cohort.groupby(level=0).apply(cohort_period)
+        cohort = cohort.groupby(level=0, group_keys=False).apply(cohort_period)
         cohort.reset_index(inplace=True)
         cohort.set_index(['Cohort Group', 'Cohort Period'], inplace=True)
         # display summary

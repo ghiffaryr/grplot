@@ -1,24 +1,26 @@
+from __future__ import annotations
 import warnings
 import itertools
 from copy import copy
-from functools import partial
+from collections import UserString
 from collections.abc import Iterable, Sequence, Mapping
 from numbers import Number
 from datetime import datetime
-from distutils.version import LooseVersion
 
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from ._decorators import (
-    share_init_params_with_map,
-)
-from .palettes import (
+from grplot_seaborn._core.data import PlotData
+from grplot_seaborn.palettes import (
     QUAL_PALETTES,
     color_palette,
 )
-from .utils import (
+from grplot_seaborn.utils import (
+    _check_argument,
+    _version_predates,
+    desaturate,
+    locator_to_legend_entries,
     get_color_cycle,
     remove_na,
 )
@@ -30,7 +32,7 @@ class SemanticMapping:
     # -- Default attributes that all SemanticMapping subclasses must set
 
     # Whether the mapping is numeric, categorical, or datetime
-    map_type = None
+    map_type: str | None = None
 
     # Ordered list of unique values in the input data
     levels = None
@@ -42,16 +44,34 @@ class SemanticMapping:
 
         # TODO Putting this here so we can continue to use a lot of the
         # logic that's built into the library, but the idea of this class
-        # is to move towards semantic mappings that are agnositic about the
+        # is to move towards semantic mappings that are agnostic about the
         # kind of plot they're going to be used to draw.
         # Fully achieving that is going to take some thinking.
         self.plotter = plotter
 
-    def map(cls, plotter, *args, **kwargs):
-        # This method is assigned the __init__ docstring
-        method_name = "_{}_map".format(cls.__name__[:-7].lower())
-        setattr(plotter, method_name, cls(plotter, *args, **kwargs))
-        return plotter
+    def _check_list_length(self, levels, values, variable):
+        """Input check when values are provided as a list."""
+        # Copied from _core/properties; eventually will be replaced for that.
+        message = ""
+        if len(levels) > len(values):
+            message = " ".join([
+                f"\nThe {variable} list has fewer values ({len(values)})",
+                f"than needed ({len(levels)}) and will cycle, which may",
+                "produce an uninterpretable plot."
+            ])
+            values = [x for _, x in zip(levels, itertools.cycle(values))]
+
+        elif len(values) > len(levels):
+            message = " ".join([
+                f"The {variable} list has more values ({len(values)})",
+                f"than needed ({len(levels)}), which may not be intended.",
+            ])
+            values = values[:len(levels)]
+
+        if message:
+            warnings.warn(message, UserWarning, stacklevel=6)
+
+        return values
 
     def _lookup_single(self, key):
         """Apply the mapping to a single data value."""
@@ -65,7 +85,6 @@ class SemanticMapping:
             return self._lookup_single(key, *args, **kwargs)
 
 
-@share_init_params_with_map
 class HueMapping(SemanticMapping):
     """Mapping that sets artist colors according to data values."""
     # A specification of the colors that should appear in the plot
@@ -78,7 +97,7 @@ class HueMapping(SemanticMapping):
     cmap = None
 
     def __init__(
-        self, plotter, palette=None, order=None, norm=None,
+        self, plotter, palette=None, order=None, norm=None, saturation=1,
     ):
         """Map the levels of the `hue` variable to distinct colors.
 
@@ -91,7 +110,20 @@ class HueMapping(SemanticMapping):
 
         data = plotter.plot_data.get("hue", pd.Series(dtype=float))
 
-        if data.notna().any():
+        if isinstance(palette, np.ndarray):
+            msg = (
+                "Numpy array is not a supported type for `palette`. "
+                "Please convert your palette to a list. "
+                "This will become an error in v0.14"
+            )
+            warnings.warn(msg, stacklevel=4)
+            palette = palette.tolist()
+
+        if data.isna().all():
+            if palette is not None:
+                msg = "Ignoring `palette` because no `hue` variable has been assigned."
+                warnings.warn(msg, stacklevel=4)
+        else:
 
             map_type = self.infer_map_type(
                 palette, norm, plotter.input_format, plotter.var_types["hue"]
@@ -110,7 +142,7 @@ class HueMapping(SemanticMapping):
                     data, palette, norm,
                 )
 
-            # --- Option 2: categorical mapping using seaborn palette
+            # --- Option 2: categorical mapping using grplot_seaborn palette
 
             elif map_type == "categorical":
 
@@ -130,6 +162,7 @@ class HueMapping(SemanticMapping):
                     list(data), palette, order,
                 )
 
+            self.saturation = saturation
             self.map_type = map_type
             self.lookup_table = lookup_table
             self.palette = palette
@@ -143,6 +176,13 @@ class HueMapping(SemanticMapping):
             # Use a value that's in the original data vector
             value = self.lookup_table[key]
         except KeyError:
+
+            if self.norm is None:
+                # Currently we only get here in scatterplot with hue_order,
+                # because scatterplot does not consider hue a grouping variable
+                # So unused hue levels are in the data, but not the lookup table
+                return (0, 0, 0, 0)
+
             # Use the colormap to interpolate between existing datapoints
             # (e.g. in the context of making a continuous legend)
             try:
@@ -156,6 +196,10 @@ class HueMapping(SemanticMapping):
                 if np.ma.is_masked(normed):
                     normed = np.nan
                 value = self.cmap(normed)
+
+        if self.saturation < 1:
+            value = desaturate(value, self.saturation)
+
         return value
 
     def infer_map_type(self, palette, norm, input_format, var_type):
@@ -199,10 +243,7 @@ class HueMapping(SemanticMapping):
                 else:
                     colors = color_palette("husl", n_colors)
             elif isinstance(palette, list):
-                if len(palette) != n_colors:
-                    err = "The palette list has the wrong number of colors."
-                    raise ValueError(err)
-                colors = palette
+                colors = self._check_list_length(levels, palette, "palette")
             else:
                 colors = color_palette(palette, n_colors)
 
@@ -254,7 +295,6 @@ class HueMapping(SemanticMapping):
         return levels, lookup_table, norm, cmap
 
 
-@share_init_params_with_map
 class SizeMapping(SemanticMapping):
     """Mapping that sets artist sizes according to data values."""
     # An object that normalizes data values to [0, 1] range
@@ -354,10 +394,7 @@ class SizeMapping(SemanticMapping):
         elif isinstance(sizes, list):
 
             # List inputs give size values in the same order as the levels
-            if len(sizes) != len(levels):
-                err = "The `sizes` list has the wrong number of values."
-                raise ValueError(err)
-
+            sizes = self._check_list_length(levels, sizes, "sizes")
             lookup_table = dict(zip(levels, sizes))
 
         else:
@@ -479,16 +516,13 @@ class SizeMapping(SemanticMapping):
         return levels, lookup_table, norm, size_range
 
 
-@share_init_params_with_map
 class StyleMapping(SemanticMapping):
     """Mapping that sets artist style according to data values."""
 
     # Style mapping is always treated as categorical
     map_type = "categorical"
 
-    def __init__(
-        self, plotter, markers=None, dashes=None, order=None,
-    ):
+    def __init__(self, plotter, markers=None, dashes=None, order=None):
         """Map the levels of the `style` variable to distinct values.
 
         Parameters
@@ -565,9 +599,7 @@ class StyleMapping(SemanticMapping):
                 raise ValueError(err)
             lookup_table = arg
         elif isinstance(arg, Sequence):
-            if len(levels) != len(arg):
-                err = f"The `{attr}` argument has the wrong number of values"
-                raise ValueError(err)
+            arg = self._check_list_length(levels, arg, attr)
             lookup_table = dict(zip(levels, arg))
         elif arg:
             err = f"This `{attr}` argument was not understood: {arg}"
@@ -584,15 +616,6 @@ class StyleMapping(SemanticMapping):
 class VectorPlotter:
     """Base class for objects underlying *plot functions."""
 
-    _semantic_mappings = {
-        "hue": HueMapping,
-        "size": SizeMapping,
-        "style": StyleMapping,
-    }
-
-    # TODO units is another example of a non-mapping "semantic"
-    # we need a general name for this and separate handling
-    semantics = "x", "y", "hue", "size", "style", "units"
     wide_structure = {
         "x": "@index", "y": "@values", "hue": "@columns", "style": "@columns",
     }
@@ -602,30 +625,20 @@ class VectorPlotter:
 
     def __init__(self, data=None, variables={}):
 
+        self._var_levels = {}
+        # var_ordered is relevant only for categorical axis variables, and may
+        # be better handled by an internal axis information object that tracks
+        # such information and is set up by the scale_* methods. The analogous
+        # information for numeric axes would be information about log scales.
+        self._var_ordered = {"x": False, "y": False}  # alt., used DefaultDict
         self.assign_variables(data, variables)
 
-        for var, cls in self._semantic_mappings.items():
-
-            # Create the mapping function
-            map_func = partial(cls.map, plotter=self)
-            setattr(self, f"map_{var}", map_func)
-
-            # Call the mapping function to initialize with default values
-            getattr(self, f"map_{var}")()
-
-        self._var_levels = {}
-
-    @classmethod
-    def get_semantics(cls, kwargs, semantics=None):
-        """Subset a dictionary` arguments with known semantic variables."""
-        # TODO this should be get_variables since we have included x and y
-        if semantics is None:
-            semantics = cls.semantics
-        variables = {}
-        for key, val in kwargs.items():
-            if key in semantics and val is not None:
-                variables[key] = val
-        return variables
+        # TODO Lots of tests assume that these are called to initialize the
+        # mappings to default values on class initialization. I'd prefer to
+        # move away from that and only have a mapping when explicitly called.
+        for var in ["hue", "size", "style"]:
+            if var in variables:
+                getattr(self, f"map_{var}")()
 
     @property
     def has_xy_data(self):
@@ -646,11 +659,8 @@ class VectorPlotter:
 
         """
         for var in self.variables:
-            try:
-                map_obj = getattr(self, f"_{var}_map")
+            if (map_obj := getattr(self, f"_{var}_map", None)) is not None:
                 self._var_levels[var] = map_obj.levels
-            except AttributeError:
-                pass
         return self._var_levels
 
     def assign_variables(self, data=None, variables={}):
@@ -660,23 +670,24 @@ class VectorPlotter:
 
         if x is None and y is None:
             self.input_format = "wide"
-            plot_data, variables = self._assign_variables_wideform(
-                data, **variables,
-            )
+            frame, names = self._assign_variables_wideform(data, **variables)
         else:
+            # When dealing with long-form input, use the newer PlotData
+            # object (internal but introduced for the objects interface)
+            # to centralize / standardize data consumption logic.
             self.input_format = "long"
-            plot_data, variables = self._assign_variables_longform(
-                data, **variables,
-            )
+            plot_data = PlotData(data, variables)
+            frame = plot_data.frame
+            names = plot_data.names
 
-        self.plot_data = plot_data
-        self.variables = variables
+        self.plot_data = frame
+        self.variables = names
         self.var_types = {
             v: variable_type(
-                plot_data[v],
+                frame[v],
                 boolean_type="numeric" if v in "xy" else "categorical"
             )
-            for v in variables
+            for v in names
         }
 
         return self
@@ -696,10 +707,10 @@ class VectorPlotter:
         Returns
         -------
         plot_data : :class:`pandas.DataFrame`
-            Long-form data object mapping seaborn variables (x, y, hue, ...)
+            Long-form data object mapping grplot_seaborn variables (x, y, hue, ...)
             to data vectors.
         variables : dict
-            Keys are defined seaborn variables; values are names inferred from
+            Keys are defined grplot_seaborn variables; values are names inferred from
             the inputs (or None when no name can be determined).
 
         """
@@ -781,8 +792,10 @@ class VectorPlotter:
             wide_data = pd.DataFrame(data, copy=True)
 
             # At this point we should reduce the dataframe to numeric cols
-            numeric_cols = wide_data.apply(variable_type) == "numeric"
-            wide_data = wide_data.loc[:, numeric_cols]
+            numeric_cols = [
+                k for k, v in wide_data.items() if variable_type(v) == "numeric"
+            ]
+            wide_data = wide_data[numeric_cols]
 
             # Now melt the data to long form
             melt_kws = {"var_name": "@columns", "value_name": "@values"}
@@ -821,122 +834,22 @@ class VectorPlotter:
 
         return plot_data, variables
 
-    def _assign_variables_longform(self, data=None, **kwargs):
-        """Define plot variables given long-form data and/or vector inputs.
+    def map_hue(self, palette=None, order=None, norm=None, saturation=1):
+        mapping = HueMapping(self, palette, order, norm, saturation)
+        self._hue_map = mapping
 
-        Parameters
-        ----------
-        data : dict-like collection of vectors
-            Input data where variable names map to vector values.
-        kwargs : variable -> data mappings
-            Keys are seaborn variables (x, y, hue, ...) and values are vectors
-            in any format that can construct a :class:`pandas.DataFrame` or
-            names of columns or index levels in ``data``.
+    def map_size(self, sizes=None, order=None, norm=None):
+        mapping = SizeMapping(self, sizes, order, norm)
+        self._size_map = mapping
 
-        Returns
-        -------
-        plot_data : :class:`pandas.DataFrame`
-            Long-form data object mapping seaborn variables (x, y, hue, ...)
-            to data vectors.
-        variables : dict
-            Keys are defined seaborn variables; values are names inferred from
-            the inputs (or None when no name can be determined).
-
-        Raises
-        ------
-        ValueError
-            When variables are strings that don't appear in ``data``.
-
-        """
-        plot_data = {}
-        variables = {}
-
-        # Data is optional; all variables can be defined as vectors
-        if data is None:
-            data = {}
-
-        # TODO should we try a data.to_dict() or similar here to more
-        # generally accept objects with that interface?
-        # Note that dict(df) also works for pandas, and gives us what we
-        # want, whereas DataFrame.to_dict() gives a nested dict instead of
-        # a dict of series.
-
-        # Variables can also be extraced from the index attribute
-        # TODO is this the most general way to enable it?
-        # There is no index.to_dict on multiindex, unfortunately
-        try:
-            index = data.index.to_frame()
-        except AttributeError:
-            index = {}
-
-        # The caller will determine the order of variables in plot_data
-        for key, val in kwargs.items():
-
-            # First try to treat the argument as a key for the data collection.
-            # But be flexible about what can be used as a key.
-            # Usually it will be a string, but allow numbers or tuples too when
-            # taking from the main data object. Only allow strings to reference
-            # fields in the index, because otherwise there is too much ambiguity.
-            try:
-                val_as_data_key = (
-                    val in data
-                    or (isinstance(val, (str, bytes)) and val in index)
-                )
-            except (KeyError, TypeError):
-                val_as_data_key = False
-
-            if val_as_data_key:
-
-                # We know that __getitem__ will work
-
-                if val in data:
-                    plot_data[key] = data[val]
-                elif val in index:
-                    plot_data[key] = index[val]
-                variables[key] = val
-
-            elif isinstance(val, (str, bytes)):
-
-                # This looks like a column name but we don't know what it means!
-
-                err = f"Could not interpret value `{val}` for parameter `{key}`"
-                raise ValueError(err)
-
-            else:
-
-                # Otherwise, assume the value is itself data
-
-                # Raise when data object is present and a vector can't matched
-                if isinstance(data, pd.DataFrame) and not isinstance(val, pd.Series):
-                    if np.ndim(val) and len(data) != len(val):
-                        val_cls = val.__class__.__name__
-                        err = (
-                            f"Length of {val_cls} vectors must match length of `data`"
-                            f" when both are used, but `data` has length {len(data)}"
-                            f" and the vector passed to `{key}` has length {len(val)}."
-                        )
-                        raise ValueError(err)
-
-                plot_data[key] = val
-
-                # Try to infer the name of the variable
-                variables[key] = getattr(val, "name", None)
-
-        # Construct a tidy plot DataFrame. This will convert a number of
-        # types automatically, aligning on index in case of pandas objects
-        plot_data = pd.DataFrame(plot_data)
-
-        # Reduce the variables dictionary to fields with valid data
-        variables = {
-            var: name
-            for var, name in variables.items()
-            if plot_data[var].notnull().any()
-        }
-
-        return plot_data, variables
+    def map_style(self, markers=None, dashes=None, order=None):
+        mapping = StyleMapping(self, markers, dashes, order)
+        self._style_map = mapping
 
     def iter_data(
-        self, grouping_vars=None, reverse=False, from_comp_data=False,
+        self, grouping_vars=None, *,
+        reverse=False, from_comp_data=False,
+        by_facet=True, allow_empty=False, dropna=True,
     ):
         """Generator for getting subsets of data defined by semantic variables.
 
@@ -946,10 +859,17 @@ class VectorPlotter:
         ----------
         grouping_vars : string or list of strings
             Semantic variables that define the subsets of data.
-        reverse : bool, optional
+        reverse : bool
             If True, reverse the order of iteration.
-        from_comp_data : bool, optional
+        from_comp_data : bool
             If True, use self.comp_data rather than self.plot_data
+        by_facet : bool
+            If True, add faceting variables to the set of grouping variables.
+        allow_empty : bool
+            If True, yield an empty dataframe when no observations exist for
+            combinations of grouping variables.
+        dropna : bool
+            If True, remove rows with missing data.
 
         Yields
         ------
@@ -960,7 +880,7 @@ class VectorPlotter:
 
         """
         # TODO should this default to using all (non x/y?) semantics?
-        # or define groupping vars somewhere?
+        # or define grouping vars somewhere?
         if grouping_vars is None:
             grouping_vars = []
         elif isinstance(grouping_vars, str):
@@ -969,30 +889,52 @@ class VectorPlotter:
             grouping_vars = list(grouping_vars)
 
         # Always insert faceting variables
-        facet_vars = {"col", "row"}
-        grouping_vars.extend(
-            facet_vars & set(self.variables) - set(grouping_vars)
-        )
+        if by_facet:
+            facet_vars = {"col", "row"}
+            grouping_vars.extend(
+                facet_vars & set(self.variables) - set(grouping_vars)
+            )
 
         # Reduce to the semantics used in this plot
-        grouping_vars = [
-            var for var in grouping_vars if var in self.variables
-        ]
+        grouping_vars = [var for var in grouping_vars if var in self.variables]
 
         if from_comp_data:
             data = self.comp_data
         else:
             data = self.plot_data
 
+        if dropna:
+            data = data.dropna()
+
+        levels = self.var_levels.copy()
+        if from_comp_data:
+            for axis in {"x", "y"} & set(grouping_vars):
+                converter = self.converters[axis].iloc[0]
+                if self.var_types[axis] == "categorical":
+                    if self._var_ordered[axis]:
+                        # If the axis is ordered, then the axes in a possible
+                        # facet grid are by definition "shared", or there is a
+                        # single axis with a unique cat -> idx mapping.
+                        # So we can just take the first converter object.
+                        levels[axis] = converter.convert_units(levels[axis])
+                    else:
+                        # Otherwise, the mappings may not be unique, but we can
+                        # use the unique set of index values in comp_data.
+                        levels[axis] = np.sort(data[axis].unique())
+                else:
+                    transform = converter.get_transform().transform
+                    levels[axis] = transform(converter.convert_units(levels[axis]))
+
         if grouping_vars:
 
             grouped_data = data.groupby(
-                grouping_vars, sort=False, as_index=False
+                grouping_vars, sort=False, as_index=False, observed=False,
             )
 
             grouping_keys = []
             for var in grouping_vars:
-                grouping_keys.append(self.var_levels.get(var, []))
+                key = levels.get(var)
+                grouping_keys.append([] if key is None else key)
 
             iter_keys = itertools.product(*grouping_keys)
             if reverse:
@@ -1000,21 +942,28 @@ class VectorPlotter:
 
             for key in iter_keys:
 
-                # Pandas fails with singleton tuple inputs
-                pd_key = key[0] if len(key) == 1 else key
-
+                pd_key = (
+                    key[0] if len(key) == 1 and _version_predates(pd, "2.2.0") else key
+                )
                 try:
                     data_subset = grouped_data.get_group(pd_key)
                 except KeyError:
+                    # XXX we are adding this to allow backwards compatibility
+                    # with the empty artists that old categorical plots would
+                    # add (before 0.12), which we may decide to break, in which
+                    # case this option could be removed
+                    data_subset = data.loc[[]]
+
+                if data_subset.empty and not allow_empty:
                     continue
 
                 sub_vars = dict(zip(grouping_vars, key))
 
-                yield sub_vars, data_subset
+                yield sub_vars, data_subset.copy()
 
         else:
 
-            yield {}, data
+            yield {}, data.copy()
 
     @property
     def comp_data(self):
@@ -1033,31 +982,28 @@ class VectorPlotter:
                 .copy(deep=False)
                 .drop(["x", "y"], axis=1, errors="ignore")
             )
+
             for var in "yx":
                 if var not in self.variables:
                     continue
 
-                # Get a corresponding axis object so that we can convert the units
-                # to matplotlib's numeric representation, which we can compute on
-                # This is messy and it would probably be better for VectorPlotter
-                # to manage its own converters (using the matplotlib tools).
-                # XXX Currently does not support unshared categorical axes!
-                # (But see comment in _attach about how those don't exist)
-                if self.ax is None:
-                    ax = self.facets.axes.flat[0]
+                parts = []
+                grouped = self.plot_data[var].groupby(self.converters[var], sort=False)
+                for converter, orig in grouped:
+                    orig = orig.mask(orig.isin([np.inf, -np.inf]), np.nan)
+                    orig = orig.dropna()
+                    if var in self.var_levels:
+                        # TODO this should happen in some centralized location
+                        # it is similar to GH2419, but more complicated because
+                        # supporting `order` in categorical plots is tricky
+                        orig = orig[orig.isin(self.var_levels[var])]
+                    comp = pd.to_numeric(converter.convert_units(orig)).astype(float)
+                    transform = converter.get_transform().transform
+                    parts.append(pd.Series(transform(comp), orig.index, name=orig.name))
+                if parts:
+                    comp_col = pd.concat(parts)
                 else:
-                    ax = self.ax
-                axis = getattr(ax, f"{var}axis")
-
-                # Use the converter assigned to the axis to get a float representation
-                # of the data, passing np.nan or pd.NA through (pd.NA becomes np.nan)
-                with pd.option_context('mode.use_inf_as_null', True):
-                    orig = self.plot_data[var].dropna()
-                comp_col = pd.Series(index=orig.index, dtype=float, name=var)
-                comp_col.loc[orig.index] = pd.to_numeric(axis.convert_units(orig))
-
-                if axis.get_scale() == "log":
-                    comp_col = np.log10(comp_col)
+                    comp_col = pd.Series(dtype=float, name=var)
                 comp_data.insert(0, var, comp_col)
 
             self._comp_data = comp_data
@@ -1079,7 +1025,12 @@ class VectorPlotter:
         else:
             return self.ax
 
-    def _attach(self, obj, allowed_types=None, log_scale=None):
+    def _attach(
+        self,
+        obj,
+        allowed_types=None,
+        log_scale=None,
+    ):
         """Associate the plotter with an Axes manager and initialize its units.
 
         Parameters
@@ -1088,7 +1039,7 @@ class VectorPlotter:
             Structural object that we will eventually plot onto.
         allowed_types : str or list of str
             If provided, raise when either the x or y variable does not have
-            one of the declared seaborn types.
+            one of the declared grplot_seaborn types.
         log_scale : bool, number, or pair of bools or numbers
             If not False, set the axes to use log scaling, with the given
             base or defaulting to 10. If a tuple, interpreted as separate
@@ -1109,13 +1060,21 @@ class VectorPlotter:
             self.facets = None
             ax_list = [obj]
 
+        # Identify which "axis" variables we have defined
+        axis_variables = set("xy").intersection(self.variables)
+
+        # -- Verify the types of our x and y variables here.
+        # This doesn't really make complete sense being here here, but it's a fine
+        # place for it, given  the current system.
+        # (Note that for some plots, there might be more complicated restrictions)
+        # e.g. the categorical plots have their own check that as specific to the
+        # non-categorical axis.
         if allowed_types is None:
             allowed_types = ["numeric", "datetime", "categorical"]
         elif isinstance(allowed_types, str):
             allowed_types = [allowed_types]
 
-        for var in set("xy").intersection(self.variables):
-            # Check types of x/y variables
+        for var in axis_variables:
             var_type = self.var_types[var]
             if var_type not in allowed_types:
                 err = (
@@ -1124,65 +1083,108 @@ class VectorPlotter:
                 )
                 raise TypeError(err)
 
-            # Register with the matplotlib unit conversion machinery
-            # Perhaps cleaner to manage our own transform objects?
-            # XXX Currently this does not allow "unshared" categorical axes
-            # We could add metadata to a FacetGrid and set units based on that.
-            # See also comment in comp_data, which only uses a single axes to do
-            # its mapping, meaning that it won't handle unshared axes well either.
-            for ax in ax_list:
-                axis = getattr(ax, f"{var}axis")
-                seed_data = self.plot_data[var]
-                if var_type == "categorical":
-                    seed_data = categorical_order(seed_data)
-                axis.update_units(seed_data)
+        # -- Get axis objects for each row in plot_data for type conversions and scaling
 
-        # For categorical y, we want the "first" level to be at the top of the axis
-        if self.var_types.get("y", None) == "categorical":
-            for ax in ax_list:
-                try:
-                    ax.yaxis.set_inverted(True)
-                except AttributeError:  # mpl < 3.1
-                    if not ax.yaxis_inverted():
-                        ax.invert_yaxis()
+        facet_dim = {"x": "col", "y": "row"}
 
-        # Possibly log-scale one or both axes
-        if log_scale is not None:
+        self.converters = {}
+        for var in axis_variables:
+            other_var = {"x": "y", "y": "x"}[var]
+
+            converter = pd.Series(index=self.plot_data.index, name=var, dtype=object)
+            share_state = getattr(self.facets, f"_share{var}", True)
+
+            # Simplest cases are that we have a single axes, all axes are shared,
+            # or sharing is only on the orthogonal facet dimension. In these cases,
+            # all datapoints get converted the same way, so use the first axis
+            if share_state is True or share_state == facet_dim[other_var]:
+                converter.loc[:] = getattr(ax_list[0], f"{var}axis")
+
+            else:
+
+                # Next simplest case is when no axes are shared, and we can
+                # use the axis objects within each facet
+                if share_state is False:
+                    for axes_vars, axes_data in self.iter_data():
+                        ax = self._get_axes(axes_vars)
+                        converter.loc[axes_data.index] = getattr(ax, f"{var}axis")
+
+                # In the more complicated case, the axes are shared within each
+                # "file" of the facetgrid. In that case, we need to subset the data
+                # for that file and assign it the first axis in the slice of the grid
+                else:
+
+                    names = getattr(self.facets, f"{share_state}_names")
+                    for i, level in enumerate(names):
+                        idx = (i, 0) if share_state == "row" else (0, i)
+                        axis = getattr(self.facets.axes[idx], f"{var}axis")
+                        converter.loc[self.plot_data[share_state] == level] = axis
+
+            # Store the converter vector, which we use elsewhere (e.g comp_data)
+            self.converters[var] = converter
+
+            # Now actually update the matplotlib objects to do the conversion we want
+            grouped = self.plot_data[var].groupby(self.converters[var], sort=False)
+            for converter, seed_data in grouped:
+                if self.var_types[var] == "categorical":
+                    if self._var_ordered[var]:
+                        order = self.var_levels[var]
+                    else:
+                        order = None
+                    seed_data = categorical_order(seed_data, order)
+                converter.update_units(seed_data)
+
+        # -- Set numerical axis scales
+
+        # First unpack the log_scale argument
+        if log_scale is None:
+            scalex = scaley = False
+        else:
             # Allow single value or x, y tuple
             try:
                 scalex, scaley = log_scale
             except TypeError:
-                scalex = log_scale if "x" in self.variables else False
-                scaley = log_scale if "y" in self.variables else False
+                scalex = log_scale if self.var_types.get("x") == "numeric" else False
+                scaley = log_scale if self.var_types.get("y") == "numeric" else False
 
-            for axis, scale in zip("xy", (scalex, scaley)):
-                if scale:
-                    for ax in ax_list:
-                        set_scale = getattr(ax, f"set_{axis}scale")
-                        if scale is True:
-                            set_scale("log")
-                        else:
-                            if LooseVersion(mpl.__version__) >= "3.3":
-                                set_scale("log", base=scale)
-                            else:
-                                set_scale("log", **{f"base{axis}": scale})
+        # Now use it
+        for axis, scale in zip("xy", (scalex, scaley)):
+            if scale:
+                for ax in ax_list:
+                    set_scale = getattr(ax, f"set_{axis}scale")
+                    if scale is True:
+                        set_scale("log", nonpositive="mask")
+                    else:
+                        set_scale("log", base=scale, nonpositive="mask")
 
-    def _log_scaled(self, axis):
-        """Return True if specified axis is log scaled on all attached axes."""
+        # For categorical y, we want the "first" level to be at the top of the axis
+        if self.var_types.get("y", None) == "categorical":
+            for ax in ax_list:
+                ax.yaxis.set_inverted(True)
+
+        # TODO -- Add axes labels
+
+    def _get_scale_transforms(self, axis):
+        """Return a function implementing the scale transform (or its inverse)."""
         if self.ax is None:
-            axes_list = self.facets.axes.flatten()
+            axis_list = [getattr(ax, f"{axis}axis") for ax in self.facets.axes.flat]
+            scales = {axis.get_scale() for axis in axis_list}
+            if len(scales) > 1:
+                # It is a simplifying assumption that faceted axes will always have
+                # the same scale (even if they are unshared and have distinct limits).
+                # Nothing in the grplot_seaborn API allows you to create a FacetGrid with
+                # a mixture of scales, although it's possible via matplotlib.
+                # This is constraining, but no more so than previous behavior that
+                # only (properly) handled log scales, and there are some places where
+                # it would be much too complicated to use axes-specific transforms.
+                err = "Cannot determine transform with mixed scales on faceted axes."
+                raise RuntimeError(err)
+            transform_obj = axis_list[0].get_transform()
         else:
-            axes_list = [self.ax]
+            # This case is more straightforward
+            transform_obj = getattr(self.ax, f"{axis}axis").get_transform()
 
-        log_scaled = []
-        for ax in axes_list:
-            data_axis = getattr(ax, f"{axis}axis")
-            log_scaled.append(data_axis.get_scale() == "log")
-
-        if any(log_scaled) and not all(log_scaled):
-            raise RuntimeError("Axis scaling is not consistent")
-
-        return any(log_scaled)
+        return transform_obj.transform, transform_obj.inverted().transform
 
     def _add_axis_labels(self, ax, default_x="", default_y=""):
         """Add axis labels if not present, set visibility to match ticklabels."""
@@ -1196,6 +1198,275 @@ class VectorPlotter:
         if not ax.get_ylabel():
             y_visible = any(t.get_visible() for t in ax.get_yticklabels())
             ax.set_ylabel(self.variables.get("y", default_y), visible=y_visible)
+
+    def add_legend_data(
+        self, ax, func, common_kws=None, attrs=None, semantic_kws=None,
+    ):
+        """Add labeled artists to represent the different plot semantics."""
+        verbosity = self.legend
+        if isinstance(verbosity, str) and verbosity not in ["auto", "brief", "full"]:
+            err = "`legend` must be 'auto', 'brief', 'full', or a boolean."
+            raise ValueError(err)
+        elif verbosity is True:
+            verbosity = "auto"
+
+        keys = []
+        legend_kws = {}
+        common_kws = {} if common_kws is None else common_kws.copy()
+        semantic_kws = {} if semantic_kws is None else semantic_kws.copy()
+
+        # Assign a legend title if there is only going to be one sub-legend,
+        # otherwise, subtitles will be inserted into the texts list with an
+        # invisible handle (which is a hack)
+        titles = {
+            title for title in
+            (self.variables.get(v, None) for v in ["hue", "size", "style"])
+            if title is not None
+        }
+        title = "" if len(titles) != 1 else titles.pop()
+        title_kws = dict(
+            visible=False, color="w", s=0, linewidth=0, marker="", dashes=""
+        )
+
+        def update(var_name, val_name, **kws):
+
+            key = var_name, val_name
+            if key in legend_kws:
+                legend_kws[key].update(**kws)
+            else:
+                keys.append(key)
+                legend_kws[key] = dict(**kws)
+
+        if attrs is None:
+            attrs = {"hue": "color", "size": ["linewidth", "s"], "style": None}
+        for var, names in attrs.items():
+            self._update_legend_data(
+                update, var, verbosity, title, title_kws, names, semantic_kws.get(var),
+            )
+
+        legend_data = {}
+        legend_order = []
+
+        # Don't allow color=None so we can set a neutral color for size/style legends
+        if common_kws.get("color", False) is None:
+            common_kws.pop("color")
+
+        for key in keys:
+
+            _, label = key
+            kws = legend_kws[key]
+            level_kws = {}
+            use_attrs = [
+                *self._legend_attributes,
+                *common_kws,
+                *[attr for var_attrs in semantic_kws.values() for attr in var_attrs],
+            ]
+            for attr in use_attrs:
+                if attr in kws:
+                    level_kws[attr] = kws[attr]
+            artist = func(label=label, **{"color": ".2", **common_kws, **level_kws})
+            if _version_predates(mpl, "3.5.0"):
+                if isinstance(artist, mpl.lines.Line2D):
+                    ax.add_line(artist)
+                elif isinstance(artist, mpl.patches.Patch):
+                    ax.add_patch(artist)
+                elif isinstance(artist, mpl.collections.Collection):
+                    ax.add_collection(artist)
+            else:
+                ax.add_artist(artist)
+            legend_data[key] = artist
+            legend_order.append(key)
+
+        self.legend_title = title
+        self.legend_data = legend_data
+        self.legend_order = legend_order
+
+    def _update_legend_data(
+        self,
+        update,
+        var,
+        verbosity,
+        title,
+        title_kws,
+        attr_names,
+        other_props,
+    ):
+        """Generate legend tick values and formatted labels."""
+        brief_ticks = 6
+        mapper = getattr(self, f"_{var}_map", None)
+        if mapper is None:
+            return
+
+        brief = mapper.map_type == "numeric" and (
+            verbosity == "brief"
+            or (verbosity == "auto" and len(mapper.levels) > brief_ticks)
+        )
+        if brief:
+            if isinstance(mapper.norm, mpl.colors.LogNorm):
+                locator = mpl.ticker.LogLocator(numticks=brief_ticks)
+            else:
+                locator = mpl.ticker.MaxNLocator(nbins=brief_ticks)
+            limits = min(mapper.levels), max(mapper.levels)
+            levels, formatted_levels = locator_to_legend_entries(
+                locator, limits, self.plot_data[var].infer_objects().dtype
+            )
+        elif mapper.levels is None:
+            levels = formatted_levels = []
+        else:
+            levels = formatted_levels = mapper.levels
+
+        if not title and self.variables.get(var, None) is not None:
+            update((self.variables[var], "title"), self.variables[var], **title_kws)
+
+        other_props = {} if other_props is None else other_props
+
+        for level, formatted_level in zip(levels, formatted_levels):
+            if level is not None:
+                attr = mapper(level)
+                if isinstance(attr_names, list):
+                    attr = {name: attr for name in attr_names}
+                elif attr_names is not None:
+                    attr = {attr_names: attr}
+                attr.update({k: v[level] for k, v in other_props.items() if level in v})
+                update(self.variables[var], formatted_level, **attr)
+
+    # XXX If the scale_* methods are going to modify the plot_data structure, they
+    # can't be called twice. That means that if they are called twice, they should
+    # raise. Alternatively, we could store an original version of plot_data and each
+    # time they are called they operate on the store, not the current state.
+
+    def scale_native(self, axis, *args, **kwargs):
+
+        # Default, defer to matplotlib
+
+        raise NotImplementedError
+
+    def scale_numeric(self, axis, *args, **kwargs):
+
+        # Feels needed to completeness, what should it do?
+        # Perhaps handle log scaling? Set the ticker/formatter/limits?
+
+        raise NotImplementedError
+
+    def scale_datetime(self, axis, *args, **kwargs):
+
+        # Use pd.to_datetime to convert strings or numbers to datetime objects
+        # Note, use day-resolution for numeric->datetime to match matplotlib
+
+        raise NotImplementedError
+
+    def scale_categorical(self, axis, order=None, formatter=None):
+        """
+        Enforce categorical (fixed-scale) rules for the data on given axis.
+
+        Parameters
+        ----------
+        axis : "x" or "y"
+            Axis of the plot to operate on.
+        order : list
+            Order that unique values should appear in.
+        formatter : callable
+            Function mapping values to a string representation.
+
+        Returns
+        -------
+        self
+
+        """
+        # This method both modifies the internal representation of the data
+        # (converting it to string) and sets some attributes on self. It might be
+        # a good idea to have a separate object attached to self that contains the
+        # information in those attributes (i.e. whether to enforce variable order
+        # across facets, the order to use) similar to the SemanticMapping objects
+        # we have for semantic variables. That object could also hold the converter
+        # objects that get used, if we can decouple those from an existing axis
+        # (cf. https://github.com/matplotlib/matplotlib/issues/19229).
+        # There are some interactions with faceting information that would need
+        # to be thought through, since the converts to use depend on facets.
+        # If we go that route, these methods could become "borrowed" methods similar
+        # to what happens with the alternate semantic mapper constructors, although
+        # that approach is kind of fussy and confusing.
+
+        # TODO this method could also set the grid state? Since we like to have no
+        # grid on the categorical axis by default. Again, a case where we'll need to
+        # store information until we use it, so best to have a way to collect the
+        # attributes that this method sets.
+
+        # TODO if we are going to set visual properties of the axes with these methods,
+        # then we could do the steps currently in CategoricalPlotter._adjust_cat_axis
+
+        # TODO another, and distinct idea, is to expose a cut= param here
+
+        _check_argument("axis", ["x", "y"], axis)
+
+        # Categorical plots can be "univariate" in which case they get an anonymous
+        # category label on the opposite axis.
+        if axis not in self.variables:
+            self.variables[axis] = None
+            self.var_types[axis] = "categorical"
+            self.plot_data[axis] = ""
+
+        # If the "categorical" variable has a numeric type, sort the rows so that
+        # the default result from categorical_order has those values sorted after
+        # they have been coerced to strings. The reason for this is so that later
+        # we can get facet-wise orders that are correct.
+        # XXX Should this also sort datetimes?
+        # It feels more consistent, but technically will be a default change
+        # If so, should also change categorical_order to behave that way
+        if self.var_types[axis] == "numeric":
+            self.plot_data = self.plot_data.sort_values(axis, kind="mergesort")
+
+        # Now get a reference to the categorical data vector and remove na values
+        cat_data = self.plot_data[axis].dropna()
+
+        # Get the initial categorical order, which we do before string
+        # conversion to respect the original types of the order list.
+        # Track whether the order is given explicitly so that we can know
+        # whether or not to use the order constructed here downstream
+        self._var_ordered[axis] = order is not None or cat_data.dtype.name == "category"
+        order = pd.Index(categorical_order(cat_data, order), name=axis)
+
+        # Then convert data to strings. This is because in matplotlib,
+        # "categorical" data really mean "string" data, so doing this artists
+        # will be drawn on the categorical axis with a fixed scale.
+        # TODO implement formatter here; check that it returns strings?
+        if formatter is not None:
+            cat_data = cat_data.map(formatter)
+            order = order.map(formatter)
+        else:
+            cat_data = cat_data.astype(str)
+            order = order.astype(str)
+
+        # Update the levels list with the type-converted order variable
+        self.var_levels[axis] = order
+
+        # Now ensure that grplot_seaborn will use categorical rules internally
+        self.var_types[axis] = "categorical"
+
+        # Put the string-typed categorical vector back into the plot_data structure
+        self.plot_data[axis] = cat_data
+
+        return self
+
+
+class VariableType(UserString):
+    """
+    Prevent comparisons elsewhere in the library from using the wrong name.
+
+    Errors are simple assertions because users should not be able to trigger
+    them. If that changes, they should be more verbose.
+
+    """
+    # TODO we can replace this with typing.Literal on Python 3.8+
+    allowed = "numeric", "datetime", "categorical"
+
+    def __init__(self, data):
+        assert data in self.allowed, data
+        super().__init__(data)
+
+    def __eq__(self, other):
+        assert other in self.allowed, other
+        return self.data == other
 
 
 def variable_type(vector, boolean_type="numeric"):
@@ -1221,13 +1492,18 @@ def variable_type(vector, boolean_type="numeric"):
     var_type : 'numeric', 'categorical', or 'datetime'
         Name identifying the type of data in the vector.
     """
+    vector = pd.Series(vector)
+
     # If a categorical dtype is set, infer categorical
-    if pd.api.types.is_categorical_dtype(vector):
-        return "categorical"
+    if isinstance(vector.dtype, pd.CategoricalDtype):
+        return VariableType("categorical")
 
     # Special-case all-na data, which is always "numeric"
     if pd.isna(vector).all():
-        return "numeric"
+        return VariableType("numeric")
+
+    # At this point, drop nans to simplify further type inference
+    vector = vector.dropna()
 
     # Special-case binary/boolean data, allow caller to determine
     # This triggers a numpy warning when vector has strings/objects
@@ -1241,15 +1517,20 @@ def variable_type(vector, boolean_type="numeric"):
         warnings.simplefilter(
             action='ignore', category=(FutureWarning, DeprecationWarning)
         )
-        if np.isin(vector, [0, 1, np.nan]).all():
-            return boolean_type
+        try:
+            if np.isin(vector, [0, 1]).all():
+                return VariableType(boolean_type)
+        except TypeError:
+            # .isin comparison is not guaranteed to be possible under NumPy
+            # casting rules, depending on the (unknown) dtype of 'vector'
+            pass
 
     # Defer to positive pandas tests
     if pd.api.types.is_numeric_dtype(vector):
-        return "numeric"
+        return VariableType("numeric")
 
     if pd.api.types.is_datetime64_dtype(vector):
-        return "datetime"
+        return VariableType("datetime")
 
     # --- If we get to here, we need to check the entries
 
@@ -1262,7 +1543,7 @@ def variable_type(vector, boolean_type="numeric"):
         return True
 
     if all_numeric(vector):
-        return "numeric"
+        return VariableType("numeric")
 
     # Check for a collection where everything is a datetime
 
@@ -1273,11 +1554,11 @@ def variable_type(vector, boolean_type="numeric"):
         return True
 
     if all_datetime(vector):
-        return "datetime"
+        return VariableType("datetime")
 
     # Otherwise, our final fallback is to consider things categorical
 
-    return "categorical"
+    return VariableType("categorical")
 
 
 def infer_orient(x=None, y=None, orient=None, require_numeric=True):
@@ -1293,18 +1574,19 @@ def infer_orient(x=None, y=None, orient=None, require_numeric=True):
     x, y : Vector data or None
         Positional data vectors for the plot.
     orient : string or None
-        Specified orientation, which must start with "v" or "h" if not None.
+        Specified orientation. If not None, can be "x" or "y", or otherwise
+        must start with "v" or "h".
     require_numeric : bool
         If set, raise when the implied dependent variable is not numeric.
 
     Returns
     -------
-    orient : "v" or "h"
+    orient : "x" or "y"
 
     Raises
     ------
-    ValueError: When `orient` is not None and does not start with "h" or "v"
-    TypeError: When dependant variable is not numeric, with `require_numeric`
+    ValueError: When `orient` is an unknown string.
+    TypeError: When dependent variable is not numeric, with `require_numeric`
 
     """
 
@@ -1319,40 +1601,47 @@ def infer_orient(x=None, y=None, orient=None, require_numeric=True):
             warnings.warn(single_var_warning.format("Horizontal", "y"))
         if require_numeric and y_type != "numeric":
             raise TypeError(nonnumeric_dv_error.format("Vertical", "y"))
-        return "v"
+        return "x"
 
     elif y is None:
         if str(orient).startswith("v"):
             warnings.warn(single_var_warning.format("Vertical", "x"))
         if require_numeric and x_type != "numeric":
             raise TypeError(nonnumeric_dv_error.format("Horizontal", "x"))
-        return "h"
+        return "y"
 
-    elif str(orient).startswith("v"):
+    elif str(orient).startswith("v") or orient == "x":
         if require_numeric and y_type != "numeric":
             raise TypeError(nonnumeric_dv_error.format("Vertical", "y"))
-        return "v"
+        return "x"
 
-    elif str(orient).startswith("h"):
+    elif str(orient).startswith("h") or orient == "y":
         if require_numeric and x_type != "numeric":
             raise TypeError(nonnumeric_dv_error.format("Horizontal", "x"))
-        return "h"
+        return "y"
 
     elif orient is not None:
-        raise ValueError(f"Value for `orient` not understood: {orient}")
+        err = (
+            "`orient` must start with 'v' or 'h' or be None, "
+            f"but `{repr(orient)}` was passed."
+        )
+        raise ValueError(err)
+
+    elif x_type != "categorical" and y_type == "categorical":
+        return "y"
 
     elif x_type != "numeric" and y_type == "numeric":
-        return "v"
+        return "x"
 
     elif x_type == "numeric" and y_type != "numeric":
-        return "h"
+        return "y"
 
     elif require_numeric and "numeric" not in (x_type, y_type):
         err = "Neither the `x` nor `y` variable appears to be numeric."
         raise TypeError(err)
 
     else:
-        return "v"
+        return "x"
 
 
 def unique_dashes(n):
@@ -1381,7 +1670,7 @@ def unique_dashes(n):
         (5, 1, 1, 1),
     ]
 
-    # Now programatically build as many as we need
+    # Now programmatically build as many as we need
     p = 3
     while len(dashes) < n:
 
@@ -1479,10 +1768,7 @@ def categorical_order(vector, order=None):
                 order = vector.cat.categories
             except (TypeError, AttributeError):
 
-                try:
-                    order = vector.unique()
-                except AttributeError:
-                    order = pd.unique(vector)
+                order = pd.Series(vector).unique()
 
                 if variable_type(vector) == "numeric":
                     order = np.sort(order)
