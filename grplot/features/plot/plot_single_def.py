@@ -648,7 +648,7 @@ def plot_single_def(plot,
             else:
                 pass
             if edgecolor is None:
-                edgecolor = 'gray'
+                edgecolor = 'auto'
             else:
                 pass
             if linewidth is None:
@@ -1077,10 +1077,6 @@ def plot_single_def(plot,
                 estimator = 'mean'
             else:
                 pass
-            if errorbar is None:
-                errorbar = ('ci', 95)
-            else:
-                pass
             if n_boot is None:
                 n_boot = 1000
             else:
@@ -1224,10 +1220,6 @@ def plot_single_def(plot,
                 # default value
                 if estimator is None:
                     estimator = 'mean'
-                else:
-                    pass
-                if errorbar is None:
-                    errorbar = ('ci', 95)
                 else:
                     pass
                 if n_boot is None:
