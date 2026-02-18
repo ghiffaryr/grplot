@@ -820,10 +820,6 @@ def plot_single_def(plot,
                 fill = True
             else:
                 pass
-            if inner is None:
-                inner = 'box'
-            else:
-                pass
             if split is None:
                 split = False
             else:
