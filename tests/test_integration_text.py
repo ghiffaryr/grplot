@@ -439,3 +439,312 @@ class TestTextComprehensive:
         df['c'] = df['c'].abs() + 1
         ax = plot2d(plot='scatterplot', df=df, x='c', y='c', text=True, xlog='log')
         plt.close('all')
+
+
+# ============================================================================
+# Text with Errorbar - Critical for errorbar integration testing
+# ============================================================================
+@pytest.mark.integration
+class TestTextWithErrorbar:
+    """Test text annotations with errorbar parameter"""
+    
+    def test_barplot_errorbar_sd_with_text(self, text_test_data):
+        """Test barplot with errorbar='sd' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_se_with_text(self, text_test_data):
+        """Test barplot with errorbar='se' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='se', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_pi_with_text(self, text_test_data):
+        """Test barplot with errorbar='pi' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='pi', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_ci_with_text(self, text_test_data):
+        """Test barplot with errorbar=('ci', 95) and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar=('ci', 95), text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_histplot_errorbar_with_text(self, text_test_data):
+        """Test histplot with errorbar and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='histplot', df=text_test_data, x='c', errorbar='sd', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_countplot_errorbar_with_text(self, text_test_data):
+        """Test countplot with errorbar and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='countplot', df=text_test_data, x='cat', errorbar='sd', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_paretoplot_errorbar_with_text(self, text_test_data):
+        """Test paretoplot with text=True"""
+        from grplot import plot2d
+        # Paretoplot requires categorical x and numeric y, so aggregate the data
+        df_agg = text_test_data.groupby('cat')['c'].sum().reset_index()
+        ax = plot2d(plot='paretoplot', df=df_agg, x='cat', y='c', text=True)
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Text with CI - Critical for ci parameter integration testing
+# ============================================================================
+@pytest.mark.integration
+class TestTextWithCI:
+    """Test text annotations with ci parameter"""
+    
+    def test_barplot_ci_95_with_text(self, text_test_data):
+        """Test barplot with ci=95 and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=95, text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_ci_68_with_text(self, text_test_data):
+        """Test barplot with ci=68 and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=68, text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_ci_sd_with_text(self, text_test_data):
+        """Test barplot with ci='sd' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci='sd', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_histplot_ci_with_text(self, text_test_data):
+        """Test histplot with ci and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='histplot', df=text_test_data, x='c', ci=95, text=True)
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Text Mode Conversion - Verify text mode changes with errorbar/ci
+# ============================================================================
+@pytest.mark.integration
+class TestTextModeConversion:
+    """Test that text modes convert correctly when errorbar/ci is present"""
+    
+    def test_text_mode_o_converts_to_i_with_errorbar(self, text_test_data):
+        """Test that text='o' becomes text='i' when errorbar is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='o')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_h_converts_to_h_i_with_errorbar(self, text_test_data):
+        """Test that text='h' becomes text='h+i' when errorbar is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='se', text='h')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_v_converts_to_v_i_with_errorbar(self, text_test_data):
+        """Test that text='v' becomes text='v+i' when errorbar is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='pi', text='v')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_o_converts_to_i_with_ci(self, text_test_data):
+        """Test that text='o' becomes text='i' when ci is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=95, text='o')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_h_converts_to_h_i_with_ci(self, text_test_data):
+        """Test that text='h' becomes text='h+i' when ci is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=95, text='h')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_v_converts_to_v_i_with_ci(self, text_test_data):
+        """Test that text='v' becomes text='v+i' when ci is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=95, text='v')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_i_unchanged_with_errorbar(self, text_test_data):
+        """Test that text='i' remains 'i' when errorbar is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='i')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_text_mode_h_i_unchanged_with_errorbar(self, text_test_data):
+        """Test that text='h+i' remains 'h+i' when errorbar is present"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='h+i')
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Text with Multiple='fill' - Test multiple parameter interaction
+# ============================================================================
+@pytest.mark.integration
+class TestTextWithMultipleFill:
+    """Test text annotations with multiple='fill'"""
+    
+    def test_histplot_multiple_fill_with_text(self, text_test_data):
+        """Test histplot with multiple='fill' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='histplot', df=text_test_data, x='c', hue='cat', multiple='fill', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_multiple_fill_with_text(self, text_test_data):
+        """Test barplot with multiple='fill' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', hue='cat2', multiple='fill', text=True)
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Text with Hue + Multiple='stack' - Test hue and multiple interaction
+# ============================================================================
+@pytest.mark.integration
+class TestTextWithHueStack:
+    """Test text annotations with hue and multiple='stack'"""
+    
+    def test_histplot_hue_stack_with_text(self, text_test_data):
+        """Test histplot with hue and multiple='stack' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='histplot', df=text_test_data, x='c', hue='cat', multiple='stack', text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_hue_stack_with_text(self, text_test_data):
+        """Test barplot with hue and multiple='stack' and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat2', y='c', hue='cat', multiple='stack', text=True)
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Text with Errorbar and Formatting - Comprehensive combinations
+# ============================================================================
+@pytest.mark.integration
+class TestTextErrorbarWithFormatting:
+    """Test text with errorbar and various formatting options"""
+    
+    def test_barplot_errorbar_text_with_sep(self, text_test_data):
+        """Test barplot with errorbar, text, and separator"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text=True, sep=',')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_text_with_tick_add(self, text_test_data):
+        """Test barplot with errorbar, text, and tick_add"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='se', text=True, tick_add='USD_')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_text_with_sep_and_tick_add(self, text_test_data):
+        """Test barplot with errorbar, text, separator, and tick_add"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='pi', text=True, sep=',c', tick_add='USD_')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_text_with_fontsize(self, text_test_data):
+        """Test barplot with errorbar, text, and custom fontsize"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text=True, text_fontsize=8)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_ci_text_with_hue(self, text_test_data):
+        """Test barplot with ci, text, and hue"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=95, text=True, hue='cat2')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_xtext_ytext(self, text_test_data):
+        """Test barplot with errorbar and independent xtext/ytext"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', ytext=True)
+        assert ax is not None
+        plt.close('all')
+
+
+# ============================================================================
+# Edge Cases - Errorbar/CI with Text
+# ============================================================================
+@pytest.mark.integration
+class TestTextErrorbarEdgeCases:
+    """Test edge cases for text with errorbar/ci"""
+    
+    def test_barplot_errorbar_none_with_text(self, text_test_data):
+        """Test barplot with errorbar=None and text=True (should use default behavior)"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar=None, text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_ci_none_with_text(self, text_test_data):
+        """Test barplot with ci=None and text=True"""
+        from grplot import plot2d
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', ci=None, text=True)
+        assert ax is not None
+        plt.close('all')
+    
+    def test_barplot_errorbar_text_mode_combinations(self, text_test_data):
+        """Test various text mode combinations with errorbar"""
+        from grplot import plot2d
+        # Test i+v mode
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='i+v')
+        assert ax is not None
+        plt.close('all')
+        
+        # Test v+i mode
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='v+i')
+        assert ax is not None
+        plt.close('all')
+        
+        # Test i+h mode
+        ax = plot2d(plot='barplot', df=text_test_data, x='cat', y='c', errorbar='sd', text='i+h')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_paretoplot_with_text_modes(self, text_test_data):
+        """Test paretoplot with various text modes"""
+        from grplot import plot2d
+        # Paretoplot requires categorical x and numeric y
+        df_agg = text_test_data.groupby('cat')['c'].sum().reset_index()
+        ax = plot2d(plot='paretoplot', df=df_agg, x='cat', y='c', text='h+i')
+        assert ax is not None
+        plt.close('all')
+    
+    def test_histplot_errorbar_text_horizontal(self, text_test_data):
+        """Test histplot with errorbar, text on y-axis (horizontal bars)"""
+        from grplot import plot2d
+        ax = plot2d(plot='histplot', df=text_test_data, y='c', errorbar='sd', ytext=True)
+        assert ax is not None
+        plt.close('all')

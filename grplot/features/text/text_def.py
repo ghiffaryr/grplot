@@ -6,16 +6,19 @@ from grplot.features.sep.text_sep.text_sep_type import text_sep_type
 from grplot.utils.first_valid_index import first_valid_index
 
 
-def text_def(plot, df, ax, ci, hue, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
+def text_def(plot, df, ax, ci, errorbar, hue, multiple, axis, text, sep, add, text_fontsize, naxislabel, axislabel, axes):
     if plot in ['histplot', 'barplot', 'countplot', 'paretoplot']:
-        # check ci
-        if (ci is not None) or (multiple == 'fill') or ((hue is not None) and (multiple == 'stack')):
-            if 'o' in text:
-                text = text.replace('o','i')
-            elif 'h' in text:
-                text = 'h+i'
-            elif 'v' in text:
-                text = 'v+i'
+        # check ci or errorbar
+        if (ci is not None) or (errorbar is not None) or (multiple == 'fill') or ((hue is not None) and (multiple == 'stack')):
+            if isinstance(text, str):
+                if 'o' in text:
+                    text = text.replace('o','i')
+                elif 'h' in text:
+                    text = 'h+i'
+                elif 'v' in text:
+                    text = 'v+i'
+                else:
+                    pass
             else:
                 pass
         else:
