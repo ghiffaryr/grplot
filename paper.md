@@ -30,8 +30,7 @@ formatting, and figure export. Users specify what to plot via a plot-type string
 or a dictionary mapping panel positions to plot types; the library applies sensible
 defaults while accepting 100+ parameters for explicit overrides at global,
 per-axis, or per-element granularity. As of version 1.0.4 (released 2026-02-18),
-`grplot` requires Python 3.10+, is available on PyPI and conda-forge, and is
-archived on Zenodo (DOI: 10.5281/zenodo.17159965).
+`grplot` requires Python 3.10+ and is available on PyPI and conda-forge.
 
 # Statement of Need
 
