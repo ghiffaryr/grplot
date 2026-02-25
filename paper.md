@@ -23,8 +23,8 @@ bibliography: paper.bib
 `grplot` is an open-source Python library that compresses multi-step statistical
 plotting workflows into a single high-level function call. Built on top of
 Matplotlib [@Hunter2007], NumPy [@Harris2020], and Pandas [@McKinney2010], and
-bundled with a vendored Seaborn fork (`grplot_seaborn`) and IPython display
-utilities [@Perez2007], it exposes a unified `plot2d` API that automatically
+bundled with a vendored Seaborn fork (`grplot_seaborn`), it exposes a unified
+`plot2d` API that automatically
 handles subplot creation, axis labeling, legends, statistical annotations, number
 formatting, and figure export. Users specify what to plot via a plot-type string
 or a dictionary mapping panel positions to plot types; the library applies sensible
@@ -76,7 +76,7 @@ preserving fine-grained per-panel control.
 | Parameter | Description |
 |---|---|
 | `plot` | Chart type string or dict mapping `"[row,col]"` to chart type |
-| `df` | Input data (Pandas DataFrame or NumPy array) |
+| `df` | Input data: Pandas DataFrame, dict of lists, or dict of NumPy arrays |
 | `x`, `y` | Column names or arrays for axes variables |
 | `Nx`, `Ny` | Grid columns and rows for multi-panel layout |
 | `figsize` | Figure dimensions `[width, height]` |
@@ -330,9 +330,9 @@ ax = cohort(
 
 # Acknowledgements
 
-The author thanks the maintainers of Matplotlib, Seaborn, NumPy, SciPy, Pandas,
-and IPython for providing the foundational infrastructure on which `grplot` is
-built. No financial support was received for this work.
+The author thanks the maintainers of Matplotlib, Seaborn [@Waskom2021], NumPy,
+Pandas, and IPython [@Perez2007] for providing the foundational infrastructure on
+which `grplot` is built. No financial support was received for this work.
 
 ## Conflict of Interest
 
