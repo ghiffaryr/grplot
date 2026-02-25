@@ -341,7 +341,7 @@ The author declares no conflicts of interest.
 
 ## AI Usage Disclosure
 
-AI was used to assist with copy-editing and grammar review of this paper. All
+GPT-4o was used to assist with copy-editing and grammar review of this paper. All
 technical content, design decisions, code, and final text were authored, reviewed,
 and validated by the human author.
 
