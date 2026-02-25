@@ -193,6 +193,8 @@ ax = plot2d(
     sep='.c',
     ytick_add='Rp(_)',
     ytext='h+i',
+    alpha=0.75,
+    alpha2=0.75,
     title='Pareto total_bill vs day'
 )
 ```
@@ -277,9 +279,9 @@ ax = plot2d(
     x=['total_bill', 'total_bill', 'day', 'day', 'day', 'total_bill'],
     y=[None, None, None, None, 'total_bill', 'day'],
     hpad=6, wpad=8,
-    figsize=[16, 16],
+    figsize=[18, 16],
     fontsize=12,
-    legend_fontsize=9,
+    legend_fontsize=11,
     sep={'total_bill': '.c',
          '.': ['Count', 'Proportion', '[2,1]', '[2,2]', 'Cumulative Percentage']},
     statdesc={'[1,1]': {'total_bill': 'general'},
@@ -295,7 +297,8 @@ ax = plot2d(
         '[3,1]': 'Pareto total_bill vs day',
         '[3,2]': 'Box day vs total_bill'
     },
-    alpha={'[1,1]': 0.75},
+    alpha={'[1,1]': 0.75, '[3,1]': 0.75},
+    alpha2={'[3,1]': 0.75},
     kde=True
 )
 ```
