@@ -3,11 +3,6 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(".."))
-
 # -- Project information -----------------------------------------------------
 project = "grplot"
 copyright = "2026, Ghiffary Rifqialdi"
@@ -73,6 +68,9 @@ html_theme_options = {
     },
     "navigation_with_keys": True,
     "top_of_page_button": "edit",
+    "source_repository": "https://github.com/ghiffaryr/grplot/",
+    "source_branch": "readthedocs",
+    "source_directory": "docs/",
 }
 html_css_files = ["custom.css"]
 
