@@ -63,7 +63,7 @@ Show the counts of observations in each categorical bin using bars.
    gs.set_theme(context='notebook', style='darkgrid', palette='deep')
 
    tips = gs.load_dataset('tips')
-   ax = plot2d(plot='histplot',
+   ax = plot2d(plot='countplot',
                df=tips,
                x='day',
                sep='.',
