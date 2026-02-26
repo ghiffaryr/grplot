@@ -1,0 +1,292 @@
+/* Custom CSS for grplot documentation — GitHub-inspired theme */
+
+/* ── Code blocks ── */
+[data-theme="dark"] .highlight {
+    background: #161b22 !important;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+}
+
+[data-theme="light"] .highlight {
+    background: #f6f8fa !important;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+}
+
+/* ── Inline code ── */
+[data-theme="dark"] code.literal {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    color: #e6edf3;
+    padding: 0.1em 0.4em;
+    font-size: 0.875em;
+}
+
+[data-theme="light"] code.literal {
+    background: #eaeef2;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    color: #0550ae;
+    padding: 0.1em 0.4em;
+    font-size: 0.875em;
+}
+
+/* ── Plot-type badge: **plot:** ``'name'`` ── */
+/* Targets the code that follows a leading <strong> in the same paragraph */
+p:has(> strong:first-child + code) code {
+    padding: 0.2em 0.65em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+[data-theme="dark"] p:has(> strong:first-child + code) code {
+    background: #1d2d3e;
+    border: 1px solid #388bfd80;
+    color: #79c0ff;
+}
+
+[data-theme="light"] p:has(> strong:first-child + code) code {
+    background: #ddf4ff;
+    border: 1px solid #54aeff80;
+    color: #0550ae;
+}
+
+/* ── Rubric headings (Plot-Specific Parameters, Example N) ── */
+p.rubric {
+    padding-bottom: 0.4em;
+    margin-top: 1.8em;
+    margin-bottom: 0.5em;
+    font-size: 1.0em;
+    letter-spacing: 0.01em;
+}
+
+[data-theme="dark"] p.rubric {
+    border-bottom: 1px solid #30363d;
+    color: #e6edf3;
+}
+
+[data-theme="light"] p.rubric {
+    border-bottom: 1px solid #d0d7de;
+    color: #1f2328;
+}
+
+/* ── Definition lists (parameter docs) ── */
+dl.simple > dt {
+    margin-top: 1em;
+    font-weight: 600;
+}
+
+dl.simple > dd {
+    margin-left: 0.2em;
+    padding-left: 1em;
+    margin-bottom: 0.3em;
+}
+
+[data-theme="dark"] dl.simple > dt { color: #e6edf3; }
+[data-theme="dark"] dl.simple > dd {
+    color: #c9d1d9;
+    border-left: 3px solid #30363d;
+}
+
+[data-theme="light"] dl.simple > dt { color: #1f2328; }
+[data-theme="light"] dl.simple > dd {
+    border-left: 3px solid #d0d7de;
+}
+
+/* ── Tables ── */
+table.docutils {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+[data-theme="dark"] table.docutils {
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    overflow: hidden;
+}
+[data-theme="dark"] table.docutils th {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 8px 14px;
+    font-weight: 600;
+}
+[data-theme="dark"] table.docutils td {
+    border: 1px solid #30363d;
+    padding: 6px 14px;
+    color: #c9d1d9;
+}
+[data-theme="dark"] table.docutils tr:nth-child(even) td {
+    background: #161b22;
+}
+
+[data-theme="light"] table.docutils {
+    border: 1px solid #d0d7de;
+}
+[data-theme="light"] table.docutils th {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    padding: 8px 14px;
+    font-weight: 600;
+    color: #1f2328;
+}
+[data-theme="light"] table.docutils td {
+    border: 1px solid #d0d7de;
+    padding: 6px 14px;
+}
+[data-theme="light"] table.docutils tr:nth-child(even) td {
+    background: #f6f8fa;
+}
+
+/* ── Images ── */
+article img {
+    display: block;
+    max-width: min(100%, 720px);
+    height: auto;
+    margin: 1.5em auto;
+    border-radius: 8px;
+}
+
+[data-theme="dark"] article img {
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="light"] article img {
+    border: 1px solid #d0d7de;
+    box-shadow: 0 2px 12px rgba(140, 149, 159, 0.25);
+}
+
+/* ── Admonitions — note, tip, warning ── */
+.admonition {
+    border-radius: 0 6px 6px 0;
+    padding: 0.75em 1em;
+    margin: 1.4em 0;
+}
+
+[data-theme="dark"] .admonition {
+    background: #161b22;
+    border-left: 4px solid #58a6ff;
+}
+[data-theme="dark"] .admonition .admonition-title {
+    color: #58a6ff;
+    font-weight: 700;
+    margin-bottom: 0.25em;
+}
+[data-theme="dark"] .admonition.warning {
+    border-left-color: #d29922;
+}
+[data-theme="dark"] .admonition.warning .admonition-title {
+    color: #d29922;
+}
+[data-theme="dark"] .admonition.important,
+[data-theme="dark"] .admonition.tip {
+    border-left-color: #3fb950;
+}
+[data-theme="dark"] .admonition.important .admonition-title,
+[data-theme="dark"] .admonition.tip .admonition-title {
+    color: #3fb950;
+}
+
+[data-theme="light"] .admonition {
+    background: #f0f6fc;
+    border-left: 4px solid #0969da;
+}
+[data-theme="light"] .admonition .admonition-title {
+    color: #0969da;
+    font-weight: 700;
+    margin-bottom: 0.25em;
+}
+[data-theme="light"] .admonition.warning {
+    background: #fff8c5;
+    border-left-color: #9a6700;
+}
+[data-theme="light"] .admonition.warning .admonition-title {
+    color: #9a6700;
+}
+[data-theme="light"] .admonition.important,
+[data-theme="light"] .admonition.tip {
+    background: #dafbe1;
+    border-left-color: #1a7f37;
+}
+[data-theme="light"] .admonition.important .admonition-title,
+[data-theme="light"] .admonition.tip .admonition-title {
+    color: #1a7f37;
+}
+
+/* ── Horizontal rule ── */
+[data-theme="dark"] hr {
+    border: none;
+    border-top: 1px solid #30363d;
+    margin: 2em 0;
+}
+[data-theme="light"] hr {
+    border: none;
+    border-top: 1px solid #d0d7de;
+    margin: 2em 0;
+}
+
+/* ── Logo ── */
+.sidebar-logo {
+    max-width: 160px;
+    padding: 0.4em 0;
+}
+
+/* ── hlist columns ── */
+.hlist td {
+    vertical-align: top;
+    padding-right: 1.5em;
+}
+
+/* ── Hero tagline ── */
+.hero-tagline {
+    margin: 0.4em 0 1.6em;
+    padding: 0.01em 1.4em;
+    border-radius: 8px;
+    font-size: 1.25em;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .hero-tagline {
+    background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+    border-left: 4px solid #58a6ff;
+    color: #e6edf3;
+}
+
+[data-theme="light"] .hero-tagline {
+    background: linear-gradient(135deg, #f0f6fc 0%, #ddf4ff 100%);
+    border-left: 4px solid #0969da;
+    color: #1f2328;
+}
+
+/* ── Feature grid container ── */
+.feature-grid {
+    margin: 1.4em 0 0;
+    padding: 1em 1.4em;
+    border-radius: 8px;
+}
+
+[data-theme="dark"] .feature-grid {
+    background: #161b22;
+    border: 1px solid #30363d;
+}
+
+[data-theme="light"] .feature-grid {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+}
+
+.feature-grid .hlist td ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-grid .hlist td ul li {
+    padding: 0.3em 0;
+    padding-left: 0.3em;
+    font-size: 0.95em;
+}
