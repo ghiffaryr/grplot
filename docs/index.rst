@@ -27,15 +27,15 @@ grplot
    :hidden:
 
    installation
-   getting_started
 
 .. toctree::
    :maxdepth: 2
    :caption: User Guide
    :hidden:
 
+   introduction
+   configuration
    plot_types
-   features
 
 .. toctree::
    :maxdepth: 2
