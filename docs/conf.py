@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 project = "grplot"
-copyright = "2026, Ghiffary Rifqialdi"
+copyright = "2022-2026, Ghiffary Rifqialdi"
 author = "Ghiffary Rifqialdi"
 release = "1.0.4"
 version = "1.0.4"
