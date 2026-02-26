@@ -94,4 +94,4 @@ Automatic Analytic Tool
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 grplot also provides automatic analytic tools including cohort analysis and
-rank order / gain / KS / lift tables. See the :doc:`api` reference for details.
+rank order / gain / KS / lift tables. See the :doc:`analytic` reference for details.
