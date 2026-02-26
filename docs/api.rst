@@ -88,6 +88,6 @@ Key Parameters
      - ``str`` or ``None``
      - Save as ``.png``, ``.pdf``, ``.svg``, or ``.eps``
 
-For full parameter documentation for each plot type (including plot-specific
-kwargs such as ``hue``, ``kde``, ``estimator``, ``orient``, etc.) see the
-`Documentation Notebook on GitHub <https://github.com/ghiffaryr/grplot/blob/main/doc/Documentation%20Notebook.ipynb>`_.
+For full parameter documentation for each plot type, including plot-specific
+kwargs such as ``hue``, ``kde``, ``estimator``, ``orient``, and more, see the
+:doc:`plot type pages <plot_types>`.
