@@ -145,10 +145,6 @@ Unit patterns are specified separately for ticks and labels:
    Most formatting options apply to both axes by default; use ``xsep``,
    ``xtick_add``/``xlabel_add`` or the corresponding ``y``-prefixed
    arguments to target a single axis.
-.. note::
-   Most formatting options apply to both axes by default; use ``xsep``,
-   ``xtick_add``/``xlabel_add`` or the corresponding ``y``-prefixed
-   arguments to target a single axis.
 
 Annotations & Statistics
 ------------------------
