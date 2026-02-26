@@ -75,7 +75,7 @@ Commonly combined with ``kdeplot``.
                y='tip',
                sep='.c',
                tick_add='Rp(_)', 
-               title='KDE-Rug tip vs total_bill')
+               title='Scatter-Rug tip vs total_bill')
 
 .. image:: ../_static/plots/rugplot_ex2.png
    :alt: KDE-Rug tip vs total_bill

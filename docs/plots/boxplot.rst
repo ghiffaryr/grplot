@@ -45,7 +45,7 @@ Draw a box plot to show distributions with respect to categories.
    Proportion of the IQR past the low and high quartiles to extend the plot whiskers. Points outside this range will be identified as outliers.
 
 ``linecolor`` *(str or matplotlib.colors, default: 'auto')*
-   Proportion of the IQR past the low and high quartiles to extend the plot whiskers. Points outside this range will be identified as outliers.
+   Color to use for line elements, when fill is True.
 
 ``linewidth`` *(float or None, default: None)*
    Width of the gray lines that frame the plot elements.
@@ -69,7 +69,7 @@ Draw a box plot to show distributions with respect to categories.
    Show the arithmetic means.
 
 ``meanprops`` *(dict, default: {'marker':'s', 'markerfacecolor':'white', 'markeredgecolor':'.3'})*
-   'markerfacecolor':'white', 'markeredgecolor':'.3'} The style of the mean.
+   The style of the mean.
 
 ``zorder`` *(int or None, default: None)*
    Axes order. The default drawing order for axes is patches, lines, text for each plot order.

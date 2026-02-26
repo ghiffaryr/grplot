@@ -120,7 +120,7 @@ Plot data and a linear regression model fit.
                y='total_bill', 
                sep='.c', 
                tick_add='Rp(_)',
-               title='total_bill vs tip rate',
+               title='total_bill vs size',
                ci=95,
                x_ci='ci',
                x_estimator=np.mean)

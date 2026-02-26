@@ -54,7 +54,7 @@ Draw a line plot with possibility of several semantic groupings.
    Method for aggregating across multiple observations of the y variable at the same x level. If None, all observations will be drawn.
 
 ``errorbar`` *(str, tuple, or callable, default: ('ci', 95))*
-   95) Name of errorbar method (either "ci", "pi", "se", or "sd"), or a tuple with a method name and a level parameter, or a function that maps from a vector to a (min, max) interval, or None to hide errorbar.
+   Name of errorbar method (either "ci", "pi", "se", or "sd"), or a tuple with a method name and a level parameter, or a function that maps from a vector to a (min, max) interval, or None to hide errorbar.
 
 ``n_boot`` *(int, default: 1000)*
    Number of bootstraps to use for computing the confidence interval.

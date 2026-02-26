@@ -51,7 +51,7 @@ Draw a combination of boxplot and kernel density estimate.
    Width of the gray lines that frame the plot elements.
 
 ``linecolor`` *(str or None, default: 'auto')*
-   Width of the gray lines that frame the plot elements.
+   Color to use for line elements, when fill is True.
 
 ``cut`` *(float, default: 2)*
    Distance, in units of bandwidth size, to extend the density past the extreme datapoints. Set to 0 to limit the violin range within the range of the observed data (i.e., to have the same effect as trim=True in ggplot).

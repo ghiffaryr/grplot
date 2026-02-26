@@ -4,7 +4,7 @@ Count Plot
 
 Show the counts of observations in each categorical bin using bars.
 
-**plot:** ``'histplot'`` with a categorical ``x``
+**plot:** ``'countplot'``
 
 .. rubric:: Plot-Specific Parameters
 

@@ -77,10 +77,10 @@ Draw a combination of barplot and cumulative percentage line plot (80/20 analysi
 ``color2`` *(matplotlib.colors or None, default: None)*
    Line plot color for all of the elements, or seed for a gradient palette.
 
-``marker`` *(str or matplotlib.markers, default: '.26')*
+``marker`` *(str or matplotlib.markers, default: 'D')*
    The marker style. marker can be either an instance of the class or the text shorthand for a particular marker.
 
-``markersize`` *(float, default: .7)*
+``markersize`` *(float, default: 7)*
    Marker size for line plot.
 
 ``alpha`` *(float or None, default: None)*

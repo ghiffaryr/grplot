@@ -38,6 +38,8 @@ Plot empirical cumulative distribution functions.
 ``zorder`` *(int or None, default: None)*
    Axes order. The default drawing order for axes is patches, lines, text for each plot order.
 
+.. rubric:: Example
+
 .. code-block:: python
 
    from grplot import plot2d

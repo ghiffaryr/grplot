@@ -27,7 +27,7 @@ Visualize proportional data as a pie chart.
    Draw a shadow beneath the pie.
 
 ``normalize`` *(bool, default: True)*
-   When True, always make a full pie by normalizing x so that sum(x) == 1. False makes a partial pie if sum(x) 1.
+   When True, always make a full pie by normalizing x so that sum(x) == 1. False makes a partial pie if sum(x) <= 1.
 
 ``labeldistance`` *(float or None, default: 1.1)*
    The radial distance at which the pie labels are drawn. If set to None, label are not drawn, but are stored for use in legend().
@@ -48,13 +48,13 @@ Visualize proportional data as a pie chart.
    Dict of arguments to pass to the text objects.
 
 ``center`` *([float, float], default: [0, 0])*
-   0] The coordinates of the center of the chart.
+   The coordinates of the center of the chart.
 
 ``frame`` *(bool, default: False)*
    Plot Axes frame with the chart if true.
 
 ``rotatelabels`` *(bool, default: False)*
-   Plot Axes frame with the chart if true.
+   Rotate each label to the angle of the corresponding slice if true.
 
 .. code-block:: python
 
