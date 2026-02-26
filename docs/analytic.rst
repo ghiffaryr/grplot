@@ -13,7 +13,7 @@ DataFrame containing a customer ID, a signup date, and a last-active date.
 
 **import:** ``from grplot.analytic import cohort``
 
-.. rubric:: Parameters
+.. rubric:: Plot-Specific Parameters
 
 ``customer_id`` *(str)*
    Name of the column that uniquely identifies each customer.
