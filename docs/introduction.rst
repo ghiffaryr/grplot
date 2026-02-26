@@ -210,7 +210,7 @@ Unit patterns are specified separately for ticks and labels:
 Annotations & Statistics
 ------------------------
 
-Easily layer text and statistical descriptions over your data. *(Remember: prefix with x or y to target a single axis).* 
+Easily layer text and statistical descriptions over your data.
 
 .. list-table::
    :header-rows: 1
