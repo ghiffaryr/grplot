@@ -15,10 +15,6 @@ DataFrame containing a customer ID, a signup date, and a last-active date.
 
 .. rubric:: Parameters
 
-``df`` *(pandas.DataFrame)*
-   Input DataFrame containing at minimum the customer ID column, the signup
-   date column, and the last-active date column.
-
 ``customer_id`` *(str)*
    Name of the column that uniquely identifies each customer.
 
@@ -29,39 +25,6 @@ DataFrame containing a customer ID, a signup date, and a last-active date.
 ``last_active_date`` *(str)*
    Name of the column holding the most recent active date (must be
    parseable as datetime).
-
-``figsize`` *([float, float], default: [8, 6])*
-   Figure size as ``[width, height]`` in inches.
-
-``fontsize`` *(int, default: 10)*
-   Base font size applied to all text elements unless overridden by the
-   more specific ``*_fontsize`` parameters below.
-
-``tick_fontsize`` *(int or None, default: None)*
-   Font size for axis tick labels. Falls back to ``fontsize`` when ``None``.
-
-``legend_fontsize`` *(int or None, default: None)*
-   Font size for the colorbar tick labels. Falls back to ``fontsize`` when
-   ``None``.
-
-``text_fontsize`` *(int or None, default: None)*
-   Font size for the in-cell heatmap annotations. Falls back to ``fontsize``
-   when ``None``.
-
-``label_fontsize`` *(int or None, default: None)*
-   Font size for the x/y axis labels. Falls back to ``fontsize`` when
-   ``None``.
-
-``title_fontsize`` *(int or None, default: None)*
-   Font size for the plot title. Falls back to ``fontsize`` when ``None``.
-
-``sep`` *(str, default: ',')*
-   Thousand separator character used when formatting colorbar tick labels
-   and heatmap cell annotations (e.g. ``'.'`` for European style).
-
-``saveas`` *(str or None, default: None)*
-   File path to save the figure. Supported extensions: ``.png``, ``.pdf``,
-   ``.svg``, ``.eps``.
 
 ``display_summary`` *(bool, default: False)*
    If ``True``, display the intermediate cohort pivot table (cohort group ×
