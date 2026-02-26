@@ -52,6 +52,10 @@ DataFrame containing a customer ID, a signup date, and a last-active date.
                sep='.',
                display_summary=True)
 
+.. image:: _static/plots/cohort.png
+   :alt: Cohort retention heatmap
+   :align: center
+
 Rank Order, Gain, KS, and Lift
 -------------------------------
 
@@ -96,3 +100,18 @@ and computes cumulative Gain, KS statistic, and Lift for each decile.
    rank_order_table = rank_order(predict_proba=predict_proba,
                                  true_label=true_label,
                                  class_non_event=1)
+
+.. csv-table::
+   :header: "Decile","Minimum Prediction Probability","Maximum Prediction Probability","Mean Prediction Probability","Count Customer","Count Non-event","Count Event","Non-event Rate","Cummulative Count Customer","Cummulative Count Non-event","Cummulative Count Event","Cummulative Customer Percentage","Cummulative Non-event Percentage","Cummulative Event Percentage","KS","Lift"
+   :widths: 4,20,20,20,8,10,8,10,10,10,10,20,20,20,6,6
+
+   9,0.933037,0.933037,0.933037,1,1,0,100.0,1,1,0,10.0,14.29,0.00,14.29,1.43
+   8,0.883011,0.883011,0.883011,1,1,0,100.0,2,2,0,20.0,28.57,0.00,28.57,1.43
+   7,0.849358,0.849358,0.849358,1,1,0,100.0,3,3,0,30.0,42.86,0.00,42.86,1.43
+   6,0.812553,0.812553,0.812553,1,0,1,0.0,4,3,1,40.0,42.86,33.33,9.53,1.07
+   5,0.800341,0.800341,0.800341,1,0,1,0.0,5,3,2,50.0,42.86,66.67,-23.81,0.86
+   4,0.611240,0.611240,0.611240,1,0,1,0.0,6,3,3,60.0,42.86,100.00,-57.14,0.71
+   3,0.576005,0.576005,0.576005,1,1,0,100.0,7,4,3,70.0,57.14,100.00,-42.86,0.82
+   2,0.178416,0.178416,0.178416,1,1,0,100.0,8,5,3,80.0,71.43,100.00,-28.57,0.89
+   1,0.163932,0.163932,0.163932,1,1,0,100.0,9,6,3,90.0,85.71,100.00,-14.29,0.95
+   0,0.118197,0.118197,0.118197,1,1,0,100.0,10,7,3,100.0,100.00,100.00,0.00,1.00
