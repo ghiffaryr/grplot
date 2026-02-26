@@ -11,21 +11,7 @@ Cohort
 Cohort retention analysis. Builds a monthly retention heatmap from a
 DataFrame containing a customer ID, a signup date, and a last-active date.
 
-.. code-block:: python
-
-   from grplot.analytic import cohort
-
-**Signature**
-
-.. code-block:: text
-
-   cohort(df, customer_id, signup_date, last_active_date,
-          figsize=[8, 6], fontsize=10,
-          tick_fontsize=None, legend_fontsize=None, text_fontsize=None,
-          label_fontsize=None, title_fontsize=None,
-          sep=',', saveas=None, display_summary=False)
-
-**Returns:** ``matplotlib.axes.Axes``
+**import:** ``from grplot.analytic import cohort``
 
 .. rubric:: Parameters
 
@@ -113,56 +99,7 @@ Rank Order table for binary classification model evaluation. Splits
 predictions into deciles (highest predicted non-event probability first)
 and computes cumulative Gain, KS statistic, and Lift for each decile.
 
-.. code-block:: python
-
-   from grplot.analytic import rank_order
-
-**Signature**
-
-.. code-block:: text
-
-   rank_order(predict_proba, true_label,
-              class_non_event=1, display_table=True)
-
-**Returns:** ``pandas.DataFrame`` — one row per decile with the following
-columns:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 40 60
-
-   * - Column
-     - Description
-   * - ``Minimum Prediction Probability``
-     - Lowest predicted probability in the decile
-   * - ``Maximum Prediction Probability``
-     - Highest predicted probability in the decile
-   * - ``Mean Prediction Probability``
-     - Mean predicted probability in the decile
-   * - ``Count Customer``
-     - Number of customers in the decile
-   * - ``Count Non-event``
-     - Number of non-event customers in the decile
-   * - ``Count Event``
-     - Number of event customers in the decile
-   * - ``Non-event Rate``
-     - Non-event count as a percentage of the decile (%)
-   * - ``Cummulative Count Customer``
-     - Running total of customers up to this decile
-   * - ``Cummulative Count Non-event``
-     - Running total of non-event customers up to this decile
-   * - ``Cummulative Count Event``
-     - Running total of event customers up to this decile
-   * - ``Cummulative Customer Percentage``
-     - Running customer count as % of all customers
-   * - ``Cummulative Non-event Percentage``
-     - Gain — running non-event count as % of all non-events
-   * - ``Cummulative Event Percentage``
-     - Running event count as % of all events
-   * - ``KS``
-     - Kolmogorov–Smirnov statistic: cumulative non-event % − cumulative event %
-   * - ``Lift``
-     - Cumulative non-event % ÷ cumulative customer %
+**import:** ``from grplot.analytic import rank_order``
 
 .. rubric:: Parameters
 
