@@ -1,206 +1,191 @@
 Features
 ========
 
-grplot introduces powerful features through its flexible argument system. Every
-feature is accessible directly via ``plot2d`` parameters.
+grplot introduces powerful features through an intuitive, hierarchical argument system. Every feature is directly accessible via ``plot2d`` parameters.
 
-Flexible Argument System
-------------------------
+The Hierarchical Argument System
+--------------------------------
 
-grplot uses a hierarchical argument system that is both intuitive and powerful:
+Arguments in grplot are processed at four different levels of granularity:
 
-- **Ordinary arguments** — apply to the entire figure (e.g. ``Nx=2, Ny=3``)
-- **Axes arguments** — apply to specific subplots (e.g. ``title={'[1,1]': 'Histogram', '[1,2]': 'ECDF'}``)
-- **Axes-plot arguments** — apply to specific plots within subplots
-- **Axes-axislabel arguments** — apply to specific axis labels (e.g. ``sep={'total_bill': '.c'}``)
+- **Ordinary arguments** — Apply to the entire figure (e.g., ``df``, ``figsize``, ``Nx``).
+- **Axes arguments** — Apply to specific subplots (e.g., ``plot``, ``filter``, ``title``).
+- **Axes-plot arguments** — Apply to specific plots within a subplot (e.g., ``zorder``).
+- **Axes-axislabel arguments** — Apply to specific axes and labels (e.g., ``lim``, ``sep``).
 
-See :doc:`getting_started` for the full argument syntax reference.
+💡 **Global Rule: The X and Y Counterparts**
 
-Automatic Number Formatting
-----------------------------
+To reduce repetition, almost all axes-axislabel arguments (like ``sep``, ``lim``, ``log``, ``dt``, ``tick_add``, ``label_add``, ``statdesc``, ``text``, ``rot``) apply to both axes by default.
 
-One of grplot's key features is built-in number formatting via the ``sep`` argument:
+You can easily target a specific axis by prefixing the argument with ``x`` or ``y``. (Example: ``lim`` sets both limits; ``xlim`` sets only the x-axis limit; ``ylim`` sets only the y-axis limit.)
 
-.. list-table::
-   :header-rows: 1
-   :widths: 15 30 55
+Core Data & Plot Setup
+----------------------
 
-   * - Value
-     - Example output
-     - Description
-   * - ``','``
-     - 1,000,000
-     - Comma thousand separator
-   * - ``'.'``
-     - 1.000.000
-     - Period thousand separator
-   * - ``',c'``
-     - formatted as currency
-     - Comma separator with currency
-   * - ``'.c'``
-     - formatted as currency
-     - Period separator with currency
-   * - ``',L'``
-     - 1M, 1B, 1T
-     - Large number abbreviation (K, M, B, T, Q)
-   * - ``'.L'``
-     - 1M, 1B, 1T
-     - Large number abbreviation with period
-   * - ``',cL'``
-     - combined
-     - Currency with large number abbreviation
-   * - ``'.cL'``
-     - combined
-     - Currency with large number abbreviation
-
-``sep`` applies to both axes. Use ``xsep`` or ``ysep`` to target a specific axis.
-
-Example:
-
-.. code-block:: python
-
-   # Currency formatting on x-axis only
-   ax = plot2d(plot='histplot', df=tips, x='total_bill',
-               xsep='.c', xtick_add='Rp(_)')
-
-Unit Addition
--------------
-
-Add unit labels to ticks and text annotations with ``tick_add``:
+These parameters define what you are plotting and the data behind it.
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 80
+   :widths: 15 15 70
 
-   * - Pattern
-     - Description
-   * - ``'{}_'``
-     - Prefix with unit (e.g. ``'$_'`` → ``$100``)
-   * - ``'_{}'``
-     - Suffix with unit (e.g. ``'_kg'`` → ``100kg``)
-   * - ``'{}_{}'``
-     - Both prefix and suffix
-   * - ``'{}(_)'``
-     - Prefix; negatives shown as ``($100)``
-   * - ``'(_){}'``
-     - Suffix; negatives shown as ``(100)kg``
-   * - ``'{}(_){}'``
-     - Both; negatives wrapped in parentheses
+   * - Parameter
+     - Level
+     - Description & Expected Values
+   * - ``plot``
+     - Axes
+     - Plot type (e.g., ``'scatterplot'``). Combine multiple plots using ``+`` (e.g., ``'plot1+plot2'``).
+   * - ``df``
+     - Ordinary
+     - Input data. Accepts pandas.DataFrame, dict of lists, or dict of numpy.ndarray.
+   * - ``x`` / ``y``
+     - Ordinary
+     - Axis positions. Accepts str, list, numpy.ndarray, pandas.Index, or None. Returns a key or list of keys mapped to df.
+   * - ``filter``
+     - Axes
+     - Data filtering prior to plotting (Pandas only). Accepts a query str or a boolean pandas.Series.
 
-Use ``xtick_add`` or ``ytick_add`` to target a specific axis.
+Figure & Subplot Layout
+-----------------------
 
-Use ``label_add``, ``xlabel_add``, or ``ylabel_add`` for axis label units
-(pattern: ``'{}_'``, ``'_{}'``, or ``'{}_{}'``).
-
-Example:
-
-.. code-block:: python
-
-   ax = plot2d(plot='scatterplot', df=tips, x='tip', y='total_bill',
-               sep='.c', tick_add='Rp(_)')
-
-Statistical Descriptions
--------------------------
-
-Display statistical summaries directly on your plots with ``statdesc``:
+Control the grid structure and spacing of your overall figure.
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 70
+   :widths: 15 20 65
 
-   * - Value
-     - Description
-   * - ``'general'``
-     - Comprehensive general statistics
-   * - ``'boxplot'``
-     - Box plot statistics (whiskers, quartiles, CIs)
-   * - ``'count'``
-     - Count
-   * - ``'mean'``
-     - Mean
-   * - ``'median'``
-     - Median
-   * - ``'std'``
-     - Standard deviation
-   * - ``'min'`` / ``'max'``
-     - Minimum / maximum
-   * - ``'q1'`` / ``'q3'``
-     - First / third quartile
-   * - ``'pct1'``, ``'pct5'``, ``'pct95'``, ``'pct99'``
-     - Percentiles
-   * - ``'whislo'`` / ``'whishi'``
-     - Lower / upper whisker
-   * - ``'nonzero'``
-     - Count of non-zero values
-   * - ``'unique'``
-     - Count of unique values
-   * - ``'range'``
-     - Range (max − min)
-   * - ``'cilo'`` / ``'cihi'``
-     - Lower / upper confidence interval
+   * - Parameter
+     - Default
+     - Description (All are Ordinary arguments)
+   * - ``Nx`` / ``Ny``
+     - Dynamic
+     - Grid columns (Nx) / rows (Ny). Defaults: Nx = max(Nx, Ny) if ≤ 2 else 2. Ny = 1 if max(Nx, Ny) ≤ 2 else ceil(max/2).
+   * - ``figsize``
+     - ``[8, 6]``
+     - Figure dimensions: Width, height in inches.
+   * - ``pad``
+     - ``6``
+     - Outer padding between figure edge and subplots (fraction of font size).
+   * - ``hpad`` / ``wpad``
+     - ``pad``
+     - Inner padding height/width between adjacent subplots.
 
-Combine multiple statistics with ``+``:
+Axis Controls & Scales
+----------------------
 
-.. code-block:: python
+Fine-tune the behavior of your x and y axes. (Remember: prefix with x or y to target a single axis.)
 
-   ystatdesc='count+unique'
-   statdesc={'total_bill': 'general'}
-   statdesc={'[1,1]': {'total_bill': 'general'}, '[3,2]': {'total_bill': 'boxplot'}}
+.. list-table::
+   :header-rows: 1
+   :widths: 15 20 65
 
-Use ``xstatdesc`` or ``ystatdesc`` to target a specific axis.
+   * - Parameter
+     - Default
+     - Description (All are Axes-axislabel arguments)
+   * - ``lim``
+     - None
+     - Axis limits formatted as ``[bottom, top]``.
+   * - ``log``
+     - None
+     - Axis scale. Accepts: ``'linear'``, ``'log'``, ``'symlog'``, or ``'logit'``.
+   * - ``dt``
+     - None
+     - Datetime format using Python's standard strftime formats (e.g., ``'%Y-%m-%d'``).
+   * - ``rot``
+     - None
+     - Tick rotation in degrees (float).
 
-Text Annotations
-----------------
-
-Control automatic data annotations with ``text``:
-
-- For scatter and line plots: ``text=True`` enables annotations.
-- For histogram, bar, count, and pareto plots: pass a position string.
-
-  - ``'h'`` — horizontal
-  - ``'v'`` — vertical
-  - ``'i'`` — inside the bar
-
-Combine positions with ``+`` (e.g. ``'h+i'``). Use ``xtext`` / ``ytext`` to
-target a specific axis.
-
-Example:
-
-.. code-block:: python
-
-   text={'Count': 'h', True: ['[2,1]', '[2,2]'], '[3,1]': {'total_bill': 'h+i'}}
-
-Data Filtering
---------------
-
-Filter the dataframe before plotting with ``filter``. Accepts a pandas query
-string or a boolean Series:
-
-.. code-block:: python
-
-   ax = plot2d(plot='histplot', df=tips,
-               filter=(tips['total_bill'] > 10), ...)
-
-Multi-Plot Layouts
+Formatting & Units
 ------------------
 
-Create grids of subplots with ``Nx`` (columns) and ``Ny`` (rows):
+grplot provides powerful built-in string manipulation for numbers and labels. (Remember: prefix with x or y to target a specific axis.)
 
-.. code-block:: python
+Number formatting uses the ``sep`` argument. Patterns may include separators,
+currency, and large-number abbreviations.
 
-   ax = plot2d(plot={'[1,1]': 'histplot',
-                     '[1,2]': 'ecdfplot',
-                     '[2,1]': 'treemapsplot',
-                     '[2,2]': 'pieplot',
-                     '[3,1]': 'paretoplot',
-                     '[3,2]': 'boxplot+stripplot'},
-               Nx=2, Ny=3, ...)
+.. list-table::
+   :header-rows: 1
+   :widths: 20 30 50
 
-All arguments that support axes addressing (e.g. ``title``, ``sep``, ``statdesc``,
-``text``, ``tick_add``, ``alpha``) can be set independently per subplot.
+   * - Pattern
+     - Meaning
+     - Example
+   * - ``','`` / ``'.'``
+     - Thousand separator
+     - ``1,000`` / ``1.000``
+   * - ``',c'`` / ``'.c'``
+     - Currency-style formatting (adds two trailing zeros and thousands separators without symbol)
+     - ``1000`` → ``1,000.00`` or ``1.000,00``
+   * - ``',L'`` / ``'.L'``
+     - Large-number abbreviation (K, M, B, T, Q)
+     - ``1.5M``, ``1,000`` / ``1,5M``, ``1.000``
+   * - ``',cL'`` / ``'.cL'``
+     - Currency + abbreviation
+     - ``1.5M``, ``1,000.00`` / ``1,5M``, ``1.000,00``
 
-Figure Layout
--------------
+Unit patterns are specified separately for ticks and labels:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 30 50
+
+   * - Argument
+     - Pattern(s)
+     - Effect
+   * - ``tick_add``
+     - ``'{}_'`` ``'_{}'`` ``'{}_{}'``
+     - Prefix/suffix value with unit
+   * - ``tick_add`` (negatives)
+     - ``'{}(_)'`` ``'(_){}'`` ``'{}(_){}'``
+     - Wrap negatives in parentheses: ``($100)``, ``(100)kg``
+   * - ``label_add``
+     - ``'{}_'`` ``'_{}'``
+     - Add unit to axis label itself
+
+.. note::
+   Most formatting options apply to both axes by default; use ``xsep``,
+   ``xtick_add``/``xlabel_add`` or the corresponding ``y``-prefixed
+   arguments to target a single axis.
+.. note::
+   Most formatting options apply to both axes by default; use ``xsep``,
+   ``xtick_add``/``xlabel_add`` or the corresponding ``y``-prefixed
+   arguments to target a single axis.
+
+Annotations & Statistics
+------------------------
+
+Easily layer text and statistical descriptions over your data.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 15 65
+
+   * - Parameter
+     - Level
+     - Description
+   * - ``statdesc``
+     - Axes-axislabel
+     - Statistical summaries added to the plot. Combine multiple using ``+`` (e.g., ``'mean+std'``).
+   * - ``text``
+     - Axes-axislabel
+     - Data annotations. Set to True/False to toggle automatic text labeling on points/bars.
+   * - ``xlabel`` / ``ylabel``
+     - Axes
+     - Explicit axis labels (str). This will override any label_add configurations.
+   * - ``title``
+     - Axes
+     - Plot/Subplot title (str).
+
+Available statdesc Returns:
+
+- Grouped: ``'general'``, ``'boxplot'``
+- Central & Spread: ``'mean'``, ``'median'``, ``'std'``, ``'range'``, ``'min'``, ``'max'``
+- Counts: ``'count'``, ``'nonzero'``, ``'unique'``
+- Quartiles & Bounds: ``'q1'``, ``'q3'``, ``'pct1'``, ``'pct5'``, ``'pct95'``, ``'pct99'``, ``'whislo'``, ``'whishi'``, ``'cilo'``, ``'cihi'``
+
+Styling, Typography & Drawing Order
+----------------------------------
+
+Control the aesthetic elements of the plot. All font parameters belong to the Axes level.
 
 .. list-table::
    :header-rows: 1
@@ -209,74 +194,27 @@ Figure Layout
    * - Parameter
      - Default
      - Description
-   * - ``figsize``
-     - ``[8, 6]``
-     - Width, height in inches
-   * - ``pad``
-     - ``6``
-     - Padding between figure edge and subplot edges (fraction of font size)
-   * - ``hpad``
-     - ``pad``
-     - Height padding between adjacent subplots
-   * - ``wpad``
-     - ``pad``
-     - Width padding between adjacent subplots
-
-Axis Control
-------------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 60
-
-   * - Parameter
-     - Description
-   * - ``xlim`` / ``ylim``
-     - Set axis limits: ``[bottom, top]``
-   * - ``xlog`` / ``ylog``
-     - Set axis scale: ``'linear'``, ``'log'``, ``'symlog'``, or ``'logit'``
-   * - ``xdt`` / ``ydt``
-     - Date/time format string (e.g. ``'%Y-%m-%d'``)
-   * - ``xrot`` / ``yrot``
-     - Tick rotation in degrees
-
-Use ``lim``, ``log``, ``dt``, or ``rot`` to set both axes at once.
-
-Font Sizes
-----------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 25 15 60
-
-   * - Parameter
-     - Default
-     - Description
    * - ``fontsize``
      - ``10``
-     - Base font size; applies to all text unless overridden
-   * - ``tick_fontsize``
+     - Base font size. Acts as the fallback for all text.
+   * - ``*_fontsize``
      - ``fontsize``
-     - Tick label font size
-   * - ``legend_fontsize``
-     - ``fontsize``
-     - Legend font size
-   * - ``text_fontsize``
-     - ``fontsize``
-     - Data annotation font size
-   * - ``label_fontsize``
-     - ``fontsize``
-     - Axis label font size
-   * - ``title_fontsize``
-     - ``fontsize``
-     - Title font size
+     - Specific sizing for: tick_fontsize, legend_fontsize, text_fontsize, label_fontsize, title_fontsize.
+   * - ``legend_loc``
+     - ``'best'``
+     - Legend position (e.g., ``'upper right'``, ``'center left'``, ``'lower center'``, etc.).
+   * - ``zorder``
+     - None
+     - Drawing order (Axes-plot level). Default order is patches (bottom), lines (middle), text (top).
 
 Performance and Export
------------------------
+----------------------
+
+Manage system resources and save your output. Both are Ordinary arguments.
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 15 65
+   :widths: 15 15 70
 
    * - Parameter
      - Default
