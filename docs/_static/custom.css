@@ -229,8 +229,13 @@ article img {
 }
 
 /* ── Logo ── */
+:root {
+    --sidebar-width: 18rem;
+}
+
 .sidebar-logo {
-    max-width: 240px;
+    width: 100%;
+    max-width: 100%;
     padding: 0.4em 0;
 }
 
