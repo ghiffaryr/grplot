@@ -1,4 +1,4 @@
-<img src="doc/logo/grlogo_white_border.svg"><br>
+<img src="docs/_static/grlogo_white_border.svg"><br>
 
 --------------------------------------
 
