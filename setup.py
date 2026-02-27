@@ -1,7 +1,7 @@
 from setuptools import find_packages
 
 DISTNAME = "grplot"
-VERSION = "1.0.5"
+VERSION = "1.0.6"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
