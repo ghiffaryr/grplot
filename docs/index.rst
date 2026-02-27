@@ -45,3 +45,11 @@ grplot
    analytic
 
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Resources
+   :hidden:
+
+   resources
+
+
