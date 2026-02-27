@@ -1,0 +1,23 @@
+# MANIFEST.in controls what goes into the sdist created by python -m build
+
+# always include metadata files users expect
+include README.md
+include LICENSE
+include pyproject.toml
+
+# include all Python source under the packages
+recursive-include grplot *.py
+recursive-include grplot_seaborn *.py
+
+# include any data files (none currently, but future-proof)
+recursive-include grplot *.txt *.rst *.json
+recursive-include grplot_seaborn *.txt *.rst *.json
+
+# explicitly exclude directories that should never be shipped
+prune tests
+prune docs
+prune .git
+
+# common junk
+global-exclude *.py[cod]
+global-exclude __pycache__
