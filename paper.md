@@ -58,13 +58,15 @@ scratch.
 
 # Design and API
 
-## Hierarchical Parameter Model
+## Hierarchical Argument System
 
-`plot2d` accepts parameters at three scopes:
+Arguments in grplot are processed at four different levels of granularity:
 
-- **Global**: applied to all panels (e.g., `figsize`, `fontsize`).
+- **Ordinary**: applied to all panels (e.g., `figsize`, `fontsize`).
 - **Axes-level**: scoped to a panel by 1-based index `"[i]"` (1-D) or
   `"[row,col]"` (2-D grid), e.g., `title={"[2,1]": "My title"}`.
+- **Axes–Axislabel-level**: per-panel axis-label overrides, e.g.,
+  `statdesc={"[1,1]": {"total_bill": "general"}})`.
 - **Axes-Plot-level**: element-level overrides within a panel, e.g.,
   `hue={"[1,2]": {"scatterplot": "species"}}`.
 
