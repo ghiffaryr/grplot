@@ -95,6 +95,15 @@ dl.simple > dd {
     border-left: 3px solid #d0d7de;
 }
 
+/* ── Badge images ── */
+img.badge {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 0 0 0; /* smaller horizontal gap */
+    padding: 0 0; /* slight top/bottom padding */
+    line-height: 1; prevent extra height from line spacing
+}
+
 /* ── Tables ── */
 table.docutils {
     width: 100%;
@@ -247,7 +256,7 @@ article img {
 
 /* ── Hero tagline ── */
 .hero-tagline {
-    margin: 0.4em 0 1.6em;
+    margin: 0.4em 0 0em;
     padding: 0.01em 1.4em;
     border-radius: 8px;
     font-size: 1.25em;
@@ -269,7 +278,7 @@ article img {
 
 /* ── Feature grid container ── */
 .feature-grid {
-    margin: 1.4em 0 0;
+    margin: 0.4em 0 0;
     padding: 1em 1.4em;
     border-radius: 8px;
 }
