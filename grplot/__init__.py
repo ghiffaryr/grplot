@@ -1,4 +1,8 @@
 from matplotlib import pyplot as plt
+# override default dpi to 300 for high-quality image
+_default_dpi = plt.rcParamsDefault.get('figure.dpi', None)
+if _default_dpi is not None and plt.rcParams['figure.dpi'] == _default_dpi:
+    plt.rcParams['figure.dpi'] = 300
 import numpy
 from grplot.features.filter.check_filter import check_filter
 from grplot.features.optimizer.optimizer_data import optimizer_data
@@ -11,7 +15,7 @@ from grplot.utils.check_pandas_index import check_pandas_index
 from grplot.utils.strtoarray import strtoarray
 
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 
 def plot2d(plot, # default general value
@@ -202,10 +206,10 @@ def plot2d(plot, # default general value
     by ghiffary rifqialdi
     based on numpy, scipy, matplotlib, seaborn, squarify, pandas, and ipython
     
-    version = '1.0.4'
+    version = '1.0.5'
 
     release date
-    18/02/2026
+    27/02/2026
     -----------------------------------------------
 
     documentation is available at https://github.com/ghiffaryr/grplot

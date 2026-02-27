@@ -12,6 +12,47 @@ from grplot.utils.scientific_superscript import scientific_superscript
 from grplot.utils.trim_to_3_nonzero_after_decimal import trim_to_3_nonzero_after_decimal
 
 
+def test_import_sets_dpi(monkeypatch):
+    """Importing grplot should set the matplotlib figure.dpi to 300 by default."""
+    import sys
+    import matplotlib as mpl
+    from matplotlib import pyplot as plt
+
+    # explicitly reset rcParams to the library default value so the import
+    # runs in a known state regardless of prior test activity.
+    default = mpl.rcParamsDefault['figure.dpi']
+    mpl.rcParams['figure.dpi'] = default
+    plt.rcParams['figure.dpi'] = default
+
+    # remove any previously imported grplot so the import executes fresh
+    sys.modules.pop('grplot', None)
+
+    # sanity check
+    assert mpl.rcParams['figure.dpi'] != 300
+
+    import grplot  # noqa: F401
+    assert mpl.rcParams['figure.dpi'] == 300
+
+
+def test_user_override_before_import(monkeypatch):
+    """If the user changes dpi before importing grplot we should not overwrite it."""
+    import sys
+    import matplotlib as mpl
+    from matplotlib import pyplot as plt
+
+    # reset to default then simulate user change
+    default = mpl.rcParamsDefault['figure.dpi']
+    mpl.rcParams['figure.dpi'] = default
+    plt.rcParams['figure.dpi'] = default
+
+    mpl.rcParams['figure.dpi'] = 150
+    plt.rcParams['figure.dpi'] = 150
+    sys.modules.pop('grplot', None)
+
+    import grplot  # noqa: F401
+    assert mpl.rcParams['figure.dpi'] == 150
+
+
 class TestStrToArray:
     """Tests for strtoarray function"""
     

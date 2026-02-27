@@ -6,12 +6,15 @@ The following configurations help you optimize grplot for your specific environm
 Image Quality — Dots per Inch
 -----------------------------
 
-A bigger value produces a higher-quality image. Usually, 300 is enough for publication. Pass this before plotting:
+By default, `grplot` ensures figures use a high-resolution DPI of 300. This
+happens automatically when you import the library, so you normally don't need
+any additional configuration. If you override the value yourself, make sure to
+set it before creating any plots, for example:
 
 .. code-block:: python
 
    import matplotlib as mpl
-   mpl.rcParams['figure.dpi'] = 300
+   mpl.rcParams['figure.dpi'] = 150
 
 Unsupported de Python Locale Solution
 -------------------------------------
