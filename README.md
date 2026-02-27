@@ -1,4 +1,4 @@
-<img src="docs/_static/grlogo_white_border.svg"><br>
+<img src="https://raw.githubusercontent.com/ghiffaryr/grplot/main/docs/_static/grlogo_white_border.svg"><br>
 
 --------------------------------------
 
