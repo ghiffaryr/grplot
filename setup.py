@@ -28,6 +28,7 @@ INSTALL_REQUIRES = [
     "numpy>=1.20, !=1.24.0",
     "pandas>=1.2",
     "matplotlib>=3.4, !=3.6.1",
+    "ipython",
 ]
 PACKAGES = find_packages(include=["grplot*", "grplot_seaborn*"],
                          exclude=["tests*", "docs*"])
