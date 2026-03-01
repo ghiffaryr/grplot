@@ -1,5 +1,5 @@
 ---
-title: 'grplot: A Python Library for Lazy Statistical Data Visualization'
+title: "grplot: A Python Library for Lazy Statistical Data Visualization"
 tags:
   - Python
   - data visualization
@@ -10,27 +10,37 @@ tags:
 authors:
   - name: Ghiffary Rifqialdi
     orcid: 0000-0003-2649-1947
-    affiliation: 1
+    corresponding: true
+    affiliation: "1, 2, 3"
 affiliations:
-  - name: Independent Researcher
+  - name: University of Hamburg, Hamburg, Germany
     index: 1
-date: 25 February 2026
+  - name: University of L'Aquila, L'Aquila, Italy
+    index: 2
+  - name: Institut Teknologi Bandung, Bandung, Indonesia
+    index: 3
+date: 1 March 2026
 bibliography: paper.bib
 ---
 
 # Summary
 
-`grplot` is an open-source Python library that compresses multi-step statistical
-plotting workflows into a single high-level function call. Built on top of
+`grplot` is an open-source Python library that reduces multi-step statistical
+plotting workflows to a single high-level function call. Built on top of
 Matplotlib [@Hunter2007], NumPy [@Harris2020], and Pandas [@McKinney2010], and
-bundled with a vendored Seaborn fork (`grplot_seaborn`), it exposes a unified
-`plot2d` API that automatically
-handles subplot creation, axis labeling, legends, statistical annotations, number
-formatting, and figure export. Users specify what to plot via a plot-type string
+bundled with a vendored Seaborn fork (`grplot_seaborn`) that internally uses
+SciPy [@Virtanen2020], it exposes a unified `plot2d` API that automatically
+handles subplot layout, axis labeling, legends, statistical annotations,
+tick-label number formatting (thousand separators, currency symbols, and
+magnitude abbreviations), and figure export to PNG, PDF, SVG, and EPS. Users
+specify what to plot via a plot-type string
 or a dictionary mapping panel positions to plot types; the library applies sensible
-defaults while accepting 100+ parameters for explicit overrides at global,
-per-axis, or per-element granularity. As of version 1.0.4 (released 2026-02-18),
-`grplot` requires Python 3.10+ and is available on PyPI and conda-forge.
+defaults while accepting more than 100 parameters for explicit overrides at global,
+per-axis, or per-element granularity. As of version 1.0.6, `grplot` requires
+Python 3.10+ and is available on PyPI (v1.0.6) and conda-forge (currently
+distributed as v1.0.4; the conda-forge feedstock lags PyPI releases)
+[@Rifqialdi2026]. Full documentation is
+available at [grplot.readthedocs.io](https://grplot.readthedocs.io/).
 
 # Statement of Need
 
@@ -41,312 +51,151 @@ legends, and finally saving the output. For practitioners who generate many plot
 routinely—data analysts, researchers, and data scientists—this boilerplate is
 repetitive and error-prone.
 
-Existing libraries address parts of this problem. Matplotlib [@Hunter2007]
-provides full control but involves verbose syntax. Seaborn [@Waskom2021] reduces
-setup for common statistical charts. Altair [@VanderPlas2019] and `plotnine`
-[@Wickham2016] offer declarative grammars, and Plotly [@Plotly2015] focuses on
-interactivity. None of these, however, offers a single call that combines
-multi-panel layout, statistical summaries, number formatting, annotation, and file
-export for static, reproducible figures.
-
 `grplot` fills this gap with a consistent imperative API. It is particularly
 suited to data practitioners who need reproducible, annotated figures in notebooks
 or technical reports without rebuilding formatting utilities for each project. It
-also ships two domain-specific analytics utilities—cohort retention analysis and
-rank-order/gain/KS/lift tables—that practitioners commonly reimplement from
+also ships two domain-specific analytic utilities—cohort retention analysis and
+rank-order/gain/KS/lift tables—that practitioners commonly need to reimplement from
 scratch.
 
-# Design and API
+# State of the Field
+
+Several Python libraries address statistical data visualization, each with a
+different scope. Matplotlib [@Hunter2007] provides a complete 2-D graphics
+environment with full control over every element, but requires verbose, procedural
+code for even routine plots. Seaborn [@Waskom2021] raises the abstraction level
+for common statistical charts while remaining tightly coupled to Matplotlib's
+axis-management model. Altair [@VanderPlas2019] and `plotnine` [@Kibirige2022] implement
+declarative grammars of graphics [@Wickham2016] that are elegant for exploratory
+work but do not natively support multi-panel layout, number formatting, or
+annotation in a single call. Plotly [@Plotly2015] excels at interactive web-based
+visualization but is not oriented toward static, publication-ready figures.
+
+`grplot` was built rather than contributing to existing projects for three
+reasons. First, none of the tools above offers a single end-to-end call that
+combines multi-panel subplot layout, chart rendering, number formatting,
+inset statistical summaries, value-label annotations, and figure export. Second, the
+target workflow—generating many annotated figures for notebooks and technical
+reports—prioritizes brevity and consistency over the full configurability of
+Matplotlib or the declarative grammar of Altair. Third, the bundled
+domain-specific analytics (`cohort` and `rank_order`) are not available in any
+of the packages above and would otherwise require separate, custom
+implementations for each project.
+
+# Software Design
 
 ## Hierarchical Argument System
 
-Arguments in grplot are processed at four different levels of granularity:
+The central design challenge was exposing a large surface area of configuration
+(20 chart types, multi-panel grids, per-axis formatting, per-element overrides)
+through a single function without requiring users to understand its full breadth
+for routine use. `grplot` resolves this with a four-level hierarchy of argument
+granularity:
 
-- **Ordinary**: applied to all panels (e.g., `figsize`, `fontsize`).
-- **Axes-level**: scoped to a panel by 1-based index `"[i]"` (1-D) or
-  `"[row,col]"` (2-D grid), e.g., `title={"[2,1]": "My title"}`.
-- **Axes–Axislabel-level**: per-panel axis-label overrides, e.g.,
-  `statdesc={"[1,1]": {"total_bill": "general"}})`.
-- **Axes-Plot-level**: element-level overrides within a panel, e.g.,
-  `hue={"[1,2]": {"scatterplot": "species"}}`.
+- **Ordinary**: applied to the entire figure (e.g., `df`, `figsize`, `Nx`).
+- **Axes**: scoped to a specific subplot by 1-based index `"[i]"` (1-D) or
+  `"[row,col]"` (2-D grid), e.g., `plot`, `filter`, `title`.
+- **Axes-plot**: scoped to a specific chart layer within a subplot (e.g.,
+  `hue={"[1,2]": {"scatterplot": "species"}}`).
+- **Axes-axislabel**: scoped to a specific axis label within a subplot (e.g.,
+  `sep`, `statdesc={"[1,1]": {"total_bill": "general"}}`).
 
-This hierarchy lets a single call express a complete multi-panel dashboard while
-preserving fine-grained per-panel control.
-
-## Core Parameters
-
-| Parameter | Description |
-|---|---|
-| `plot` | Chart type string or dict mapping `"[row,col]"` to chart type |
-| `df` | Input data: Pandas DataFrame, dict of lists, or dict of NumPy arrays |
-| `x`, `y` | Column names or arrays for axes variables |
-| `Nx`, `Ny` | Grid columns and rows for multi-panel layout |
-| `figsize` | Figure dimensions `[width, height]` |
-| `pad`, `hpad`, `wpad` | Figure and inter-panel padding |
-| `filter` | Per-panel Pandas query string or boolean Series |
-| `title` | Panel or global title |
-| `fontsize`, `tick_fontsize`, `legend_fontsize`, `label_fontsize`, `title_fontsize` | Font size controls |
-| `legend_loc` | Legend location |
-| `sep`, `xsep`, `ysep` | Thousands/decimal number formatting |
-| `lim`, `xlim`, `ylim` | Axis limits |
-| `log`, `xlog`, `ylog` | Log-scale axis |
-| `dt`, `xdt`, `ydt` | Datetime tick format strings |
-| `rot`, `xrot`, `yrot` | Tick label rotation |
-| `statdesc`, `xstatdesc`, `ystatdesc` | Statistical summary annotation |
-| `text`, `xtext`, `ytext` | Value-label text annotations |
-| `label_add`, `tick_add`, `statdesc_add` | Text concatenation onto labels/ticks |
-| `saveas` | Export path and format |
-| `optimizer` | Data pre-processing mode |
+Almost all axes-axislabel arguments apply to both axes by default; prefixing with
+`x` or `y` targets a single axis (e.g., `xlim`, `yrot`). This design deliberately
+trades away the lowest-level Matplotlib configurability in exchange for allowing a
+complete, multi-panel, annotated figure to be expressed in one call with
+consistent, predictable defaults. Full parameter documentation is available in the
+[online documentation](https://grplot.readthedocs.io/en/latest/introduction.html).
 
 ## Supported Chart Types
 
-| Family | Chart types |
-|---|---|
-| Relational | `scatterplot`, `lineplot` |
-| Distribution | `histplot`, `kdeplot`, `ecdfplot`, `rugplot` |
-| Categorical | `stripplot`, `swarmplot`, `boxplot`, `violinplot`, `boxenplot`, `pointplot`, `barplot`, `countplot` |
-| Specialized | `pieplot`, `treemapsplot`, `packedbubblesplot`, `paretoplot` |
-| Regression | `regplot`, `residplot` |
+`grplot` wraps 20 chart types across four families:
 
-Any two chart types may be overlaid on the same axis using `+` notation
-(e.g., `"histplot+kdeplot"`, `"lineplot+scatterplot"`). Five composites carry
-pre-tuned default values: `boxplot+stripplot`, `violinplot+stripplot`,
-`boxplot+swarmplot`, `violinplot+swarmplot`, and `stripplot+pointplot`.
-Multiple panels can be composed into grid dashboards using the `Nx` (columns)
-and `Ny` (rows) parameters.
+| Family       | Chart types                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Relational   | `scatterplot`, `lineplot`                                                                                         |
+| Distribution | `histplot`, `kdeplot`, `ecdfplot`, `rugplot`, `pieplot`, `treemapsplot`, `packedbubblesplot`                      |
+| Categorical  | `stripplot`, `swarmplot`, `boxplot`, `violinplot`, `boxenplot`, `pointplot`, `barplot`, `countplot`, `paretoplot` |
+| Regression   | `regplot`, `residplot`                                                                                            |
+
+`treemapsplot` bundles an inline implementation of the squarified treemap layout
+algorithm described by @Laserson2013, requiring no external `squarify` dependency.
+Any two chart types may be overlaid on the same axis using `+` notation (e.g., `"histplot+kdeplot"`).
+Five composites carry pre-tuned default values: `boxplot+stripplot`,
+`violinplot+stripplot`, `boxplot+swarmplot`, `violinplot+swarmplot`, and
+`stripplot+pointplot`. Multiple panels can be composed into grid dashboards using
+`Nx` (columns) and `Ny` (rows), as illustrated in \autoref{fig:dashboard}.
+
+## Vendored Seaborn Fork
+
+`grplot` ships a vendored fork of Seaborn (`grplot_seaborn`) to decouple
+production software that embeds `grplot` from upstream Seaborn breaking changes.
+This is a deliberate stability trade-off: users gain version-independence at the
+cost of not automatically inheriting Seaborn upstream improvements. The fork is
+kept up to date with stable Seaborn releases as part of `grplot` maintenance.
 
 ## Analytic Utilities
 
 `grplot.analytic.cohort` produces a cohort retention heatmap from a customer
-transaction table, computing monthly retention rates and an optional summary row
-in a single call.
+transaction table, computing monthly retention rates in a single call
+(\autoref{fig:cohort}). When
+`display_summary=True`, the underlying cohort pivot table is also printed to
+the notebook output for inspection.
 
-`grplot.analytic.rank_order` generates a rank-order table with gain, KS statistic,
-and lift curves from predicted probabilities and true binary labels, supporting
-multi-class outputs via a class selector.
+`grplot.analytic.rank_order` produces a rank-order table with cumulative gain,
+KS statistic, and lift per decile from predicted probabilities and true binary
+labels, supporting multi-class outputs via a class selector. These utilities follow
+standard industry conventions and remove a common source of bespoke,
+error-prone reimplementation in data science notebooks.
 
-# Usage Examples
+![Six-panel 2×3 grid dashboard—histogram, ECDF, treemap, pie, Pareto, and
+box+strip composite—generated with a single `plot2d` call and a per-panel row
+filter applied to the Seaborn `tips` dataset. Tick formatting (`Rp(_)`), inset
+statistical annotation blocks, and bar-top value labels are all configured
+through `plot2d` parameters without any post-processing.\label{fig:dashboard}](2d.png)
 
-## Scatter Plot
+![Monthly cohort retention heatmap produced by `grplot.analytic.cohort` from a
+retail transaction dataset. Rows represent cohort groups (signup month); columns
+represent cohort periods (months since first purchase); cell values show the
+percentage of customers active in each subsequent month.\label{fig:cohort}](cohort.png)
 
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
+# Research Impact Statement
 
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-tips = gs.load_dataset('tips')
+`grplot` reduces the time and code required to produce annotated, publication-ready
+figures in Python. By consolidating multi-step Matplotlib/Seaborn workflows into a
+single `plot2d` call with a hierarchical parameter system, it lowers the barrier to
+exploring and communicating data for data analysts, researchers, and data scientists who
+may not have deep expertise in lower-level graphics APIs. The bundled analytic
+utilities (`cohort` and `rank_order`) further accelerate common modeling-evaluation
+and customer-analysis workflows that practitioners would otherwise rebuild from
+scratch. `grplot` supports reproducibility by making figure-generation code concise,
+readable, and easy to version-control, and it integrates naturally into Jupyter
+notebook environments widely used in data science research.
 
-ax = plot2d(
-    plot='scatterplot',
-    df=tips.head(5),
-    x='tip',
-    y='total_bill',
-    sep='.c',
-    tick_add='Rp(_)',
-    text=True,
-    title='total_bill vs tip'
-)
-```
+Since its public release, `grplot` has accumulated more than 98,000 total downloads
+on PyPI (source: pepy.tech, retrieved 2026-02-28), ranking in the top 10% of
+packaged Python projects by download volume (source: ClickHouse ClickPy, retrieved
+2026-02-28). An interactive
+[Colab documentation notebook](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g)
+serves as a community-readiness signal: it allows practitioners to run all
+examples in a zero-install environment, and its existence reflects requests from
+potential users for a lower-friction entry point than a local installation.
 
-![Single scatter plot with automatic value-label annotations and formatted tick separators.](scatterplot.png)
+# AI Usage Disclosure
 
-## Histogram with Statistical Summary
-
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
-
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-tips = gs.load_dataset('tips')
-
-ax = plot2d(
-    plot='histplot',
-    df=tips,
-    x='total_bill',
-    hue='sex',
-    xsep='.c',
-    ysep='.',
-    statdesc={'total_bill': 'general'},
-    xtick_add='Rp(_)',
-    ytext='h',
-    title='Histogram Count vs total_bill',
-    multiple='stack',
-    kde=True,
-    alpha=0.75
-)
-```
-
-![Stacked histogram with KDE overlay, formatted tick separators, bar-top count labels, and an inset general-statistics annotation block.](histplot.png)
-
-## Pareto Plot
-
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
-
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-tips = gs.load_dataset('tips')
-
-ax = plot2d(
-    plot='paretoplot',
-    df=tips,
-    x='day',
-    y='total_bill',
-    sep='.c',
-    ytick_add='Rp(_)',
-    ytext='h+i',
-    alpha=0.75,
-    alpha2=0.75,
-    title='Pareto total_bill vs day'
-)
-```
-
-![Pareto chart combining a sorted bar chart with a cumulative-percentage line and dual-axis layout.](paretoplot.png)
-
-## Pie Plot
-
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
-
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-tips = gs.load_dataset('tips')
-
-ax = plot2d(
-    plot='pieplot',
-    df=tips,
-    x='day',
-    sep='.',
-    text=True,
-    title='Pie of day'
-)
-```
-
-![Pie chart with automatic percentage and category-label text overlays.](pieplot.png)
-
-## Dashboard Row Layout (1-D Multi-Panel)
-
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
-import pandas as pd
-
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-flights = gs.load_dataset('flights')
-flights = flights.replace(
-    {'month': dict(zip(pd.unique(flights['month']).tolist(), range(1, 13)))}
-)
-flights['date'] = pd.to_datetime(flights[['year', 'month']].assign(DAY=1))
-flights = flights.drop(labels=['year', 'month'], axis=1)
-
-ax = plot2d(
-    plot={'[1]': 'lineplot+scatterplot', '[2]': 'histplot'},
-    Nx=2, Ny=1,
-    df=flights,
-    x=['date', 'passengers'],
-    y=['passengers', None],
-    figsize=[16, 6],
-    fontsize=12,
-    legend_fontsize=9,
-    sep={'passengers': '.', 'year': None},
-    xdt={'[1]': '%y %b'},
-    ytext={'[2]': 'h'},
-    statdesc={'[1]': {'passengers': 'count+unique'},
-              '[2]': {'passengers': 'general'}},
-    title={'[1]': 'Line passengers vs date',
-           '[2]': 'Hist Count vs passengers'}
-)
-```
-
-![Two-panel row dashboard: a line+scatter overlay with datetime axis and per-point statistics annotation (left) alongside a histogram with bar-top labels and a general-statistics block (right).](1d.png)
-
-## Dashboard Grid Layout (2-D Multi-Panel)
-
-```python
-from grplot import plot2d
-import grplot_seaborn as gs
-
-gs.set_theme(context='notebook', style='darkgrid', palette='deep')
-tips = gs.load_dataset('tips')
-
-ax = plot2d(
-    plot={
-        '[1,1]': 'histplot',    '[1,2]': 'ecdfplot',
-        '[2,1]': 'treemapsplot','[2,2]': 'pieplot',
-        '[3,1]': 'paretoplot',  '[3,2]': 'boxplot+stripplot'
-    },
-    Nx=2, Ny=3,
-    df=tips,
-    filter=(tips['total_bill'] > 10),
-    x=['total_bill', 'total_bill', 'day', 'day', 'day', 'total_bill'],
-    y=[None, None, None, None, 'total_bill', 'day'],
-    hpad=6, wpad=8,
-    figsize=[18, 16],
-    fontsize=12,
-    legend_fontsize=11,
-    sep={'total_bill': '.c',
-         '.': ['Count', 'Proportion', '[2,1]', '[2,2]', 'Cumulative Percentage']},
-    statdesc={'[1,1]': {'total_bill': 'general'},
-              '[3,2]': {'total_bill': 'boxplot'}},
-    text={'Count': 'h', True: ['[2,1]', '[2,2]'],
-          '[3,1]': {'total_bill': 'h+i'}},
-    tick_add={'total_bill': 'Rp(_)'},
-    title={
-        '[1,1]': 'Histogram Count vs total_bill',
-        '[1,2]': 'ECDF Proportion vs total_bill',
-        '[2,1]': 'Treemaps of day',
-        '[2,2]': 'Pie of day',
-        '[3,1]': 'Pareto total_bill vs day',
-        '[3,2]': 'Box day vs total_bill'
-    },
-    alpha={'[1,1]': 0.75, '[3,1]': 0.75},
-    alpha2={'[3,1]': 0.75},
-    kde=True
-)
-```
-
-![Six-panel 2×3 grid dashboard—histogram, ECDF, treemap, pie, Pareto, and box+strip composite—generated with a single `plot2d` call and a per-panel filter.](2d.png)
-
-## Cohort Retention Analysis
-
-```python
-from grplot.analytic import cohort
-import pandas as pd
-
-df = pd.read_csv(
-    'https://github.com/ghiffaryr/grplot_data/raw/main/retail_raw_reduced.csv',
-    parse_dates=['order_date']
-)
-df['last_active_date'] = df.groupby('customer_id')['order_date'].transform('max')
-
-ax = cohort(
-    df=df,
-    customer_id='customer_id',
-    signup_date='order_date',
-    last_active_date='last_active_date',
-    figsize=[16, 12],
-    fontsize=16,
-    sep='.',
-    display_summary=True
-)
-```
-
-![Monthly cohort retention heatmap produced by `grplot.analytic.cohort`, showing percentage of customers retained relative to their signup cohort over successive months.](cohort.png)
+An AI assistant was used solely to assist with brainstorming and idea
+development during the writing of this paper. The tool was not used in software
+creation, code generation, or documentation writing. All technical content,
+design decisions, and architectural choices are the work of the author alone. All
+AI-assisted ideation was reviewed, evaluated, and validated by the author before
+inclusion.
 
 # Acknowledgements
 
-The author thanks the maintainers of Matplotlib, Seaborn [@Waskom2021], NumPy,
-Pandas, and IPython [@Perez2007] for providing the foundational infrastructure on
-which `grplot` is built. No financial support was received for this work.
-
-## Conflict of Interest
-
-The author declares no conflicts of interest.
-
-## AI Usage Disclosure
-
-GPT-4o was used to assist with copy-editing and grammar review of this paper. All
-technical content, design decisions, code, and final text were authored, reviewed,
-and validated by the human author.
+The author thanks the maintainers of Matplotlib [@Hunter2007], Seaborn
+[@Waskom2021], NumPy [@Harris2020], Pandas [@McKinney2010], SciPy [@Virtanen2020],
+and IPython [@Perez2007] for providing the foundational infrastructure on which
+`grplot` is built. No financial support was received for this work. The author
+declares no conflict of interest.
 
 # References
