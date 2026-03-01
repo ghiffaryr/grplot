@@ -98,7 +98,7 @@ granularity:
 - **Axes-plot**: scoped to a specific chart layer within a subplot (e.g.,
   `hue={"[1,2]": {"scatterplot": "species"}}`).
 - **Axes-axislabel**: scoped to a specific axis label within a subplot (e.g.,
-  `sep`, `statdesc={"[1,1]": {"total_bill": "general"}}`).
+  `statdesc={"[1,1]": {"total_bill": "general"}}`).
 
 Almost all axes-axislabel arguments apply to both axes by default; prefixing with
 `x` or `y` targets a single axis (e.g., `xlim`, `yrot`). This design deliberately
