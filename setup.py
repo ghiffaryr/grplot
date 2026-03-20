@@ -1,7 +1,7 @@
-from setuptools import find_packages
+from setuptools import setup
 
 DISTNAME = "grplot"
-VERSION = "1.0.6"
+VERSION = "1.0.7"
 MAINTAINER = "Ghiffary Rifqialdi"
 MAINTAINER_EMAIL = "grifqialdi@gmail.com"
 DESCRIPTION = "grplot: lazy statistical data visualization"
@@ -30,8 +30,40 @@ INSTALL_REQUIRES = [
     "matplotlib>=3.4, !=3.6.1",
     "ipython",
 ]
-PACKAGES = find_packages(include=["grplot*", "grplot_seaborn*"],
-                         exclude=["tests*", "docs*"])
+PACKAGES = ["grplot",
+            "grplot.analytic",
+            "grplot.features",
+            "grplot.features.add.label_add",
+            "grplot.features.add.statdesc_add",
+            "grplot.features.add.text_add",
+            "grplot.features.add.tick_add",
+            "grplot.features.dt",
+            "grplot.features.filter",
+            "grplot.features.font",
+            "grplot.features.label",
+            "grplot.features.legend",
+            "grplot.features.lim",
+            "grplot.features.log",
+            "grplot.features.optimizer",
+            "grplot.features.pad",
+            "grplot.features.plot",
+            "grplot.features.rot",
+            "grplot.features.saveas",
+            "grplot.features.sep.statdesc_sep",
+            "grplot.features.sep.text_sep",
+            "grplot.features.sep.tick_sep",
+            "grplot.features.statdesc",
+            "grplot.features.text",
+            "grplot.features.title",
+            "grplot.hotfix",
+            "grplot.utils",
+            "grplot_seaborn",
+            "grplot_seaborn._core",
+            "grplot_seaborn._marks",
+            "grplot_seaborn._stats",
+            "grplot_seaborn.colors",
+            "grplot_seaborn.external",            
+           ]
 
 if __name__ == "__main__":
 
