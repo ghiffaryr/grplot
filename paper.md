@@ -44,19 +44,36 @@ available at [grplot.readthedocs.io](https://grplot.readthedocs.io/).
 
 # Statement of Need
 
-Producing publication-quality figures in Python typically requires orchestrating
-several libraries: constructing Figure/Axes objects in Matplotlib, calling Seaborn
-chart functions, manually setting tick formats, adding text annotations, adjusting
-legends, and finally saving the output. For practitioners who generate many plots
-routinely—data analysts, researchers, and data scientists—this boilerplate is
-repetitive and error-prone.
+Existing Python and R visualization libraries—Matplotlib [@Hunter2007], Seaborn
+[@Waskom2021], `plotnine` [@Kibirige2022], and `ggplot2` [@Wickham2016]—already
+produce publication-quality figures, and their grammar-of-graphics or
+axis-level APIs give users fine-grained, composable control over ticks,
+legends, and output. `grplot`'s contribution is not a replacement for these
+tools, but two additions that practitioners otherwise implement themselves,
+project after project:
 
-`grplot` fills this gap with a consistent imperative API. It is particularly
-suited to data practitioners who need reproducible, annotated figures in notebooks
-or technical reports without rebuilding formatting utilities for each project. It
-also ships two domain-specific analytic utilities—cohort retention analysis and
-rank-order/gain/KS/lift tables—that practitioners commonly need to reimplement from
-scratch.
+1. **An inset annotation and unit-formatting system.** `grplot` computes and
+   renders descriptive-statistic blocks (quantiles, whiskers, confidence
+   intervals), bar/point value labels, and locale- and magnitude-aware tick
+   formatting (thousand separators, currency symbols, `K`/`M`/`B`/`T`
+   abbreviation) directly on the axis, driven by declarative arguments rather
+   than manual `ax.text`/`FuncFormatter` calls. This is the part of `grplot`
+   that has no direct equivalent in Matplotlib, Seaborn, `plotnine`, or
+   Altair, and is intended to compose with those tools' own axes rather than
+   supersede them—`grplot` reuses standard `Axes` objects throughout.
+2. **Two domain-specific analytic utilities**—cohort retention analysis and
+   rank-order/gain/KS/lift tables—that practitioners in modeling and
+   customer-analytics workflows commonly need to reimplement from scratch,
+   with no equivalent single-call implementation in the packages above.
+
+The multi-panel `plot2d` convenience call that composes these features into
+one function is a secondary, complementary layer: it is most useful for
+quickly assembling *heterogeneous* dashboards (e.g., a histogram, a Pareto
+chart, and an annotated box plot in one figure), where each panel type would
+otherwise require bespoke annotation code (see Software Design for a
+quantified comparison). For homogeneous grids of a single chart type, a short
+loop over the underlying plotting library is often just as concise, and
+`grplot` does not claim an advantage in that case.
 
 # State of the Field
 
@@ -65,22 +82,25 @@ different scope. Matplotlib [@Hunter2007] provides a complete 2-D graphics
 environment with full control over every element, but requires verbose, procedural
 code for even routine plots. Seaborn [@Waskom2021] raises the abstraction level
 for common statistical charts while remaining tightly coupled to Matplotlib's
-axis-management model. Altair [@VanderPlas2019] and `plotnine` [@Kibirige2022] implement
+axis-management model. Altair [@VanderPlas2018] and `plotnine` [@Kibirige2022] implement
 declarative grammars of graphics [@Wickham2016] that are elegant for exploratory
 work but do not natively support multi-panel layout, number formatting, or
 annotation in a single call. Plotly [@Plotly2015] excels at interactive web-based
 visualization but is not oriented toward static, publication-ready figures.
 
-`grplot` was built rather than contributing to existing projects for three
-reasons. First, none of the tools above offers a single end-to-end call that
-combines multi-panel subplot layout, chart rendering, number formatting,
-inset statistical summaries, value-label annotations, and figure export. Second, the
-target workflow—generating many annotated figures for notebooks and technical
-reports—prioritizes brevity and consistency over the full configurability of
-Matplotlib or the declarative grammar of Altair. Third, the bundled
-domain-specific analytics (`cohort` and `rank_order`) are not available in any
-of the packages above and would otherwise require separate, custom
-implementations for each project.
+None of the tools above ships an inset statistical-annotation system (quantile/
+whisker/CI blocks, value labels, magnitude- and locale-aware tick formatting)
+as a declarative, reusable layer, nor the `cohort` and `rank_order`
+domain-specific analytics `grplot` provides; practitioners currently
+reimplement these per project using each library's lower-level `Axes`/`text`/
+`Formatter` primitives. `grplot` was built to package this recurring
+annotation and analytics work as a standalone contribution, implemented on
+top of—rather than in place of—Matplotlib and a vendored Seaborn fork. Its
+optional `plot2d` multi-panel convenience layer is a secondary, narrower
+contribution: useful for quickly assembling heterogeneous dashboards
+combining several chart families, at the cost of the modularity and
+composability that grammar-of-graphics libraries like `ggplot2` and
+`plotnine` deliberately optimize for instead (see Software Design).
 
 # Software Design
 
@@ -106,6 +126,35 @@ trades away the lowest-level Matplotlib configurability in exchange for allowing
 complete, multi-panel, annotated figure to be expressed in one call with
 consistent, predictable defaults. Full parameter documentation is available in the
 [online documentation](https://grplot.readthedocs.io/en/latest/introduction.html).
+
+## Design Trade-off Relative to Grammar-of-Graphics Libraries
+
+This single-call design is a deliberate departure from the grammar-of-graphics
+philosophy of `ggplot2` and `plotnine`, which favor small, composable,
+independently testable functions over configuration-heavy entry points. That
+approach optimizes for modularity, maintainability, and code reuse across
+distinct plots; `grplot`'s approach instead optimizes for a narrower target
+workflow—producing many *heterogeneous*, consistently annotated panels in a
+single notebook or report—where repeating boilerplate across chart families is
+the more common failure mode. To quantify where this trade-off actually pays
+off, we compared line counts for two equivalent dashboards implemented with
+`grplot` and with vanilla Matplotlib/Seaborn:
+
+| Dashboard                                                                                   | `grplot` | Matplotlib/Seaborn | Ratio |
+| --------------------------------------------------------------------------------------------| -------- | ------------------- | ----- |
+| 6 heterogeneous panels (histogram+KDE+stats, ECDF, treemap, pie, Pareto, box+strip+CI)       | 32 lines | 101 lines           | 3.2×  |
+| 9 homogeneous panels (boxplot only, repeated across a metric/cluster grid)                   | 37 lines | 34 lines            | ~1.0× |
+
+The advantage is concentrated in the first case: mixing several chart families
+that each require their own statistical-annotation code (quantile lines, a
+twin-axis cumulative curve, confidence intervals) is exactly where manual
+Matplotlib/Seaborn code grows and becomes inconsistent across panels as the
+number of analyses increases. For a grid of one repeated chart type, a short
+loop over Matplotlib/Seaborn is equally concise, and `grplot` claims no
+advantage there. Because `plot2d` returns the underlying Matplotlib `Axes`
+array, users retain full access to the layered Matplotlib API for any
+per-panel customization beyond what `grplot`'s arguments expose, rather than
+losing that granularity.
 
 ## Supported Chart Types
 
@@ -172,14 +221,20 @@ scratch. `grplot` supports reproducibility by making figure-generation code conc
 readable, and easy to version-control, and it integrates naturally into Jupyter
 notebook environments widely used in data science research.
 
-Since its public release, `grplot` has accumulated more than 98,000 total downloads
-on PyPI (source: pepy.tech, retrieved 2026-02-28), ranking in the top 10% of
-packaged Python projects by download volume (source: ClickHouse ClickPy, retrieved
-2026-02-28). An interactive
+Since its public release, `grplot` has accumulated more than 98,000 cumulative
+downloads on PyPI (source: pepy.tech, retrieved 2026-02-28). Ranked against the
+full, all-time population of packages ever uploaded to PyPI (source: ClickHouse
+PyPI download dataset, queried 2026-02-28, methodology available on request),
+this places `grplot` in the top 10% by cumulative downloads—a population that
+includes a large number of abandoned or single-use packages, so this figure
+should not be read as evidence of adoption comparable to established
+visualization libraries. By recent monthly download volume, `grplot` remains
+several orders of magnitude behind Seaborn, `plotnine`, and `ggplot2`, and we
+report this plainly rather than as a claim of competitive uptake: `grplot` is a
+young, narrowly scoped library, and its current usage reflects that. An
+interactive
 [Colab documentation notebook](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g)
-serves as a community-readiness signal: it allows practitioners to run all
-examples in a zero-install environment, and its existence reflects requests from
-potential users for a lower-friction entry point than a local installation.
+allows practitioners to run all examples in a zero-install environment.
 
 # AI Usage Disclosure
 
