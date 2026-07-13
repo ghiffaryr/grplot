@@ -221,20 +221,13 @@ scratch. `grplot` supports reproducibility by making figure-generation code conc
 readable, and easy to version-control, and it integrates naturally into Jupyter
 notebook environments widely used in data science research.
 
-Since its public release, `grplot` has accumulated more than 98,000 cumulative
-downloads on PyPI (source: pepy.tech, retrieved 2026-02-28). Ranked against the
-full, all-time population of packages ever uploaded to PyPI (source: ClickHouse
-PyPI download dataset, queried 2026-02-28, methodology available on request),
-this places `grplot` in the top 10% by cumulative downloads—a population that
-includes a large number of abandoned or single-use packages, so this figure
-should not be read as evidence of adoption comparable to established
-visualization libraries. By recent monthly download volume, `grplot` remains
-several orders of magnitude behind Seaborn, `plotnine`, and `ggplot2`, and we
-report this plainly rather than as a claim of competitive uptake: `grplot` is a
-young, narrowly scoped library, and its current usage reflects that. An
-interactive
+An interactive
 [Colab documentation notebook](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g)
-allows practitioners to run all examples in a zero-install environment.
+allows practitioners to run all examples in a zero-install environment, and the
+software has been used in production data-analysis workflows in the Apache Spark
+ecosystem (Cloudera Data Science Workbench) and at CAC Corporation, Japan, for
+customer analytics including speech-emotion-recognition data exploration and
+data-quality optimization by cluster analysis.
 
 # AI Usage Disclosure
 
@@ -250,7 +243,8 @@ inclusion.
 The author thanks the maintainers of Matplotlib [@Hunter2007], Seaborn
 [@Waskom2021], NumPy [@Harris2020], Pandas [@McKinney2010], SciPy [@Virtanen2020],
 and IPython [@Perez2007] for providing the foundational infrastructure on which
-`grplot` is built. No financial support was received for this work. The author
+`grplot` is built. The author also thanks Rinaldi Purnama for early exploratory
+work on unit testing. No financial support was received for this work. The author
 declares no conflict of interest.
 
 # References
