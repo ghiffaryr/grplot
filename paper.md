@@ -68,7 +68,7 @@ project after project:
 
 The multi-panel `plot2d` convenience call that composes these features into
 one function is a secondary, complementary layer: it is most useful for
-quickly assembling *heterogeneous* dashboards (e.g., a histogram, a Pareto
+quickly assembling _heterogeneous_ dashboards (e.g., a histogram, a Pareto
 chart, and an annotated box plot in one figure), where each panel type would
 otherwise require bespoke annotation code (see Software Design for a
 quantified comparison). For homogeneous grids of a single chart type, a short
@@ -134,16 +134,16 @@ philosophy of `ggplot2` and `plotnine`, which favor small, composable,
 independently testable functions over configuration-heavy entry points. That
 approach optimizes for modularity, maintainability, and code reuse across
 distinct plots; `grplot`'s approach instead optimizes for a narrower target
-workflow—producing many *heterogeneous*, consistently annotated panels in a
+workflow—producing many _heterogeneous_, consistently annotated panels in a
 single notebook or report—where repeating boilerplate across chart families is
 the more common failure mode. To quantify where this trade-off actually pays
 off, we compared line counts for two equivalent dashboards implemented with
 `grplot` and with vanilla Matplotlib/Seaborn:
 
-| Dashboard                                                                                   | `grplot` | Matplotlib/Seaborn | Ratio |
-| --------------------------------------------------------------------------------------------| -------- | ------------------- | ----- |
-| 6 heterogeneous panels (histogram+KDE+stats, ECDF, treemap, pie, Pareto, box+strip+CI)       | 32 lines | 101 lines           | 3.2×  |
-| 9 homogeneous panels (boxplot only, repeated across a metric/cluster grid)                   | 37 lines | 34 lines            | ~1.0× |
+| Dashboard                                                                              | `grplot` | Matplotlib/Seaborn | Ratio |
+| -------------------------------------------------------------------------------------- | -------- | ------------------ | ----- |
+| 6 heterogeneous panels (histogram+KDE+stats, ECDF, treemap, pie, Pareto, box+strip+CI) | 32 lines | 101 lines          | 3.2×  |
+| 9 homogeneous panels (boxplot only, repeated across a metric/cluster grid)             | 37 lines | 34 lines           | ~1.0× |
 
 The advantage is concentrated in the first case: mixing several chart families
 that each require their own statistical-annotation code (quantile lines, a
@@ -221,8 +221,7 @@ scratch. `grplot` supports reproducibility by making figure-generation code conc
 readable, and easy to version-control, and it integrates naturally into Jupyter
 notebook environments widely used in data science research.
 
-Since its public release, `grplot` has accumulated more than 98,000 cumulative
-downloads on PyPI (source: pepy.tech, retrieved 2026-02-28). An interactive
+An interactive
 [Colab documentation notebook](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g)
 allows practitioners to run all examples in a zero-install environment.
 
