@@ -221,8 +221,7 @@ scratch. `grplot` supports reproducibility by making figure-generation code conc
 readable, and easy to version-control, and it integrates naturally into Jupyter
 notebook environments widely used in data science research.
 
-Since its public release, `grplot` has accumulated more than 98,000 cumulative
-downloads on PyPI (source: pepy.tech, retrieved 2026-02-28). An interactive
+An interactive
 [Colab documentation notebook](https://colab.research.google.com/drive/1jkOoWooJgrr9xgEF6KWyNi56_Naqum_g)
 allows practitioners to run all examples in a zero-install environment.
 
