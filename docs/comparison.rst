@@ -7,9 +7,9 @@ dashboard implemented both ways so you can judge the difference directly.
 Six-panel statistical dashboard
 --------------------------------
 
-The dashboard below combines six different chart families — a histogram
+The dashboard below combines six different chart families (a histogram
 with KDE and summary statistics, an ECDF, a treemap, a pie chart, a Pareto
-chart, and an annotated box + strip plot — each requiring its own
+chart, and an annotated box + strip plot), each requiring its own
 statistical-annotation logic (quantile lines and a stats box, a twin-axis
 cumulative curve, confidence-interval whiskers).
 
@@ -170,7 +170,7 @@ Using Matplotlib/Seaborn
    plt.tight_layout()
    plt.savefig('dashboard.png', dpi=100, bbox_inches='tight')
 
-**101 lines** — roughly 3x longer, because each panel's statistical
+**101 lines**, roughly 3x longer, because each panel's statistical
 annotation (the stats box, the twin-axis cumulative line, the confidence
 interval) is written out by hand instead of being generated from a
 declarative argument.
@@ -183,8 +183,8 @@ Where the difference disappears
 --------------------------------
 
 This advantage is not universal, and it would be misleading to imply
-otherwise. For a grid of *one repeated chart type* — nine box plots across a
-metric/cluster grid, for example — grplot (37 lines) and a short Matplotlib
+otherwise. For a grid of *one repeated chart type* (nine box plots across a
+metric/cluster grid, for example), grplot (37 lines) and a short Matplotlib
 loop (34 lines) come out roughly the same length. grplot's boilerplate
 reduction is concentrated in dashboards that mix several chart families, each
 needing its own statistical-annotation code; it offers no particular

@@ -5,7 +5,7 @@ grplot
 
 .. container:: hero-tagline
 
-   Publication-ready statistical plots — **one function, zero boilerplate.**
+   Publication-ready statistical plots: **one function, zero boilerplate.**
 
 
 .. |pypi_ver| image:: https://img.shields.io/pypi/v/grplot.svg
@@ -53,7 +53,7 @@ grplot
    :align: center
 
 *A histogram with KDE and summary statistics, an ECDF, a treemap, a pie
-chart, a Pareto chart, and an annotated box + strip plot — six different
+chart, a Pareto chart, and an annotated box + strip plot: six different
 chart families, fully annotated, produced by one* ``plot2d`` *call. See*
 :doc:`comparison` *for the equivalent Matplotlib/Seaborn code side by side,*
 :doc:`plots/dashboard` *for this example's full write-up, and*
@@ -66,7 +66,7 @@ chart families, fully annotated, produced by one* ``plot2d`` *call. See*
 
       - 📐 Smart figure sizing & multi-panel layout
       - 💱 Thousand separators & currency symbols
-      - 📊 20+ plot types — scatter, box, violin & more
+      - 📊 20+ plot types: scatter, box, violin & more
       - 🏷️ Automatic bar labels & point annotations
       - 📈 On-plot statistical summaries
       - 🔄 Tick rotation & unit labels
