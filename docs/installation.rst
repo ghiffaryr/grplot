@@ -1,7 +1,7 @@
 Installation
 ============
 
-Pip — PyPI
+Pip (PyPI)
 ----------
 
 .. code-block:: bash
@@ -18,7 +18,7 @@ Conda
 How to Update
 -------------
 
-Pip — PyPI
+Pip (PyPI)
 ~~~~~~~~~~
 
 .. code-block:: bash

@@ -1,4 +1,4 @@
-/* Custom CSS for grplot documentation — GitHub-inspired theme */
+/* Custom CSS for grplot documentation: GitHub-inspired theme */
 
 /* ── Code blocks ── */
 [data-theme="dark"] .highlight {
@@ -168,7 +168,7 @@ article img {
     box-shadow: 0 2px 12px rgba(140, 149, 159, 0.25);
 }
 
-/* ── Admonitions — note, tip, warning ── */
+/* ── Admonitions: note, tip, warning ── */
 .admonition {
     border-radius: 0 6px 6px 0;
     padding: 0.75em 1em;

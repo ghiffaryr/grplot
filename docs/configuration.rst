@@ -3,7 +3,7 @@ Configuration
 
 The following configurations help you optimize grplot for your specific environment.
 
-Image Quality — Dots per Inch
+Image Quality (Dots per Inch)
 -----------------------------
 
 By default, `grplot` ensures figures use a high-resolution DPI of 300. This
@@ -19,7 +19,7 @@ set it before creating any plots, for example:
 Unsupported de Python Locale Solution
 -------------------------------------
 
-Not all environments support the `de` Python locale, which can break the matplotlib axis formatter for thousand separators. The alternative implementation—directly drawing the string—will always work. To use it, pass the following argument before plotting:
+Not all environments support the `de` Python locale, which can break the matplotlib axis formatter for thousand separators. The alternative implementation (directly drawing the string) will always work. To use it, pass the following argument before plotting:
 
 .. code-block:: python
 
