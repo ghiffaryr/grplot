@@ -239,7 +239,7 @@ inclusion.
 The author thanks the maintainers of Matplotlib [@Hunter2007], Seaborn
 [@Waskom2021], NumPy [@Harris2020], Pandas [@McKinney2010], SciPy [@Virtanen2020],
 and IPython [@Perez2007] for providing the foundational infrastructure on which
-`grplot` is built. The author also thanks @renardelyon for early contributions
+`grplot` is built. The author also thanks renardelyon for early contributions
 to unit testing in the initial development phase. No financial support was
 received for this work. The author
 declares no conflict of interest.
