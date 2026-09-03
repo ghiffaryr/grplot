@@ -141,9 +141,9 @@ off, we compared line counts for two equivalent dashboards implemented with
 `grplot` and with vanilla Matplotlib/Seaborn:
 
 | Dashboard                                                                                   | `grplot` | Matplotlib/Seaborn | Ratio |
-| --------------------------------------------------------------------------------------------| -------- | ------------------- | ----- |
-| 6 heterogeneous panels (histogram+KDE+stats, ECDF, treemap, pie, Pareto, box+strip+CI)       | 32 lines | 101 lines           | 3.2×  |
-| 9 homogeneous panels (boxplot only, repeated across a metric/cluster grid)                   | 37 lines | 34 lines            | ~1.0× |
+|----------------------------------------|----------|----------------------|----------|
+| 6 heterogeneous panels (histogram+KDE+stats, ECDF, treemap, pie, Pareto, box+strip+CI)       | 32 lines | 101 lines           | 3.2×     |
+| 9 homogeneous panels (boxplot only, repeated across a metric/cluster grid)                   | 37 lines | 34 lines            | ~1.0×    |
 
 The advantage is concentrated in the first case: mixing several chart families
 that each require their own statistical-annotation code (quantile lines, a
@@ -161,7 +161,7 @@ losing that granularity.
 `grplot` wraps 20 chart types across four families:
 
 | Family       | Chart types                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Relational   | `scatterplot`, `lineplot`                                                                                         |
 | Distribution | `histplot`, `kdeplot`, `ecdfplot`, `rugplot`, `pieplot`, `treemapsplot`, `packedbubblesplot`                      |
 | Categorical  | `stripplot`, `swarmplot`, `boxplot`, `violinplot`, `boxenplot`, `pointplot`, `barplot`, `countplot`, `paretoplot` |
