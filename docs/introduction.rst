@@ -1,17 +1,26 @@
 Introduction
 ============
 
-grplot introduces powerful features through an intuitive, hierarchical argument system. Every feature is directly accessible via ``plot2d`` parameters, allowing you to configure everything from high-level data inputs to the finest label details in a single function call.
+grplot reduces the boilerplate of producing annotated, publication-ready
+statistical figures: subplot layout, tick/number formatting, inset
+statistical summaries, and value-label annotations are configured through
+``plot2d`` parameters instead of separate Matplotlib/Seaborn calls per
+figure. This page documents the hierarchical argument system and
+configuration options that apply across *every* plot type. For a direct,
+line-by-line comparison against equivalent Matplotlib/Seaborn code, see
+:doc:`comparison`. For worked, runnable examples of each individual chart
+with rendered output, see :doc:`plot_types`; for multi-panel dashboards
+combining several chart types in one call, see :doc:`plots/dashboard`.
 
 Understanding the Argument System
 ---------------------------------
 
 Arguments in grplot are processed at four different levels of granularity:
 
-- **Ordinary arguments** — Apply to the entire figure (e.g., ``df``, ``figsize``, ``Nx``).
-- **Axes arguments** — Apply to specific subplots (e.g., ``plot``, ``filter``, ``title``).
-- **Axes-plot arguments** — Apply to specific plots within a subplot (e.g., ``zorder``).
-- **Axes-axislabel arguments** — Apply to specific axes and labels (e.g., ``lim``, ``sep``).
+- **Ordinary arguments**: Apply to the entire figure (e.g., ``df``, ``figsize``, ``Nx``).
+- **Axes arguments**: Apply to specific subplots (e.g., ``plot``, ``filter``, ``title``).
+- **Axes-plot arguments**: Apply to specific plots within a subplot (e.g., ``zorder``).
+- **Axes-axislabel arguments**: Apply to specific axes and labels (e.g., ``lim``, ``sep``).
 
 💡 **Global Rule: The X and Y Counterparts**
 
@@ -291,7 +300,7 @@ Manage system resources and save your output. Both are Ordinary arguments.
    * - ``optimizer``
      - str
      - ``'perf'``
-     - ``'perf'``/``'pandas'`` — fast, more memory. ``'saver'``/``'numpy'`` — slower, less memory.
+      - ``'perf'``/``'pandas'``: fast, more memory. ``'saver'``/``'numpy'``: slower, less memory.
    * - ``saveas``
      - str or None
      - ``None``
