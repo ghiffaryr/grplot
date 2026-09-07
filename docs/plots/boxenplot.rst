@@ -51,7 +51,7 @@ Draw an enhanced box plot for larger datasets.
    Method to use for the width of the letter value boxes: - "exponential": Represent the corresponding percentile - "linear": Decrease by a constant amount for each box - "area": Represent the density of data points in that box
 
 ``k_depth`` *(str or int, default: 'tukey')*
-   The number of levels to compute and draw in each tail: - "tukey": Use log2(n) - 3 levels, covering similar range as boxplot whiskers - "proportion": Leave approximately outlier_prop fliers - "trusthworthy": Extend to level with confidence of at least trust_alpha - "full": Use log2(n) + 1 levels and extend to most extreme points
+   The number of levels to compute and draw in each tail: - "tukey": Use log2(n) - 3 levels, covering similar range as boxplot whiskers - "proportion": Leave approximately outlier_prop fliers - "trustworthy": Extend to level with confidence of at least trust_alpha - "full": Use log2(n) + 1 levels and extend to most extreme points
 
 ``outlier_prop`` *(float, default: 0.007)*
    Proportion of data expected to be outliers; used when k_depth="proportion".
